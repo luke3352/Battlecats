@@ -1,6 +1,4 @@
-/build/
-/benchpress-build/
-.DS_Store
+_Store
 gen_docs.disable
 test.disable
 regression/temp*.html
