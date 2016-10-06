@@ -173,8 +173,8 @@ setInterval(function() {
 		var player = PLAYER_LIST[i];
 		player.updatePosition();
 		pack.push({
-			x : player.x,
-			y : player.y,
+			x : player.position.x,
+			y : player.position.y,
 			number : player.number
 		});
 	}

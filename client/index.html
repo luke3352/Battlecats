@@ -23,12 +23,12 @@
 					ctx.fillText(data[i].number, data[i].x, data[i].y);
 			});
 
-			document.getElementById("Menu").onclick = function(event) {
-				socket.emit('menu');
-			}
-			document.getElementById("Pause").onclick = function(event) {
-				socket.emit('pause');
-			}
+			//document.getElementById("Menu").onclick = function(event) {
+			//	socket.emit('menu');
+			//}
+			//document.getElementById("Pause").onclick = function(event) {
+			//	socket.emit('pause');
+			//}
 			
 			document.onkeydown = function(event) {
 				if (event.keyCode === 68) //d
