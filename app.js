@@ -9,7 +9,7 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(8080);
+serv.listen(2000);
 console.log("Server started.");
 /*
  * List of sockets
@@ -76,7 +76,11 @@ var Room = function(id) {
 		numOfPlayers: 4, //Default selection
 		pressingStart: false, //Other buttons like this
 		isPublic: false, //Public or private
-		
+		roomName: "", 
+		password: "",
+		gameMode: 1, //default game mode is stock 
+		gameModeVal: 3, // either stock or time
+		items: false, //items disabled for now
 	};
 	//TODO Room options
 	return self;
@@ -165,6 +169,28 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'up') player.pressingUp = data.state;
 		else if (data.inputId === 'down') player.pressingDown = data.state;
 	});
+	//creates room
+	socket.on('sendCreateRoomData',function(data){
+        var room = Room(1);
+		
+		room = roomName = data[0];
+		room = isPublic = data[1];
+		room = password = data[2];
+		room = numOfPlayers = data[3];
+		room = gameMode = data[4];
+		room = gameModeVal = data[5];
+		room = items = data[6];
+			
+    });	
+	
+	// HANDLES MESSAGES
+    socket.on('sendMsgToServer',function(data){
+        var playerName = ("" + socket.id).slice(2,7);
+        for(var i in SOCKET_LIST){
+            SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
+        }
+    });	
+	
 });
 
 setInterval(function() {
