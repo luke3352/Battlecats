@@ -3,12 +3,216 @@
 <head>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
+<style>
+
+	#picture {
+    position: absolute;
+}
+
+.display, .rectangle {
+    position: absolute;
+	z-index: 9999;
+    width: 1000px;
+    height: 700px;
+    border-radius: 20px;
+    background-color: #f4d942;
+    border: 2px solid #ccc;
+}
+
+.rectangle {
+    top: 0px;
+    left: 0px;
+}
+#buttonJoin{
+	margin-left:370px;
+    margin-top: 350px;
+}
+
+#buttonCreateGame{
+	margin-left: 400px;
+    margin-top: 350px;
+}
+
+#CreateRoom{
+float: left;
+
+}
+</style>
 </head>
 
 <body>
 	<div>
 		<canvas id="ctx" width="500" height="500"
 			style="border: 1px solid #000000;"></canvas>
+
+			<div id="SelectRoom">
+		
+		<div class="rectangle">
+		<p align = "Center">BATTLE CATS</p>
+		<button id="buttonJoin" >Join Room</button>
+		<button id="buttonCreate">Create Room</button>
+		<button id="buttonOptions">Options</button>
+		<button id="buttonHide">Hide</button>
+		</div>
+</div>
+
+<div align= "left" id="CreateRoom">
+      
+	<div class="rectangle">
+		<p align = "Center">CREATE ROOM</p>
+		<form>
+		Game Name:<br>
+		<input type="text" id="gamename" required><br><br>
+		Public:
+		<input type="checkbox" id="public"><br><br>
+		<p id = "passwordText">Password:</p>
+		<input type="text" id="password">
+		<br><br>
+		Players: 
+		<select id="numPlayers">
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+		</select>
+		
+		<br><br>
+		Game Mode: 
+		<select id="gameMode">
+			<option value="1">Stock</option>
+			<option value="2">Time</option>
+		</select>
+		
+		<select class="1-100"></select>
+		
+		<br><br>
+		Items:
+		<input type="checkbox" id="items"><br><br>
+		
+		<br>
+		
+		</form>
+	<button align = "left" id="buttonCreateGame">Create Game</button>
+	</div>
+</div>
+
+<div id = "joinRoom">
+
+	<div class="rectangle">
+	<p align = "Center">JOIN ROOM</p>
+	<input id="chat-input" type="text" style="width:500px"></input>
+	<button align = "left" id="buttonCharacterSelect">Character Select</button>
+
+	</div>
+
+</div>
+
+<div id = "characterSelect">
+
+	<div class="rectangle">
+	<p align = "Center">CHARACTER SELECT</p>
+	<button align = "left" id="buttonWeaponSelect">Weapon Select</button>
+
+	</div>
+
+</div>
+
+<div id = "weaponSelect">
+
+	<div class="rectangle">
+	<p align = "Center">WEAPON SELECT</p>
+	<button align = "left" id="buttonReady">Ready</button>
+	</div>
+
+</div>
+
+<div id = "optionsSelect">
+	
+	<div class="rectangle">
+	<p align = "Center">OPTIONS</p>
+	<button align = "left" id="buttonBack">Back</button>
+	</div>
+
+</div>
+
+
+
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+var publicCheckBox = false;
+	//handles buttons, simply hides the buttons for the page when a button is pressed
+$(document).ready(function(){
+	
+	$(CreateRoom).hide();
+	$(joinRoom).hide();
+	$(SelectRoom).show();
+	$(characterSelect).hide();
+	$(weaponSelect).hide();
+	$(optionsSelect).hide();
+});
+
+$("#buttonCreate").click(function(){
+        $(CreateRoom).show();
+		$(SelectRoom).hide();
+	
+		
+		$("#public").click(function(){
+		if(publicCheckBox==false)
+		{
+			$(password).hide();
+			$("#passwordText").hide();
+			publicCheckBox=true;
+		}
+		else{
+			$(password).show();
+			$("p").show();
+			publicCheckBox=false;
+		}
+		});
+		
+    });
+$("#buttonCreateGame").click(function(){
+			$(CreateRoom).hide();
+			$(joinRoom).show();
+		});
+		
+$("#buttonCharacterSelect").click(function(){
+			$(joinRoom).hide();
+			$(characterSelect).show();
+		});
+		
+$("#buttonJoin").click(function(){
+			$(joinRoom).show();
+			$(SelectRoom).hide();
+		});
+		
+$("#buttonWeaponSelect").click(function(){
+			$(characterSelect).hide();
+			$(weaponSelect).show();
+		});
+		
+$("#buttonOptions").click(function(){
+			$(SelectRoom).hide();
+			$(optionsSelect).show();
+		});
+		
+$("#buttonBack").click(function(){
+			$(SelectRoom).show();
+			$(optionsSelect).hide();
+		});
+$("#buttonHide").click(function(){
+			$(SelectRoom).hide();
+		});
+		
+$(function(){
+    var $select = $(".1-100");
+    for (i=1;i<=100;i++){
+        $select.append($('<option></option>').val(i).html(i))
+    }
+});
+
+
+
+</script>
 
 		<script>
 			var ctx = document.getElementById("ctx").getContext("2d");
