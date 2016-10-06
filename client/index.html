@@ -3,6 +3,7 @@
 <head>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
+
 <style>
 
 	#picture {
@@ -59,15 +60,20 @@ float: left;
 <div align= "left" id="CreateRoom">
       
 	<div class="rectangle">
+	
 		<p align = "Center">CREATE ROOM</p>
 		<form>
+		
 		Game Name:<br>
 		<input type="text" id="gamename" required><br><br>
+		
 		Public:
 		<input type="checkbox" id="public"><br><br>
+		
 		<p id = "passwordText">Password:</p>
 		<input type="text" id="password">
 		<br><br>
+		
 		Players: 
 		<select id="numPlayers">
 			<option value="2">2</option>
@@ -82,25 +88,39 @@ float: left;
 			<option value="2">Time</option>
 		</select>
 		
-		<select class="1-100"></select>
+		<select id = "gameModeValue" class="1-100"></select>
 		
 		<br><br>
 		Items:
-		<input type="checkbox" id="items"><br><br>
+		<input type="checkbox" id="items">
+		<br><br>
 		
 		<br>
 		
+		
 		</form>
-	<button align = "left" id="buttonCreateGame">Create Game</button>
+		<button align = "left" id="buttonCreateGame">Create Game</button>
+		
+		
 	</div>
 </div>
 
 <div id = "joinRoom">
 
 	<div class="rectangle">
+	
 	<p align = "Center">JOIN ROOM</p>
-	<input id="chat-input" type="text" style="width:500px"></input>
-	<button align = "left" id="buttonCharacterSelect">Character Select</button>
+	
+		<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+			<div>Enter a message!</div>
+		</div>
+		
+		<form id="chat-form">
+			<input id="chat-input" type="text" style="width:500px"></input>
+		</form>
+		<br><br>
+		
+		<button align = "left" id="buttonCharacterSelect">Character Select</button>
 
 	</div>
 
@@ -173,6 +193,7 @@ $("#buttonCreate").click(function(){
 $("#buttonCreateGame").click(function(){
 			$(CreateRoom).hide();
 			$(joinRoom).show();
+			getFormData();
 		});
 		
 $("#buttonCharacterSelect").click(function(){
@@ -218,21 +239,50 @@ $(function(){
 			var ctx = document.getElementById("ctx").getContext("2d");
 			ctx.font = '30px Arial';
 
+			    var chatText = document.getElementById('chat-text');
+			var chatInput = document.getElementById('chat-input');
+			var chatForm = document.getElementById('chat-form');
+    
 			var socket = io();
-
+			// Updates the chat	
+			socket.on('addToChat',function(data){
+			chatText.innerHTML += '<div>' + data + '</div>';
+			});
+			// Update
 		    
 			socket.on('newPositions', function(data) {
 				ctx.clearRect(0, 0, 500, 500);
 				for (var i = 0; i < data.length; i++)
 					ctx.fillText(data[i].number, data[i].x, data[i].y);
 			});
-
-			document.getElementById("Menu").onclick = function(event) {
+			
+			function getFormData(){
+			//gathers data from the create room form
+			var gameName = document.getElementById("gamename").value;
+			var publicBoolean = document.getElementById("public").value;
+			var password = document.getElementById("password").value;
+			var numPlayers = document.getElementById("numPlayers").value;
+			var gameMode = document.getElementById("gameMode").value;
+			var gameModeValue = document.getElementById("gameModeValue").value;
+			var items = document.getElementById("items").value;
+			
+			//puts data into string for sending
+			var sendCreateRoomData = [gameName, publicBoolean, password, numPlayers, gameMode, gameModeValue, items];
+			socket.emit('sendCreateRoomData',sendCreateRoomData);
+			}
+			
+			/*document.getElementById("Menu").onclick = function(event) {
 				socket.emit('menu');
 			}
 			document.getElementById("Pause").onclick = function(event) {
 				socket.emit('pause');
-			}
+			}*/
+			
+			 chatForm.onsubmit = function(e){
+			 e.preventDefault();
+			 socket.emit('sendMsgToServer',chatInput.value);
+			 chatInput.value = '';      
+			 }
 			
 			document.onkeydown = function(event) {
 				if (event.keyCode === 68) //d
