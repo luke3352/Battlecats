@@ -11,14 +11,75 @@ app.use('/client', express.static(__dirname + '/client'));
 
 serv.listen(8080);
 console.log("Server started.");
-
+/*
+ * List of sockets
+ */
 var SOCKET_LIST = {};
+/*
+ * List of in game players
+ */
 var PLAYER_LIST = {};
+//TODO
+/* 
+ * Should include socket ID and Username
+ */
+var USER_LIST = {};
+/*
+ * Should include private and public rooms that players can join
+ */
+var ROOMS_LIST = {};
 
+/*
+ * Parent of host, players, etc
+ */
+var User = function(id, name) {
+	var self = {
+		username: name,
+		id: id,
+		type: "", // Admin? Regular? Developer?
+		ingame: false,
+		game: {},
+		
+	}
+	//TODO Handle input
+}
+
+/*
+ * Creates room
+ * Handles host input
+ */
+var Host = function(id) {
+	var self = {
+		room: new Room(id), //Room Creation?
+		pressingStart: false,
+	}
+	//TODO Handle input
+}
+
+/*
+ * Handles room settings
+ */
+var Room = function(id) {
+	var self = {
+		roomHost: {}, //Host has different options
+		roomPlayers: [], //Players have different options
+		numOfPlayers: 4, //Default selection
+		pressingStart: false, //Other buttons like this
+		isPublic: false, //Public or private
+		
+	};
+	//TODO Room options
+}
+
+/*
+ * In game players
+ */
 var Player = function(id) {
 	var self = {
-		x : 250,
-		y : 250,
+		position : {
+			x : 250,
+			y : 250,
+		},
 		id : id,
 		number : "" + Math.floor(10 * Math.random()),
 		pressingRight : false,
@@ -27,19 +88,36 @@ var Player = function(id) {
 		pressingDown : false,
 		maxSpd : 10,
 	}
+	//Check if players share the same position
 	self.updatePosition = function() {
-		if (self.pressingRight)
-			self.x += self.maxSpd;
-		if (self.pressingLeft)
-			self.x -= self.maxSpd;
-		if (self.pressingUp)
-			self.y -= self.maxSpd;
-		if (self.pressingDown)
-			self.y += self.maxSpd;
+		for ( var i in PLAYER_LIST) {
+			//check for collision
+			if(collision(self, PLAYER_LIST[i])) {
+				
+			}
+			if (self.pressingRight) {
+				self.position.x += self.maxSpd;
+			}
+			if (self.pressingLeft) {
+				self.position.x -= self.maxSpd;
+			}
+			if (self.pressingUp) {
+				self.position.y -= self.maxSpd;
+			}
+			if (self.pressingDown) {
+				self.position.y += self.maxSpd;
+			}
+		}
+		function collision(self, enemy) {
+			
+		}
 	}
+	//TODO Handle Input
 	return self;
 }
 
+
+//
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
 	socket.id = Math.random();
@@ -54,14 +132,10 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('keyPress', function(data) {
-		if (data.inputId === 'left')
-			player.pressingLeft = data.state;
-		else if (data.inputId === 'right')
-			player.pressingRight = data.state;
-		else if (data.inputId === 'up')
-			player.pressingUp = data.state;
-		else if (data.inputId === 'down')
-			player.pressingDown = data.state;
+		if (data.inputId === 'left') player.pressingLeft = data.state;
+		else if (data.inputId === 'right') player.pressingRight = data.state;
+		else if (data.inputId === 'up') player.pressingUp = data.state;
+		else if (data.inputId === 'down') player.pressingDown = data.state;
 	});
 });
 
@@ -78,6 +152,10 @@ setInterval(function() {
 	}
 	for ( var i in SOCKET_LIST) {
 		var socket = SOCKET_LIST[i];
+		//TODO
+		// IN GAME SOCKETS
 		socket.emit('newPositions', pack);
+		
+		// PLAYER ROOM SOCKETS
 	}
 }, 1000 / 25);
