@@ -28,6 +28,14 @@ var USER_LIST = {};
  * Should include private and public rooms that players can join
  */
 var ROOMS_LIST = {};
+/*
+ * List of characters
+ */
+var CHARACTER_LIST = {};
+/*
+ * List of weapons
+ */
+var WEAPON_LIST = {};
 
 /*
  * Parent of host, players, etc
@@ -42,6 +50,7 @@ var User = function(id, name) {
 		
 	}
 	//TODO Handle input
+	return self;
 }
 
 /*
@@ -54,6 +63,7 @@ var Host = function(id) {
 		pressingStart: false,
 	}
 	//TODO Handle input
+	return self;
 }
 
 /*
@@ -69,6 +79,7 @@ var Room = function(id) {
 		
 	};
 	//TODO Room options
+	return self;
 }
 
 /*
@@ -80,12 +91,15 @@ var Player = function(id) {
 			x : 250,
 			y : 250,
 		},
+		weapon : {},
+		character : {},
 		id : id,
 		number : "" + Math.floor(10 * Math.random()),
 		pressingRight : false,
 		pressingLeft : false,
 		pressingUp : false,
 		pressingDown : false,
+		attack : false,
 		maxSpd : 10,
 	}
 	//Check if players share the same position
@@ -115,7 +129,21 @@ var Player = function(id) {
 	//TODO Handle Input
 	return self;
 }
-
+/*
+ * In game weapon
+ */
+var Weapon = function() {
+	var self = {
+		attack : 0,
+		defense : 0,
+		length : 0,
+		width : 0,
+		crit : 0,
+		speed : 0,
+	}
+	//TODO Weapon interactions
+	return self;
+}
 
 //
 var io = require('socket.io')(serv, {});
