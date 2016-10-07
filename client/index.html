@@ -167,7 +167,6 @@ float: left;
 
 </div>
 
-
 			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script>
 var publicCheckBox = false;
@@ -180,6 +179,7 @@ $(document).ready(function(){
 	$(characterSelect).hide();
 	$(weaponSelect).hide();
 	$(optionsSelect).hide();
+	$(optionsSelectInGame).hide();
 });
 
 $("#buttonCreate").click(function(){
@@ -239,6 +239,7 @@ $("#buttonReady").click(function(){
 			$(weaponSelect).hide();
 		});
 
+		
 $(function(){
     var $select = $(".1-100");
     for (i=1;i<=100;i++){
@@ -303,7 +304,7 @@ $(function(){
 			 socket.emit('sendMsgToServer',chatInput.value);
 			 chatInput.value = '';      
 			 }
-			
+			var toggle = false;
 			document.onkeydown = function(event) {
 				if (event.keyCode === 68) //d
 					socket.emit('keyPress', {
@@ -325,11 +326,11 @@ $(function(){
 						inputId : 'up',
 						state : true
 					});
-				else if (event.keyCode === 87) //w
-					socket.emit('keyPress', {
-						inputId : 'up',
-						state : true
-					});
+				else if (event.keyCode === 9) //tab
+					{
+						$(optionsSelectInGame).show();
+					}
+
 
 			}
 			document.onkeyup = function(event) {
@@ -353,6 +354,11 @@ $(function(){
 						inputId : 'up',
 						state : false
 					});
+				else if (event.keyCode === 9) //tab
+						{$(optionsSelectInGame).hide();
+						}
+				
+					
 			}
 		</script>
 	</div>
