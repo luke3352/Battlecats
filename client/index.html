@@ -130,8 +130,12 @@ float: left;
 
 	<div class="rectangle">
 	<p align = "Center">CHARACTER SELECT</p>
+	
+	<br><br>
+	<p align = "Center">Pick a Color!</p>
+	<br><br><br>
 	<button align = "left" id="buttonWeaponSelect">Weapon Select</button>
-
+	
 	</div>
 
 </div>
@@ -154,6 +158,14 @@ float: left;
 
 </div>
 
+<div id = "optionsSelectInGame">
+	
+	<div class="rectangle">
+	<p align = "Center">OPTIONS</p>
+	<button align = "left" id="buttonBackInGame">Back</button>
+	</div>
+
+</div>
 
 
 			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -223,15 +235,16 @@ $("#buttonBack").click(function(){
 $("#buttonHide").click(function(){
 			$(SelectRoom).hide();
 		});
-		
+$("#buttonReady").click(function(){
+			$(weaponSelect).hide();
+		});
+
 $(function(){
     var $select = $(".1-100");
     for (i=1;i<=100;i++){
         $select.append($('<option></option>').val(i).html(i))
     }
 });
-
-
 
 </script>
 
@@ -305,6 +318,11 @@ $(function(){
 				else if (event.keyCode === 65) //a
 					socket.emit('keyPress', {
 						inputId : 'left',
+						state : true
+					});
+				else if (event.keyCode === 87) //w
+					socket.emit('keyPress', {
+						inputId : 'up',
 						state : true
 					});
 				else if (event.keyCode === 87) //w

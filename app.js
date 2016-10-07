@@ -9,7 +9,7 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2000);
+serv.listen(2002);
 console.log("Server started.");
 /*
  * List of sockets
@@ -173,14 +173,14 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendCreateRoomData',function(data){
         var room = Room(1);
 		
-		room = roomName = data[0];
-		room = isPublic = data[1];
-		room = password = data[2];
-		room = numOfPlayers = data[3];
-		room = gameMode = data[4];
-		room = gameModeVal = data[5];
-		room = items = data[6];
-			
+		room.roomName = data[0];
+		room.isPublic = data[1];
+		room.password = data[2];
+		room.numOfPlayers = data[3];
+		room.gameMode = data[4];
+		room.gameModeVal = data[5];
+		room.items = data[6];
+			console.log(room.roomName);
     });	
 	
 	// HANDLES MESSAGES
