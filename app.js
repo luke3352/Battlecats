@@ -9,7 +9,11 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(__dirname + '/client'));
 
+<<<<<<< HEAD
 serv.listen(2002);
+=======
+serv.listen(2001);
+>>>>>>> 5b9cad79a50fac62082a604aec06964cf4a664a1
 console.log("Server started.");
 /*
  * List of sockets
