@@ -24,10 +24,6 @@
 	left: 0px;
 }
 
-#buttonLogin {
-	
-}
-
 #buttonJoin {
 	margin-left: 370px;
 	margin-top: 350px;
@@ -54,11 +50,10 @@
 				<fieldset>
 					<legend>login</legend>
 					
-						username:<br> <input type="text" id="gamename" required><br>
+						username:<br> <input type="text" id="username" required><br>
 				<br> password:<br> <input type="text" id="password"><br>
 				<br>
 					
-					</p>
 				</fieldset>
 			</form>
 			<button style="align: 'left'" id="buttonContinue">Continue</button>
@@ -191,7 +186,7 @@
 			$(weaponSelect).hide();
 			$(optionsSelect).hide();
 			$(login).hide();
-			getFormData();
+			getloginFormData();
 		});
 		
 		$("#buttonCreate").click(function() {
@@ -216,7 +211,7 @@
 			$(CreateRoom).hide();
 			$(login).hide();
 			$(joinRoom).show();
-			getFormData();
+			getroomFormData();
 		});
 
 		$("#buttonCharacterSelect").click(function() {
@@ -253,9 +248,7 @@
 				$select.append($('<option></option>').val(i).html(i))
 			}
 		});
-	</script>
 
-	<script>
 		var ctx = document.getElementById("ctx").getContext("2d");
 		ctx.font = '30px Arial';
 
@@ -283,7 +276,7 @@
 		//	socket.emit('pause');
 		//}
 
-		function getFormData() {
+		function getRoomFormData() {
 			//gathers data from the create room form
 			var gameName = document.getElementById("gamename").value;
 			var publicBoolean = document.getElementById("public").value;
@@ -298,6 +291,20 @@
 					numPlayers, gameMode, gameModeValue, items ];
 			socket.emit('sendCreateRoomData', sendCreateRoomData);
 		}
+		
+		function getloginFormData() {
+			console.log("calledgetloginformdata")
+			//gathers data from the login form
+			var username = document.getElementById("username").value;
+			var password = document.getElementById("password").value;
+			//puts data into string for sending
+			var sendLoginData = {username: username, password: password };
+			
+			socket.emit('sendLoginData', sendLoginData);
+			console.log("sent socket data");
+		}
+		
+		
 
 		/*document.getElementById("Menu").onclick = function(event) {
 			socket.emit('menu');

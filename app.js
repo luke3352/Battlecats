@@ -1,36 +1,7 @@
 //app.js
 var express = require('express');
-var mysql = require("mysql");
 var app = express();
 var serv = require('http').Server(app);
-
-var connection = mysql.createConnection({
-	  host     : 'mysql.cs.iastate.edu',
-	  user     : 'dbu309la07',
-	  password : '5rqZthHkdvd',
-	  database : 'db309la07'
-	});
-
-connection.connect(function(error){
-	if (!!error){
-		console.log('Error');
-	}
-	else{
-		console.log('Connected');
-	}
-});
-
-connection.query('SELECT _password from User_Info;', function(err, rows, fields) {
-	connection.end();
-	if (!err){
-	  console.log('The solution is: ', rows);
-	}
-	else{
-	  console.log('Error while performing Query.');
-	}
-});
-
-connection.end();
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -40,6 +11,36 @@ app.use('/client', express.static(__dirname + '/client'));
 
 serv.listen(2002);
 console.log("Server started.");
+
+var connect1 = function(username, password){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+		});
+
+	connection.connect(function(error){
+		if (!!error){
+			console.log('Error');
+		}
+		else{
+			console.log('Connected');
+		}
+
+	console.log(password);
+	connection.query("SELECT _password from User_Info WHERE username = username;", function(err, rows, fields) {
+			
+			if (!err){
+			  console.log(rows);
+			}
+			else{
+			  console.log('Error while performing Query.');
+			}
+		});
+		connection.end();
+	});
+	};
 /*
  * List of sockets
  */
@@ -202,14 +203,22 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendCreateRoomData',function(data){
         var room = Room(1);
 		
-		room = roomName = data[0];
-		room = isPublic = data[1];
-		room = password = data[2];
-		room = numOfPlayers = data[3];
-		room = gameMode = data[4];
-		room = gameModeVal = data[5];
-		room = items = data[6];
-			
+		room.roomName = data[0];
+		room.isPublic = data[1];
+		room.password = data[2];
+		room.numOfPlayers = data[3];
+		room.gameMode = data[4];
+		room.gameModeVal = data[5];
+		room.items = data[6];
+			console.log(room.roomName);
+    });	
+	socket.on('sendLoginData',function(data){
+		console.log("recieved data");
+		 var username = data[0];
+	     var password = data[1];
+	     console.log("set data");
+		connect1(username, password);
+		console.log("connected");
     });	
 	
 	// HANDLES MESSAGES
@@ -219,6 +228,8 @@ io.sockets.on('connection', function(socket) {
             SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
         }
     });	
+    
+    
 	
 });
 
