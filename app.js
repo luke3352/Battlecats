@@ -95,6 +95,8 @@ var Player = function(id) {
 			x : 250,
 			y : 250,
 		},
+		width : 30,
+		height : 30,
 		weapon : {},
 		character : {},
 		id : id,
@@ -201,6 +203,8 @@ setInterval(function() {
 		pack.push({
 			x : player.position.x,
 			y : player.position.y,
+			width : player.width,
+			height : player.height,
 			number : player.number
 		});
 	}
