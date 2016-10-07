@@ -1,7 +1,36 @@
 //app.js
 var express = require('express');
+var mysql = require("mysql");
 var app = express();
 var serv = require('http').Server(app);
+
+var connection = mysql.createConnection({
+	  host     : 'mysql.cs.iastate.edu',
+	  user     : 'dbu309la07',
+	  password : '5rqZthHkdvd',
+	  database : 'db309la07'
+	});
+
+connection.connect(function(error){
+	if (!!error){
+		console.log('Error');
+	}
+	else{
+		console.log('Connected');
+	}
+});
+
+connection.query('SELECT _password from User_Info;', function(err, rows, fields) {
+	connection.end();
+	if (!err){
+	  console.log('The solution is: ', rows);
+	}
+	else{
+	  console.log('Error while performing Query.');
+	}
+});
+
+connection.end();
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -9,7 +38,7 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2001);
+serv.listen(2002);
 console.log("Server started.");
 /*
  * List of sockets
