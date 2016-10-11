@@ -226,9 +226,7 @@ io.sockets.on('connection', function(socket) {
         for(var i in SOCKET_LIST){
             SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
         }
-    });	
-    
-    
+    });	 
 	
 });
 
