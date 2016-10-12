@@ -2,6 +2,7 @@
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
+var mysql = require("mysql");
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -9,8 +10,39 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2002);
+serv.listen(2000);
 console.log("Server started.");
+
+var connect1 = function(user, pass){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+		});
+
+	connection.connect(function(error){
+		if (!!error){
+			console.log('Error');
+		}
+		else{
+			console.log('Connected');
+		}
+
+	console.log(pass);
+	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + user+ "'" +";", function(err, rows, fields) {
+			var string = JSON.stringify(rows);
+			var json = JSON.parse(string);
+			if (!err){
+			  console.log(rows)
+			}
+			else{
+			  console.log('Error while performing Query.');
+			}
+		});
+		connection.end();
+	});
+	};
 /*
  * List of sockets
  */
@@ -95,6 +127,8 @@ var Player = function(id) {
 			x : 250,
 			y : 250,
 		},
+		width : 30,
+		height : 30,
 		weapon : {},
 		character : {},
 		id : id,
@@ -104,7 +138,7 @@ var Player = function(id) {
 		pressingUp : false,
 		pressingDown : false,
 		attack : false,
-		maxSpd : 10,
+		maxSpd : 2,
 	}
 	//Check if players share the same position
 	self.updatePosition = function() {
@@ -183,6 +217,11 @@ io.sockets.on('connection', function(socket) {
 		room.items = data[6];
 			console.log(room.roomName);
     });	
+	socket.on('sendLoginData',function(data){
+		 var username = data.username;
+	     var password = data.password;
+		connect1(username, password);
+    });	
 	
 	// HANDLES MESSAGES
     socket.on('sendMsgToServer',function(data){
@@ -190,7 +229,7 @@ io.sockets.on('connection', function(socket) {
         for(var i in SOCKET_LIST){
             SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
         }
-    });	
+    });	 
 	
 });
 
@@ -202,6 +241,8 @@ setInterval(function() {
 		pack.push({
 			x : player.position.x,
 			y : player.position.y,
+			width : player.width,
+			height : player.height,
 			number : player.number
 		});
 	}
