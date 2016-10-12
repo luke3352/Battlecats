@@ -13,7 +13,7 @@ app.use('/client', express.static(__dirname + '/client'));
 serv.listen(2002);
 console.log("Server started.");
 
-var connect1 = function(user, pass){
+var verifypassword = function(username, password){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
@@ -29,12 +29,20 @@ var connect1 = function(user, pass){
 			console.log('Connected');
 		}
 
-	console.log(pass);
-	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + user+ "'" +";", function(err, rows, fields) {
-			var string = JSON.stringify(rows);
-			var json = JSON.parse(string);
+	console.log(password);
+	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
 			if (!err){
-			  console.log(rows)
+				var string = JSON.stringify(rows);
+				var json = JSON.parse(string);
+				var inputpassword = json[0]._password;
+				if (password === inputpassword){
+					console.log(true);
+					return true;
+				}
+				else{
+					console.log(false);
+					return false;
+				}
 			}
 			else{
 			  console.log('Error while performing Query.');
@@ -43,6 +51,7 @@ var connect1 = function(user, pass){
 		connection.end();
 	});
 	};
+
 /*
  * List of sockets
  */
@@ -217,7 +226,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-		connect1(username, password);
+	     var correctpassword = verifypassword(username, password);
     });	
 	
 	// HANDLES MESSAGES
