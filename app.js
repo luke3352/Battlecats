@@ -129,6 +129,7 @@ var Player = function(id) {
 		function collision(self, enemy) {
 			
 		}
+		
 	}
 	//TODO Handle Input
 	return self;
