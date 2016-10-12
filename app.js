@@ -9,7 +9,7 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2002);
+serv.listen(2000);
 console.log("Server started.");
 /*
  * List of sockets
@@ -106,7 +106,7 @@ var Player = function(id) {
 		pressingUp : false,
 		pressingDown : false,
 		attack : false,
-		maxSpd : 10,
+		maxSpd : 2,
 	}
 	//Check if players share the same position
 	self.updatePosition = function() {
