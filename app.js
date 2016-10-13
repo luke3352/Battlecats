@@ -52,13 +52,14 @@ var verifypassword = function(username, password){
 			console.log('Connected');
 		}
 
-	console.log(password);
 	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
 			if (!err){
 				var string = JSON.stringify(rows);
 				var json = JSON.parse(string);
-				var inputpassword = json[0]._password;
-				if (password === inputpassword){
+				var correctpassword = json[0]._password;
+				console.log("entered password: " + password);
+				console.log("correct password: " + correctpassword)
+				if (password === correctpassword){
 					console.log(true);
 					return true;
 				}
