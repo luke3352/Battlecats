@@ -1,11 +1,34 @@
 //app.js
 var express = require('express');
 var app = express();
+var path = require('path');
 var serv = require('http').Server(app);
 var mysql = require("mysql");
 
+// All HTML files
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/client/index.html');
+	res.sendFile(path.join(__dirname + '/client/index.html'));
+});
+app.get('/login', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/login/login.html'));
+});
+app.get('/mainMenu', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html'));
+});
+app.get('/createRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html'));
+});
+app.get('/joinRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html'));
+});
+app.get('/characterSelect', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/character-select/characterSelect.html'));
+});
+app.get('/weaponSelect', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html'));
+});
+app.get('/game', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/game/game.html'));
 });
 
 app.use('/client', express.static(__dirname + '/client'));
@@ -29,12 +52,11 @@ var connect1 = function(user, pass){
 			console.log('Connected');
 		}
 
-	console.log(pass);
 	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + user+ "'" +";", function(err, rows, fields) {
 			var string = JSON.stringify(rows);
 			var json = JSON.parse(string);
 			if (!err){
-			  console.log(rows)
+
 			}
 			else{
 			  console.log('Error while performing Query.');
@@ -215,7 +237,6 @@ io.sockets.on('connection', function(socket) {
 		room.gameMode = data[4];
 		room.gameModeVal = data[5];
 		room.items = data[6];
-			console.log(room.roomName);
     });	
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+<style>
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}		
+</style>
+</head>
+<body>
+	<div id="joinRoom">
+		<div class="rectangle">
+			<p align="Center">JOIN ROOM</p>
+			<div id="chat-text" style="width: 500px; height: 100px; overflow-y: scroll">
+				<div>Enter a message!</div>
+			</div>
+			<form id="chat-form">
+				<input id="chat-input" type="text" style="width: 500px"></input>
+			</form><br><br>
+			<form action="/characterSelect" method="GET">
+				<input type="submit" style="align: 'left'" id="buttonCharacterSelect" value="Character Select"/>
+			</form>
+		</div>
+	</div>
+
+<script>
+$(document).ready(function() {
+	var socket = io();
+
+	var chatText = document.getElementById('chat-text');
+	var chatInput = document.getElementById('chat-input');
+	var chatForm = document.getElementById('chat-form');
+	
+	// Updates the chat	
+	socket.on('addToChat',function(data){
+		chatText.innerHTML += '<div>' + data + '</div>';
+	});
+	
+	chatForm.onsubmit = function(e){
+		e.preventDefault();
+		socket.emit('sendMsgToServer',chatInput.value);
+		chatInput.value = '';      
+	}
+});
+</script>
+</body>
+</html>

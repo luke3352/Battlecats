@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+
+<style>
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}		
+#CreateRoom {
+	float: left;
+}
+
+#buttonCreateGame {
+	margin-left: 400px;
+	margin-top: 350px;
+}	
+</style>
+</head>
+<body>
+	<div align="left" id="CreateRoom"> 
+		<div class="rectangle"> 
+			<p align="Center">CREATE ROOM</p>
+			<form action="/joinRoom" method="GET"> 
+				Game Name:<br> 
+				<input type="text" id="gamename" required><br><br> 
+				Public: 
+				<input type="checkbox" id="public"><br><br> 
+				<p id="passwordText">Password:</p>
+				<input type="text" id="password"><br><br>
+				Players: 
+				<select id="numPlayers">
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select><br><br> 
+				Game Mode: 
+				<select id="gameMode">
+					<option value="1">Stock</option>
+					<option value="2">Time</option>
+				</select> 
+				<select id="gameModeValue" class="1-100"></select><br><br>
+				Items: <input type="checkbox" id="items"><br><br><br>
+				<input type="submit" style="align: 'left'" id="buttonCreateGame" value="Create Game"/>
+			</form>
+		</div>
+	</div>
+
+<script>
+$(document).ready(function() {
+	var publicCheckBox = false;
+	
+	$("#buttonCreateGame").click(function() {
+		getroomFormData();
+	});	
+	$("#public").click(function() {
+		if (publicCheckBox == false) {
+			$(password).hide();
+			$("#passwordText").hide();
+			publicCheckBox = true;
+		} else {
+			$(password).show();
+			$("p").show();
+			publicCheckBox = false;
+		}
+	});
+	//Room creation		
+	$(function() {
+		var $select = $(".1-100");
+		for (i = 1; i <= 100; i++) {
+			$select.append($('<option></option>').val(i).html(i))
+		}
+	});
+	var socket = io();
+
+	function getroomFormData(){
+		//gathers data from the create room form
+		var gameName = document.getElementById("gamename").value;
+		var publicBoolean = document.getElementById("public").value;
+		var password = document.getElementById("password").value;
+		var numPlayers = document.getElementById("numPlayers").value;
+		var gameMode = document.getElementById("gameMode").value;
+		var gameModeValue = document.getElementById("gameModeValue").value;
+		var items = document.getElementById("items").value;
+		
+		//puts data into string for sending
+		var sendCreateRoomData = [gameName, publicBoolean, password, numPlayers, gameMode, gameModeValue, items];
+		socket.emit('sendCreateRoomData',sendCreateRoomData);
+	}
+});
+</script>
+</body>
+</html>

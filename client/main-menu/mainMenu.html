@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<style>
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}	
+#buttonJoin {
+	margin-left: 370px;
+	margin-top: 350px;
+}	
+</style>
+</head>
+<body>
+	<div id="SelectRoom"> 
+		<div class="rectangle">
+			<p align="Center">BATTLE CATS</p>
+			<form action="/joinRoom" method="GET">
+				<input type="submit" id="buttonJoin" value="Join Room"/>
+			</form>
+			<form action="/createRoom" method="GET">			
+				<input type="submit" id="buttonCreate" value="Create Room"/>
+			</form>
+			<button id="buttonOptions">Options</button>
+		</div>
+	</div>
+	<div id="optionsSelect">
+		<div class="rectangle">
+			<p align="Center">OPTIONS</p>
+			<button style="align: 'left'" id="buttonBack">Back</button>
+		</div>
+	</div>
+<script>
+$(document).ready(function() {
+	$(optionsSelect).hide();
+	$("#buttonOptions").click(function() {
+		$(SelectRoom).hide();
+		$(optionsSelect).show();
+	});
+	$("#buttonBack").click(function() {
+		$(SelectRoom).show();
+		$(optionsSelect).hide();
+	});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+<style>
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}		
+</style>
+</head>
+<body>
+<div id="login"> 
+	<div class="rectangle">
+		<form id="formlogin" name="formlogin" action="/mainMenu" method="GET">
+			<fieldset>
+				<legend>login</legend> 
+				username:<br> <input type="text" id="username" required><br><br> 
+				password:<br> <input type="text" id="password"><br><br> 
+			</fieldset>
+		</form>
+		<input type="submit" style="align: 'left'" id="buttonContinue" value="Continue"/>
+	</div>
+</div>
+	
+<script>
+$(document).ready(function() {
+	var socket = io();
+
+	$("#buttonContinue").click(function() {
+		getloginFormData();
+	});
+	
+	function getloginFormData() {
+		//gathers data from the login form
+		var username = document.getElementById("username").value;
+		var password = document.getElementById("password").value;
+		//puts data into string for sending
+		var sendLoginData = {username: username, password: password };
+		
+		socket.emit('sendLoginData', sendLoginData);
+	}
+	
+});
+</script>
+</body>
+
+</html>
