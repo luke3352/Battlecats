@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<style>
+#picture {
+	position: absolute;
+}
+
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+
+.rectangle {
+	top: 0px;
+	left: 0px;
+}
+
+#buttonJoin {
+	margin-left: 370px;
+	margin-top: 350px;
+}
+
+#buttonCreateGame {
+	margin-left: 400px;
+	margin-top: 350px;
+}
+
+#CreateRoom {
+	float: left;
+}
+</style>
+</head>
+
+<body>
+	<canvas id="ctx" width="500" height="500" style="border: 1px solid #000000;"></canvas>
+	<div id="login"> 
+		<div class="rectangle">
+			<form id="formlogin" name="formlogin">
+				<fieldset>
+					<legend>login</legend> 
+					username:<br> <input type="text" id="username" required><br><br> 
+					password:<br> <input type="text" id="password"><br><br> 
+				</fieldset>
+			</form>
+			<button style="align: 'left'" id="buttonContinue">Continue</button>
+		</div>
+	</div>
+
+	<div id="SelectRoom"> 
+		<div class="rectangle">
+			<p align="Center">BATTLE CATS</p>
+			<button id="buttonJoin">Join Room</button>
+			<button id="buttonCreate">Create Room</button>
+			<button id="buttonOptions">Options</button>
+			<button id="buttonHide">Hide</button>
+			<button id="buttonLogin">Login</button>
+		</div>
+	</div>
+
+	<div align="left" id="CreateRoom"> 
+		<div class="rectangle"> 
+			<p align="Center">CREATE ROOM</p>
+			<form> 
+				Game Name:<br> 
+				<input type="text" id="gamename" required><br><br> 
+				Public: 
+				<input type="checkbox" id="public"><br><br> 
+				<p id="passwordText">Password:</p>
+				<input type="text" id="password"><br><br>
+				Players: 
+				<select id="numPlayers">
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select><br><br> 
+				Game Mode: 
+				<select id="gameMode">
+					<option value="1">Stock</option>
+					<option value="2">Time</option>
+				</select> 
+				<select id="gameModeValue" class="1-100"></select><br><br>
+				Items: <input type="checkbox" id="items"><br><br><br>
+			</form>
+			<button style="align: 'left'" id="buttonCreateGame">Create Game</button>
+		</div>
+	</div>
+
+	<div id="joinRoom">
+		<div class="rectangle">
+			<p align="Center">JOIN ROOM</p>
+			<div id="chat-text" style="width: 500px; height: 100px; overflow-y: scroll">
+				<div>Enter a message!</div>
+			</div>
+			<form id="chat-form">
+				<input id="chat-input" type="text" style="width: 500px"></input>
+			</form><br><br>
+			<button style="align: 'left'" id="buttonCharacterSelect">Character Select</button>
+		</div>
+	</div>
+
+	<div id="characterSelect">
+		<div class="rectangle">
+			<p align="Center">CHARACTER SELECT</p><br><br>
+			<p align="Center">Pick a Color!</p><br><br><br>
+			<button style="align: 'left'" id="buttonWeaponSelect">Weapon Select</button>
+		</div>
+	</div>
+
+	<div id="weaponSelect">
+		<div class="rectangle">
+			<p align="Center">WEAPON SELECT</p>
+			<button style="align: 'left'" id="buttonReady">Ready</button>
+		</div>
+	</div>
+
+	<div id="optionsSelect">
+		<div class="rectangle">
+			<p align="Center">OPTIONS</p>
+			<button style="align: 'left'" id="buttonBack">Back</button>
+		</div>
+	</div>
+
+	<div id="optionsSelectInGame">
+		<div class="rectangle">
+			<p align="Center">OPTIONS</p>
+			<button style="align: 'left'" id="buttonBackInGame">Back</button>
+		</div>
+	</div>
+
+<script>
+var publicCheckBox = false;
+//handles buttons, simply hides the buttons for the page when a button is pressed
+$(document).ready(function() {
+
+
+	$(CreateRoom).hide();
+	$(joinRoom).hide();
+	$(SelectRoom).hide();
+	$(characterSelect).hide();
+	$(weaponSelect).hide();
+	$(optionsSelect).hide();
+	$(optionsSelectInGame).hide();
+	$(login).show();
+
+});
+
+$("#buttonContinue").click(function() {
+	$(CreateRoom).hide();
+	$(joinRoom).hide();
+	$(SelectRoom).show();
+	$(characterSelect).hide();
+	$(weaponSelect).hide();
+	$(optionsSelect).hide();
+	$(login).hide();
+	$(optionsSelectInGame).hide();
+	getloginFormData();
+});
+
+
+$("#buttonCreate").click(function() {
+	$(CreateRoom).show();
+	$(SelectRoom).hide();
+	$(login).hide();
+
+	$("#public").click(function() {
+		if (publicCheckBox == false) {
+			$(password).hide();
+			$("#passwordText").hide();
+			publicCheckBox = true;
+		} else {
+			$(password).show();
+			$("p").show();
+			publicCheckBox = false;
+		}
+	});
+
+});
+$("#buttonCreateGame").click(function() {
+	$(CreateRoom).hide();
+	$(login).hide();
+	$(joinRoom).show();
+	getroomFormData();
+});
+
+$("#buttonCharacterSelect").click(function() {
+	$(joinRoom).hide();
+	$(characterSelect).show();
+});
+
+$("#buttonJoin").click(function() {
+	$(joinRoom).show();
+	$(SelectRoom).hide();
+});
+
+$("#buttonWeaponSelect").click(function() {
+	$(characterSelect).hide();
+	$(weaponSelect).show();
+});
+
+$("#buttonOptions").click(function() {
+	$(SelectRoom).hide();
+	$(optionsSelect).show();
+});
+
+$("#buttonBack").click(function() {
+	$(SelectRoom).show();
+	$(optionsSelect).hide();
+});
+$("#buttonHide").click(function() {
+	$(SelectRoom).hide();
+});
+$("#buttonReady").click(function(){
+	$(weaponSelect).hide();
+});
+
+$(function() {
+	var $select = $(".1-100");
+	for (i = 1; i <= 100; i++) {
+		$select.append($('<option></option>').val(i).html(i))
+	}
+});
+
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.font = '30px Arial';
+
+var chatText = document.getElementById('chat-text');
+var chatInput = document.getElementById('chat-input');
+var chatForm = document.getElementById('chat-form');
+ 
+var socket = io();
+
+// Updates the chat	
+socket.on('addToChat',function(data){
+	chatText.innerHTML += '<div>' + data + '</div>';
+});
+
+// Updates Player In-Game Position
+socket.on('newPositions', function(data) {
+	ctx.clearRect(0, 0, 500, 500);
+	for (var i = 0; i < data.length; i++) {
+		ctx.fillStyle = "#4169e1";
+		ctx.fillRect(data[i].x,data[i].y,data[i].width,data[i].height);	
+	}
+});
+
+function getroomFormData(){
+	//gathers data from the create room form
+	var gameName = document.getElementById("gamename").value;
+	var publicBoolean = document.getElementById("public").value;
+	var password = document.getElementById("password").value;
+	var numPlayers = document.getElementById("numPlayers").value;
+	var gameMode = document.getElementById("gameMode").value;
+	var gameModeValue = document.getElementById("gameModeValue").value;
+	var items = document.getElementById("items").value;
+	
+	//puts data into string for sending
+	var sendCreateRoomData = [gameName, publicBoolean, password, numPlayers, gameMode, gameModeValue, items];
+	socket.emit('sendCreateRoomData',sendCreateRoomData);
+}
+
+function getloginFormData() {
+	//gathers data from the login form
+	var username = document.getElementById("username").value;
+	var password = document.getElementById("password").value;
+	//puts data into string for sending
+	var sendLoginData = {username: username, password: password };
+	
+	socket.emit('sendLoginData', sendLoginData);
+}
+
+chatForm.onsubmit = function(e){
+	e.preventDefault();
+	socket.emit('sendMsgToServer',chatInput.value);
+	chatInput.value = '';      
+}
+
+document.onkeydown = function(event) {
+	if (event.keyCode === 68) { //d
+		socket.emit('keyPress', {
+			inputId : 'right',
+			state : true
+		});
+	}
+	else if (event.keyCode === 83) { //s
+		socket.emit('keyPress', {
+			inputId : 'down',
+			state : true
+		});
+	}
+	else if (event.keyCode === 65) { //a
+		socket.emit('keyPress', {
+			inputId : 'left',
+			state : true
+		});
+	}
+	else if (event.keyCode === 87) { //w
+		socket.emit('keyPress', {
+			inputId : 'up',
+			state : true
+		});
+	}
+	else if (event.keyCode === 9) { //tab
+		$(optionsSelectInGame).show();
+	}
+}
+document.onkeyup = function(event) {
+	if (event.keyCode === 68) { //d
+		socket.emit('keyPress', {
+			inputId : 'right',
+			state : false
+		});
+	}
+	else if (event.keyCode === 83) { //s
+		socket.emit('keyPress', {
+			inputId : 'down',
+			state : false
+		});
+	}
+	else if (event.keyCode === 65) { //a
+		socket.emit('keyPress', {
+			inputId : 'left',
+			state : false
+		});
+	}
+	else if (event.keyCode === 87) { //w
+		socket.emit('keyPress', {
+			inputId : 'up',
+			state : false
+		});
+	}
+	else if (event.keyCode === 9) { //tab
+		$(optionsSelectInGame).hide();
+	}
+}
+</script>
+</body>
+</html>

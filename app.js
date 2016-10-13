@@ -1,16 +1,39 @@
 //app.js
 var express = require('express');
 var app = express();
+var path = require('path');
 var serv = require('http').Server(app);
 var mysql = require("mysql");
 
+// All HTML files
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/client/index.html');
+	res.sendFile(path.join(__dirname + '/client/index.html'));
+});
+app.get('/login', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/login/login.html'));
+});
+app.get('/mainMenu', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html'));
+});
+app.get('/createRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html'));
+});
+app.get('/joinRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html'));
+});
+app.get('/characterSelect', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/character-select/characterSelect.html'));
+});
+app.get('/weaponSelect', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html'));
+});
+app.get('/game', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/game/game.html'));
 });
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2002);
+serv.listen(2000);
 console.log("Server started.");
 
 var verifypassword = function(username, password){
@@ -136,6 +159,8 @@ var Player = function(id) {
 			x : 250,
 			y : 250,
 		},
+		width : 30,
+		height : 30,
 		weapon : {},
 		character : {},
 		id : id,
@@ -145,7 +170,7 @@ var Player = function(id) {
 		pressingUp : false,
 		pressingDown : false,
 		attack : false,
-		maxSpd : 10,
+		maxSpd : 2,
 	}
 	//Check if players share the same position
 	self.updatePosition = function() {
@@ -170,6 +195,7 @@ var Player = function(id) {
 		function collision(self, enemy) {
 			
 		}
+		
 	}
 	//TODO Handle Input
 	return self;
@@ -221,7 +247,6 @@ io.sockets.on('connection', function(socket) {
 		room.gameMode = data[4];
 		room.gameModeVal = data[5];
 		room.items = data[6];
-			console.log(room.roomName);
     });	
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
@@ -247,6 +272,8 @@ setInterval(function() {
 		pack.push({
 			x : player.position.x,
 			y : player.position.y,
+			width : player.width,
+			height : player.height,
 			number : player.number
 		});
 	}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+
+<style>
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}		
+	
+</style>
+</head>
+<body>
+	<div id="characterSelect">
+		<div class="rectangle">
+			<p align="Center">CHARACTER SELECT</p><br><br>
+			<p align="Center">Pick a Color!</p><br><br><br>
+			<form action="/weaponSelect" method="GET">
+				<input type="submit" style="align: 'left'" id="buttonWeaponSelect" value="Weapon Select"/>
+			</form>
+		</div>
+	</div>
+
+<script>
+$(document).ready(function() {
+
+	
+});
+</script>
+</body>
+</html>
