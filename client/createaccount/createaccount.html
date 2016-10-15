@@ -8,10 +8,27 @@
 #picture {
 	position: absolute;
 }
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}
 </style>
 </head>
 <body>
-	<canvas id="ctx" width="500" height="500" style="border: 1px solid #000000;"></canvas>
-	<p>upcoming create account page</p>
+<div id="login"> 
+	<div class="rectangle">
+	<h1>Create New Account</h1>
+	<p>upcoming create account page...</p>
+	</div>
+</div>
 </body>
 </html>
