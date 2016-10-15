@@ -12,6 +12,9 @@ app.get('/', function(req, res) {
 app.get('/login', function(req, res) {
 	res.sendFile(path.join(__dirname + '/client/login/login.html'));
 });
+app.get('/createaccount', function(req, res){
+	res.sendFile(path.join(__dirname + '/client/createaccount/createaccount.html'));
+});
 app.get('/mainMenu', function(req, res) {
 	res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html'));
 });
@@ -37,13 +40,13 @@ serv.listen(2000);
 console.log("Server started.");
 
 var verifypassword = function(username, password){
+	var correctpassword = true;
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
 		  password : '5rqZthHkdvd',
 		  database : 'db309la07'
 		});
-
 	connection.connect(function(error){
 		if (!!error){
 			console.log('Error');
@@ -51,7 +54,7 @@ var verifypassword = function(username, password){
 		else{
 			console.log('Connected');
 		}
-
+		
 	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
 			if (!err){
 				var string = JSON.stringify(rows);
@@ -61,11 +64,11 @@ var verifypassword = function(username, password){
 				console.log("correct password: " + correctpassword)
 				if (password === correctpassword){
 					console.log(true);
-					return true;
+					correctpassword = true;
 				}
 				else{
 					console.log(false);
-					return false;
+					correctpassword = false;
 				}
 			}
 			else{
@@ -74,6 +77,7 @@ var verifypassword = function(username, password){
 		});
 		connection.end();
 	});
+	return correctpassword;
 	};
 
 /*
@@ -253,7 +257,15 @@ io.sockets.on('connection', function(socket) {
 		 var username = data.username;
 	     var password = data.password;
 	     var correctpassword = verifypassword(username, password);
+	     sendCorrectPassword(correctpassword);
     });	
+	
+	function sendCorrectPassword(correctpassword) {
+		var correctpassword = correctpassword;
+		var sendpasswordverification = {correctpassword: correctpassword};
+		socket.emit('sendpasswordverification', sendpasswordverification)
+	}
+	
 	
 	// HANDLES MESSAGES
     socket.on('sendMsgToServer',function(data){

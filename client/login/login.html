@@ -5,6 +5,17 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <style>
+#buttonContinue {
+	padding: 10px 17px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  position: relative;
+}
 #picture {
 	position: absolute;
 }
@@ -50,10 +61,22 @@ $(document).ready(function() {
 		var username = document.getElementById("username").value;
 		var password = document.getElementById("password").value;
 		//puts data into string for sending
-		var sendLoginData = {username: username, password: password };
-		
+		var sendLoginData = {username: username, password: password };	
 		socket.emit('sendLoginData', sendLoginData);
+		console.log("data sent");
 	}
+	
+	socket.on('sendpasswordverification', function(data){
+		var correctpassword = data.correctpassword;
+		if (correctpassword == true){
+			console.log("take to homepage");
+		}
+		else{
+			alert("Incorrect Password or Username");
+		}
+	});
+	
+	
 	
 });
 </script>
