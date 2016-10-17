@@ -67,8 +67,11 @@ $(document).ready(function() {
 	}
 	
 	socket.on('sendpasswordverification', function(data){
-		var correctp = data.correct;
-		if (correctp == true){
+		var correct = data.correct;
+		if (correct === 0){
+			alert("Username does not exist, Create new account");
+		}
+		else if (correct === 1){
 			window.location.href = "/";
 		}
 		else{

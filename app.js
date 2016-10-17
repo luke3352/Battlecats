@@ -35,7 +35,7 @@ var verifypassword = function(username, password){
 		  password : '5rqZthHkdvd',
 		  database : 'db309la07'
 	});
-	var correct = true;
+	var correct =1;
 	connection.connect(function(error){
 		if (!!error){
 			console.log('Error');
@@ -44,23 +44,28 @@ var verifypassword = function(username, password){
 			console.log('Connected');
 		}
 		
+		
 		connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-			if (!err){ 
+			if (!err){
 				var string = JSON.stringify(rows);
 				var json = JSON.parse(string);
+				if (JSON.stringify(rows) === "[]"){
+					console.log("username was not in database... create new account");
+					correct = 0;
+				}
+				else{
 				var correctpassword = json[0]._password;
 				console.log("entered password: " + password);
 				console.log("correct password: " + correctpassword)
 				if (password === correctpassword){
-					c = true;
 					console.log(true);
-					correct = true;
+					correct = 1; 
 				}
 				else{
-					c = false;
 					console.log(false);
-					correct = false;
+					correct = 2;
 				}
+				}	
 			}
 			else{
 			  console.log('Error while performing Query.');
