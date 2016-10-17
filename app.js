@@ -76,7 +76,7 @@ var verifypassword = function(username, password){
 					console.log(false);
 					correct = 2;
 				}
-				}
+				}	
 			}
 			else{
 			  console.log('Error while performing Query.');
