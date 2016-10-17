@@ -40,13 +40,13 @@ serv.listen(2000);
 console.log("Server started.");
 
 var verifypassword = function(username, password){
-	var correct = true;
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
 		  password : '5rqZthHkdvd',
 		  database : 'db309la07'
 	});
+	var correct = true;
 	connection.connect(function(error){
 		if (!!error){
 			console.log('Error');
@@ -56,30 +56,31 @@ var verifypassword = function(username, password){
 		}
 		
 		connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-			if (!err){
+			if (!err){ 
 				var string = JSON.stringify(rows);
 				var json = JSON.parse(string);
 				var correctpassword = json[0]._password;
 				console.log("entered password: " + password);
 				console.log("correct password: " + correctpassword)
 				if (password === correctpassword){
-					correct = true;
+					c = true;
 					console.log(true);
+					correct = true;
 				}
 				else{
-					correct = false;
+					c = false;
 					console.log(false);
+					correct = false;
 				}
 			}
 			else{
 			  console.log('Error while performing Query.');
-			};
+			}
 		});
 		connection.end();
 	});
 	return correct;
 };
-
 /*
  * List of sockets
  */
@@ -256,6 +257,7 @@ io.sockets.on('connection', function(socket) {
 		 var username = data.username;
 	     var password = data.password;
 	     var correct = verifypassword(username, password);
+	     console.log(correct);
 	     sendCorrectPassword(correct);
     });	
 	
