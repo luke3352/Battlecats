@@ -67,9 +67,9 @@ $(document).ready(function() {
 	}
 	
 	socket.on('sendpasswordverification', function(data){
-		var correctpassword = data.correctpassword;
-		if (correctpassword == true){
-			console.log("take to homepage");
+		var correctp = data.correct;
+		if (correctp == true){
+			window.location.href = "/";
 		}
 		else{
 			alert("Incorrect Password or Username");

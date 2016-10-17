@@ -40,13 +40,13 @@ serv.listen(2000);
 console.log("Server started.");
 
 var verifypassword = function(username, password){
-	var correctpassword = true;
+	var correct = true;
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
 		  password : '5rqZthHkdvd',
 		  database : 'db309la07'
-		});
+	});
 	connection.connect(function(error){
 		if (!!error){
 			console.log('Error');
@@ -55,7 +55,7 @@ var verifypassword = function(username, password){
 			console.log('Connected');
 		}
 		
-	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+		connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
 			if (!err){
 				var string = JSON.stringify(rows);
 				var json = JSON.parse(string);
@@ -63,22 +63,22 @@ var verifypassword = function(username, password){
 				console.log("entered password: " + password);
 				console.log("correct password: " + correctpassword)
 				if (password === correctpassword){
+					correct = true;
 					console.log(true);
-					correctpassword = true;
 				}
 				else{
+					correct = false;
 					console.log(false);
-					correctpassword = false;
 				}
 			}
 			else{
 			  console.log('Error while performing Query.');
-			}
+			};
 		});
 		connection.end();
 	});
-	return correctpassword;
-	};
+	return correct;
+};
 
 /*
  * List of sockets
@@ -88,8 +88,8 @@ var SOCKET_LIST = {};
  * List of in game players
  */
 var PLAYER_LIST = {};
-//TODO
-/* 
+// TODO
+/*
  * Should include socket ID and Username
  */
 var USER_LIST = {};
@@ -118,20 +118,19 @@ var User = function(id, name) {
 		game: {},
 		
 	}
-	//TODO Handle input
+	// TODO Handle input
 	return self;
 }
 
 /*
- * Creates room
- * Handles host input
+ * Creates room Handles host input
  */
 var Host = function(id) {
 	var self = {
-		room: new Room(id), //Room Creation?
+		room: new Room(id), // Room Creation?
 		pressingStart: false,
 	}
-	//TODO Handle input
+	// TODO Handle input
 	return self;
 }
 
@@ -140,18 +139,18 @@ var Host = function(id) {
  */
 var Room = function(id) {
 	var self = {
-		roomHost: {}, //Host has different options
-		roomPlayers: [], //Players have different options
-		numOfPlayers: 4, //Default selection
-		pressingStart: false, //Other buttons like this
-		isPublic: false, //Public or private
+		roomHost: {}, // Host has different options
+		roomPlayers: [], // Players have different options
+		numOfPlayers: 4, // Default selection
+		pressingStart: false, // Other buttons like this
+		isPublic: false, // Public or private
 		roomName: "", 
 		password: "",
-		gameMode: 1, //default game mode is stock 
+		gameMode: 1, // default game mode is stock
 		gameModeVal: 3, // either stock or time
-		items: false, //items disabled for now
+		items: false, // items disabled for now
 	};
-	//TODO Room options
+	// TODO Room options
 	return self;
 }
 
@@ -177,10 +176,10 @@ var Player = function(id) {
 		attack : false,
 		maxSpd : 2,
 	}
-	//Check if players share the same position
+	// Check if players share the same position
 	self.updatePosition = function() {
 		for ( var i in PLAYER_LIST) {
-			//check for collision
+			// check for collision
 			if(collision(self, PLAYER_LIST[i])) {
 				
 			}
@@ -202,7 +201,7 @@ var Player = function(id) {
 		}
 		
 	}
-	//TODO Handle Input
+	// TODO Handle Input
 	return self;
 }
 /*
@@ -217,7 +216,7 @@ var Weapon = function() {
 		crit : 0,
 		speed : 0,
 	}
-	//TODO Weapon interactions
+	// TODO Weapon interactions
 	return self;
 }
 
@@ -241,7 +240,7 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'up') player.pressingUp = data.state;
 		else if (data.inputId === 'down') player.pressingDown = data.state;
 	});
-	//creates room
+	// creates room
 	socket.on('sendCreateRoomData',function(data){
         var room = Room(1);
 		
@@ -256,13 +255,13 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-	     var correctpassword = verifypassword(username, password);
-	     sendCorrectPassword(correctpassword);
+	     var correct = verifypassword(username, password);
+	     sendCorrectPassword(correct);
     });	
 	
-	function sendCorrectPassword(correctpassword) {
-		var correctpassword = correctpassword;
-		var sendpasswordverification = {correctpassword: correctpassword};
+	function sendCorrectPassword(correct) {
+		var correct = correct;
+		var sendpasswordverification = {correct: correct};
 		socket.emit('sendpasswordverification', sendpasswordverification)
 	}
 	
@@ -292,7 +291,7 @@ setInterval(function() {
 	}
 	for ( var i in SOCKET_LIST) {
 		var socket = SOCKET_LIST[i];
-		//TODO
+		// TODO
 		// IN GAME SOCKETS
 		socket.emit('newPositions', pack);
 		
