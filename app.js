@@ -87,6 +87,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		delete SOCKET_LIST[socket.id];
 		delete Player.PLAYER_LIST[socket.id];
+		delete Room.ROOMS_LIST[socket.id];
 	});
 
 	socket.on('keyPress', function(data) {
@@ -95,17 +96,12 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'up') player.pressingUp = data.state;
 		else if (data.inputId === 'down') player.pressingDown = data.state;
 	});
+	
 	// creates room
 	socket.on('sendCreateRoomData',function(data){
-        var room = Room.room(1);
-		
-		room.roomName = data[0];
-		room.isPublic = data[1];
-		room.password = data[2];
-		room.numOfPlayers = data[3];
-		room.gameMode = data[4];
-		room.gameModeVal = data[5];
-		room.items = data[6];
+        var room = Room.room(socket.id, data);
+        room.roomPlayers.push(Player.PLAYER_LIST[socket.id]);
+		Room.ROOMS_LIST[socket.id] = room; 
     });	
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
