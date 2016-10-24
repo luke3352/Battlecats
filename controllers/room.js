@@ -1,6 +1,5 @@
 var exports = module.exports = {};
 
-exports.ROOMS_LIST = {};
 //Handles room settings
 exports.room = function(id, data) {
 	var self = {

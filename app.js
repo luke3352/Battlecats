@@ -24,6 +24,7 @@ var Room = require("./controllers/room.js");
 var Player = require("./controllers/player.js");
 
 var SOCKET_LIST = {};
+var ROOMS_LIST = {};
 
 serv.listen(2000);
 console.log("Server started.");
@@ -90,7 +91,8 @@ io.sockets.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		delete SOCKET_LIST[socket.id];
 		delete Player.PLAYER_LIST[socket.id];
-		delete Room.ROOMS_LIST[socket.id];
+		if(ROOMS_LIST[socket.id]) delete ROOMS_LIST[socket.id];
+//		delete Room.ROOMS_LIST[socket.id];
 	});
 
 	socket.on('keyPress', function(data) {
@@ -105,11 +107,10 @@ io.sockets.on('connection', function(socket) {
 		console.log("retrieving room data", room);
         var room = Room.room(socket.id, data);
         room.roomPlayers.push(Player.PLAYER_LIST[socket.id]);
-		Room.ROOMS_LIST[socket.id] = room;
-		
+		ROOMS_LIST[socket.id] = room;
 		console.log("updating rooms list");
         for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('updateRoomsList', Room.ROOMS_LIST);
+            SOCKET_LIST[i].emit('updateRoomsList', ROOMS_LIST);
         }
     });	
 	socket.on('requestSocketId', function(data){
@@ -117,7 +118,7 @@ io.sockets.on('connection', function(socket) {
 	});
 	socket.on('requestRoomsList',function(data){
         for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('updateRoomsList', Room.ROOMS_LIST);
+            SOCKET_LIST[i].emit('updateRoomsList', ROOMS_LIST);
         }	
     });
 	

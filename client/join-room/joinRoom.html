@@ -27,8 +27,10 @@
 	<div id="joinRoom">
 		<div class="rectangle">
 			<p align="Center">JOIN ROOM</p>
-			<div id="room-list">
-			
+			<div style="width: 500px; height: 100px; overflow-y: scroll">
+				<ul id="room-list">
+				
+				</ul>
 			</div>
 			<div id="chat-text" style="width: 500px; height: 100px; overflow-y: scroll">
 				<div>Enter a message!</div>
@@ -46,21 +48,19 @@
 $(document).ready(function() {
 	var socket = io();
 
-	var roomList = $('#room-list');
+	var roomList = document.getElementById('room-list');
 	socket.emit('requestRoomsList');
 
 	socket.on('updateRoomsList',function(data){
 		console.log('UPDATE ROOM LIST', data);
-		roomList.innerHTML = '<ul>';
 		for(var i in data){
 			roomList.innerHTML += '<li>' + data[i].roomName + '</li>';
 		}
-		roomList.innerHTML += '</ul>';
 	});
 	
-	var chatText = $('#chat-text');
-	var chatInput = $('#chat-input');
-	var chatForm = $('#chat-form');
+	var chatText = document.getElementById('chat-text');
+	var chatInput = document.getElementById('chat-input');
+	var chatForm = document.getElementById('chat-form');
 	
 	// Updates the chat	
 	socket.on('addToJoinRoomChat',function(data){
