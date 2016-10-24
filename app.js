@@ -12,6 +12,7 @@ app.get('/createaccount', function(req, res){ res.sendFile(path.join(__dirname +
 app.get('/mainMenu', function(req, res) { res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html')); });
 app.get('/createRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html')); });
 app.get('/joinRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html')); });
+app.get('/hostRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/host-room/hostRoom.html')); });
 app.get('/characterSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/character-select/characterSelect.html')); });
 app.get('/weaponSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html')); });
 app.get('/game', function(req, res) { res.sendFile(path.join(__dirname + '/client/game/game.html')); });
@@ -80,10 +81,12 @@ var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
 	socket.id = Math.random();
 	SOCKET_LIST[socket.id] = socket;
-
+	
 	var player = Player.player(socket.id);
 	Player.PLAYER_LIST[socket.id] = player;
-
+	var user = User.user(socket.id);
+	User.USER_LIST[socket.id] = user;
+	
 	socket.on('disconnect', function() {
 		delete SOCKET_LIST[socket.id];
 		delete Player.PLAYER_LIST[socket.id];
@@ -99,10 +102,25 @@ io.sockets.on('connection', function(socket) {
 	
 	// creates room
 	socket.on('sendCreateRoomData',function(data){
+		console.log("retrieving room data", room);
         var room = Room.room(socket.id, data);
         room.roomPlayers.push(Player.PLAYER_LIST[socket.id]);
-		Room.ROOMS_LIST[socket.id] = room; 
+		Room.ROOMS_LIST[socket.id] = room;
+		
+		console.log("updating rooms list");
+        for(var i in SOCKET_LIST){
+            SOCKET_LIST[i].emit('updateRoomsList', Room.ROOMS_LIST);
+        }
     });	
+	socket.on('requestSocketId', function(data){
+		SOCKET_LIST[socket.id].emit('currentSocketId', socket.id);
+	});
+	socket.on('requestRoomsList',function(data){
+        for(var i in SOCKET_LIST){
+            SOCKET_LIST[i].emit('updateRoomsList', Room.ROOMS_LIST);
+        }	
+    });
+	
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
@@ -119,13 +137,18 @@ io.sockets.on('connection', function(socket) {
 	
 	
 	// HANDLES MESSAGES
-    socket.on('sendMsgToServer',function(data){
+    socket.on('sendJoinRoomMsgToServer',function(data){
         var playerName = ("" + socket.id).slice(2,7);
         for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
+            SOCKET_LIST[i].emit('addToJoinRoomChat',playerName + ': ' + data);
         }
     });	 
-	
+    socket.on('sendHostRoomMsgToServer',function(data){
+        var playerName = ("" + socket.id).slice(2,7);
+        for(var i in SOCKET_LIST){
+            SOCKET_LIST[i].emit('addToHostRoomChat',playerName + ': ' + data);
+        }
+    });	 
 });
 
 setInterval(function() {

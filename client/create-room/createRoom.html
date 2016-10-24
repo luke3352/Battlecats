@@ -36,7 +36,7 @@
 	<div align="left" id="CreateRoom"> 
 		<div class="rectangle"> 
 			<p align="Center">CREATE ROOM</p>
-			<form action="/joinRoom" method="GET"> 
+			<form action="/hostRoom" method="GET"> 
 				Game Name:<br> 
 				<input type="text" id="gamename" required><br><br> 
 				Public: 
@@ -64,13 +64,7 @@
 <script>
 $(document).ready(function() {
 	var publicCheckBox = false;
-	
-	$("#buttonCreateGame").click(function() {
-		var roomID = Math.random();
-		$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
-		getroomFormData(roomID);
-	});	
-	
+		
 	$("#public").click(function() {
 		if (publicCheckBox == false) {
 			$(password).hide();
@@ -90,8 +84,16 @@ $(document).ready(function() {
 		}
 	});
 	var socket = io();
+	socket.emit('requestSocketId');
 	
-	socket.on()
+	socket.on('currentSocketId', function(id){
+		$("#buttonCreateGame").click(function() {
+			var roomID = id;
+			$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
+			getroomFormData(roomID);
+		});	
+	});
+	
 	function getroomFormData(){
 		//gathers data from the create room form
 		var data = {
@@ -103,6 +105,7 @@ $(document).ready(function() {
 			gameModeValue : document.getElementById("gameModeValue").value,
 			items : 		document.getElementById("items").value
 		};
+		console.log("emitting data: ", data);
 		socket.emit('sendCreateRoomData',data);
 		
 	}

@@ -24,12 +24,10 @@
 </style>
 </head>
 <body>
-	<div id="joinRoom">
+	<div id="hostRoom">
 		<div class="rectangle">
-			<p align="Center">JOIN ROOM</p>
-			<div id="room-list">
-			
-			</div>
+			<p align="Center">HOST ROOM</p>
+			<div id="userList"></div>
 			<div id="chat-text" style="width: 500px; height: 100px; overflow-y: scroll">
 				<div>Enter a message!</div>
 			</div>
@@ -46,30 +44,18 @@
 $(document).ready(function() {
 	var socket = io();
 
-	var roomList = $('#room-list');
-	socket.emit('requestRoomsList');
-
-	socket.on('updateRoomsList',function(data){
-		console.log('UPDATE ROOM LIST', data);
-		roomList.innerHTML = '<ul>';
-		for(var i in data){
-			roomList.innerHTML += '<li>' + data[i].roomName + '</li>';
-		}
-		roomList.innerHTML += '</ul>';
-	});
-	
-	var chatText = $('#chat-text');
-	var chatInput = $('#chat-input');
-	var chatForm = $('#chat-form');
+	var chatText = document.getElementById('chat-text');
+	var chatInput = document.getElementById('chat-input');
+	var chatForm = document.getElementById('chat-form');
 	
 	// Updates the chat	
-	socket.on('addToJoinRoomChat',function(data){
+	socket.on('addToHostRoomChat',function(data){
 		chatText.innerHTML += '<div>' + data + '</div>';
 	});
-
+	
 	chatForm.onsubmit = function(e){
 		e.preventDefault();
-		socket.emit('sendJoinRoomMsgToServer',chatInput.value);
+		socket.emit('sendHostRoomMsgToServer',chatInput.value);
 		chatInput.value = '';      
 	}
 });
