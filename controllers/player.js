@@ -1,4 +1,5 @@
 var Entity = require("./Entity.js");
+var Projectile = require("./projectile.js");
 var exports = module.exports = {};
 //List of players
 exports.PLAYER_LIST = {};
@@ -17,6 +18,14 @@ exports.player = function(id) {
 		self.generateProjectile = false;
 	// Check if players share the same position
 	self.updatePosition = function() {
+		if(self.generateProjectile){
+			var projectile = Projectile.Projectile();
+			projectile.x = self.x;
+			projectile.y = self.y;
+			projectile.shoot();
+			self.generateProjectile = false;
+		}
+		
 		for ( var i in exports.PLAYER_LIST) {
 			if (self.pressingRight) {
 				self.x += self.maxSpd;

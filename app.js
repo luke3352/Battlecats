@@ -21,8 +21,9 @@ app.use('/client', express.static(__dirname + '/client'));
 var User = 	require("./controllers/user.js");
 var Room = require("./controllers/room.js");
 var Player = require("./controllers/player.js");
-var Entity = require("./controllers/Entity.js");
+var Entity = require("./controllers/entity.js");
 var Weapon = require("./controllers/weapon.js");
+var Projectile = require("./controllers/projectile.js");
 
 var SOCKET_LIST = {};
 
@@ -96,6 +97,7 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'right') player.pressingRight = data.state;
 		else if (data.inputId === 'up') player.pressingUp = data.state;
 		else if (data.inputId === 'down') player.pressingDown = data.state;
+		else if (data.inputId === 'enter') player.generateProjectile = data.state;
 	});
 	// creates room
 	socket.on('sendCreateRoomData',function(data){
@@ -138,7 +140,7 @@ io.sockets.on('connection', function(socket) {
 setInterval(function() {
 	var pack = {
 		player:Player.updatePlayer(),
-		//projectile:Projectile.update(),
+		projectile:Projectile.update(),
 	}
 	
 	for ( var i in SOCKET_LIST) {

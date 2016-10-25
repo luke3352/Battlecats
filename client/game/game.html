@@ -29,11 +29,14 @@ $(document).ready(function() {
 	// Updates Player In-Game Position
 	socket.on('newPositions', function(data) {
 		ctx.clearRect(0, 0, 500, 500);
-		console.log("Here: "+data.length);
 		for(var i = 0; i < data.player.length; i++){
-				ctx.fillStyle = "#4169e1";
-				ctx.fillRect(data.player[i].x,data.player[i].y,data.player[i].width,data.player[i].height);		
+			ctx.fillStyle = "#4169e1";
+			ctx.fillRect(data.player[i].x,data.player[i].y,data.player[i].width,data.player[i].height);		
 			}
+		for(var i = 0 ; i < data.projectile.length; i++)	{
+			ctx.fillStyle = "#800080";
+			ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
+		}
 	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
@@ -57,6 +60,12 @@ $(document).ready(function() {
 		else if (event.keyCode === 87) { //w
 			socket.emit('keyPress', {
 				inputId : 'up',
+				state : true
+			});
+		}
+		else if (event.keyCode === 13) { //enter
+			socket.emit('keyPress', {
+				inputId : 'enter',
 				state : true
 			});
 		}
@@ -86,6 +95,12 @@ $(document).ready(function() {
 		else if (event.keyCode === 87) { //w
 			socket.emit('keyPress', {
 				inputId : 'up',
+				state : false
+			});
+		}
+		else if (event.keyCode === 13) { //enter
+			socket.emit('keyPress', {
+				inputId : 'enter',
 				state : false
 			});
 		}
