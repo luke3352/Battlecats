@@ -29,10 +29,11 @@ $(document).ready(function() {
 	// Updates Player In-Game Position
 	socket.on('newPositions', function(data) {
 		ctx.clearRect(0, 0, 500, 500);
-		for (var i = 0; i < data.length; i++) {
-			ctx.fillStyle = "#4169e1";
-			ctx.fillRect(data[i].x,data[i].y,data[i].width,data[i].height);	
-		}
+		console.log("Here: "+data.length);
+		for(var i = 0; i < data.player.length; i++){
+				ctx.fillStyle = "#4169e1";
+				ctx.fillRect(data.player[i].x,data.player[i].y,data.player[i].width,data.player[i].height);		
+			}
 	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d

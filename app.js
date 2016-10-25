@@ -21,6 +21,8 @@ app.use('/client', express.static(__dirname + '/client'));
 var User = 	require("./controllers/user.js");
 var Room = require("./controllers/room.js");
 var Player = require("./controllers/player.js");
+var Entity = require("./controllers/Entity.js");
+var Weapon = require("./controllers/weapon.js");
 
 var SOCKET_LIST = {};
 
@@ -132,19 +134,13 @@ io.sockets.on('connection', function(socket) {
 	
 });
 
+
 setInterval(function() {
-	var pack = [];
-	for ( var i in Player.PLAYER_LIST) {
-		var player = Player.PLAYER_LIST[i];
-		player.updatePosition();
-		pack.push({
-			x : player.position.x,
-			y : player.position.y,
-			width : player.width,
-			height : player.height,
-			number : player.number
-		});
+	var pack = {
+		player:Player.updatePlayer(),
+		//projectile:Projectile.update(),
 	}
+	
 	for ( var i in SOCKET_LIST) {
 		var socket = SOCKET_LIST[i];
 		// TODO
