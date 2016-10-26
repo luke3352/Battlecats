@@ -8,7 +8,7 @@ var mysql = require("mysql");
 // All HTML files
 app.get('/', function(req, res) { res.sendFile(path.join(__dirname + '/client/index.html')); });
 app.get('/login', function(req, res) { res.sendFile(path.join(__dirname + '/client/login/login.html')); });
-app.get('/createaccount', function(req, res){ res.sendFile(path.join(__dirname + '/client/createaccount/createaccount.html')); });
+app.get('/createAccount', function(req, res){ res.sendFile(path.join(__dirname + '/client/create-account/createAccount.html')); });
 app.get('/mainMenu', function(req, res) { res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html')); });
 app.get('/createRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html')); });
 app.get('/joinRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html')); });
@@ -31,53 +31,46 @@ serv.listen(2000);
 console.log("Server started.");
 
 
-var verifypassword = function(username, password){
+var verifypassword = function(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
 		  password : '5rqZthHkdvd',
 		  database : 'db309la07'
 	});
-	var correct =1;
-	connection.connect(function(error){
-		if (!!error){
-			console.log('Error');
-		}
-		else{
-			console.log('Connected');
-		}
-		
-		
-		connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-			if (!err){
-				var string = JSON.stringify(rows);
-				var json = JSON.parse(string);
-				if (JSON.stringify(rows) === "[]"){
-					console.log("username was not in database... create new account");
-					correct = 0;
-				}
-				else{
+
+	connection.connect();
+	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+		if (!err){
+			var string = JSON.stringify(rows);
+			var json = JSON.parse(string);
+			if (JSON.stringify(rows) === "[]"){
+				console.log("username was not in database... create new account");
+				correct = 0;
+			}
+			else{
 				var correctpassword = json[0]._password;
 				console.log("entered password: " + password);
 				console.log("correct password: " + correctpassword)
 				if (password === correctpassword){
 					console.log(true);
 					correct = 1; 
+					console.log("within the if statement: " + correct);
+					a = 1;
+					console.log("global variable a within the connection :" + a)
 				}
 				else{
 					console.log(false);
 					correct = 2;
 				}
-				}	
 			}
-			else{
-			  console.log('Error while performing Query.');
-			}
-		});
-		connection.end();
+			console.log(correct);
+			return callback(correct);
+		}
 	});
-	return correct;
-};
+	connection.end();
+}
+
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -111,15 +104,18 @@ io.sockets.on('connection', function(socket) {
 		room.gameModeVal = data[5];
 		room.items = data[6];
     });	
+	
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-	     var correct = verifypassword(username, password);
-	     console.log(correct);
-	     sendCorrectPassword(correct);
+	     verifypassword(username, password, function(correct){
+	    	 console.log("socket correct: " + correct);
+	      	 sendCorrectPassword(correct);
+	    });  
     });	
 	
 	function sendCorrectPassword(correct) {
+		console.log("sendCorrectPassword correct: " + correct);
 		var correct = correct;
 		var sendpasswordverification = {correct: correct};
 		socket.emit('sendpasswordverification', sendpasswordverification)
