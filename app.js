@@ -55,16 +55,12 @@ var verifypassword = function(username, password, callback){
 				if (password === correctpassword){
 					console.log(true);
 					correct = 1; 
-					console.log("within the if statement: " + correct);
-					a = 1;
-					console.log("global variable a within the connection :" + a)
 				}
 				else{
 					console.log(false);
 					correct = 2;
 				}
 			}
-			console.log(correct);
 			return callback(correct);
 		}
 	});
@@ -109,15 +105,14 @@ io.sockets.on('connection', function(socket) {
 		 var username = data.username;
 	     var password = data.password;
 	     verifypassword(username, password, function(correct){
-	    	 console.log("socket correct: " + correct);
-	      	 sendCorrectPassword(correct);
+	      	 sendCorrectPassword(username, correct);
 	    });  
     });	
 	
-	function sendCorrectPassword(correct) {
-		console.log("sendCorrectPassword correct: " + correct);
+	function sendCorrectPassword(username, correct) {
+		console.log(correct);
 		var correct = correct;
-		var sendpasswordverification = {correct: correct};
+		var sendpasswordverification = {correct: correct, username: username};
 		socket.emit('sendpasswordverification', sendpasswordverification)
 	}
 	
