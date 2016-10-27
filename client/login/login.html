@@ -63,16 +63,21 @@ $(document).ready(function() {
 		//puts data into string for sending
 		var sendLoginData = {username: username, password: password };	
 		socket.emit('sendLoginData', sendLoginData);
-		console.log("data sent");
 	}
 	
 	socket.on('sendpasswordverification', function(data){
 		var correct = data.correct;
+		var username; 
 		if (correct === 0){
 			alert("Username does not exist, Create new account");
 		}
 		else if (correct === 1){
+			//this needs to be passed and set to show that the username
+			//was succesfully logged in, and can now have wins and 
+			//ranking added to its database
+			username = data.username; 
 			window.location.href = "/";
+			
 		}
 		else{
 			alert("Incorrect Password or Username");
