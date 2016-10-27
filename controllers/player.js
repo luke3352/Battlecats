@@ -14,17 +14,25 @@ exports.player = function(id) {
 		self.pressingLeft = false;
 		self.pressingUp = false;
 		self.pressingDown = false;
+		self.mouseAngle = 0;
 		self.maxSpd = 5;
 		self.generateProjectile = false;
+		
+		/*var super_update = self.update;
+		self.update = function(){
+			self.updatePosition();
+			super_update();
+       
+			if(self.pressingAttack){
+				self.shootBullet(self.mouseAngle);
+			}
+		}*/
+	
+		
 	// Check if players share the same position
 	self.updatePosition = function() {
-		if(self.generateProjectile){
-			var projectile = Projectile.Projectile();
-			projectile.x = self.x;
-			projectile.y = self.y;
-			projectile.shoot();
-			self.generateProjectile = false;
-		}
+		
+		
 		
 		for ( var i in exports.PLAYER_LIST) {
 			if (self.pressingRight) {
@@ -39,14 +47,23 @@ exports.player = function(id) {
 			if (self.pressingDown) {
 				self.y += self.maxSpd;
 			}
+			if(self.generateProjectile){
+				var projectile = Projectile.Projectile(self.id,self.mouseAngle);
+				projectile.x = self.x;
+				projectile.y = self.y;
+				projectile.shoot(self.mouseAngle);
+			}
 		}
+			
 		function collision(self, enemy) {
 			
 		}
 		
+	
 	}
 	exports.PLAYER_LIST[id] = self;
 	return self;
+	
 }
 
 // Updates each player's position
@@ -57,10 +74,6 @@ exports.updatePlayer = function(){
 	for(var i in exports.PLAYER_LIST){
 		var player = exports.PLAYER_LIST[i];
 			player.update();
-			//console.log("This x"+ player.x);
-			//console.log("This y"+ player.y);
-			//console.log("This width"+ player.width);
-			//console.log("This height"+ player.height);
 			pack.push({
 				x:player.x,
 				y:player.y,

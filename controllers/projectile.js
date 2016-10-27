@@ -4,16 +4,19 @@ var exports = module.exports = {};
 //List of players
 exports.PROJECTILES_LIST = {};
 //Entity constructor
-exports.Projectile = function(){
+exports.Projectile = function(parent,angle){
 var WIDTH  = 500;
 var HEIGHT = 500;
 
  var self = Entity.Entity();
-	self.id = 1;
+	self.id = Math.random();
 	self.width=10;
 	self.height=10;
-	self.spdX=0;
-	self.spdY=0;
+	self.spdX = Math.cos(angle/180*Math.PI) * 10;
+    self.spdY = Math.sin(angle/180*Math.PI) * 10;
+	self.parent = parent;
+	self.timer = 0;
+	self.toRemove = false;
 	self.speed = 12;
 	self.vel = {
 		x: 0,
@@ -22,7 +25,9 @@ var HEIGHT = 500;
  
 	var super_update = self.update;
 	self.update = function(){
-		super_update();
+		if(self.timer++ > 100)
+            self.toRemove = true;
+        super_update();
 	
 		self.x += self.vel.x;
 		self.y += self.vel.y;
@@ -31,6 +36,7 @@ var HEIGHT = 500;
 		for(var i in exports.PLAYER_LIST){
 			var p = exports.PLAYER_LIST[i];
 			//HIT PLAYER
+			self.toRemove = true;
 		
 		}
 		//HIT TOP OF SCREEN, BOUNCES OFF
@@ -49,11 +55,6 @@ var HEIGHT = 500;
 	
 	//fires the projectile
 	self.shoot = function(side) {
-		
-		// set the x and y position
-		self.x = 50;
-		self.y = 50;
-		
 		// set velocity direction and magnitude
 		self.vel.x = 12;
 		self.vel.y = 12;
@@ -70,6 +71,9 @@ exports.update = function(){
 	for(var i in exports.PROJECTILES_LIST){
 		var projectile = exports.PROJECTILES_LIST[i];
 		projectile.update();
+	    if(projectile.toRemove)
+            delete exports.PROJECTILES_LIST[i];
+        else
 		pack.push({ 
 			x:projectile.x, 
 			y:projectile.y

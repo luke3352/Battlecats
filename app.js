@@ -97,7 +97,8 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'right') player.pressingRight = data.state;
 		else if (data.inputId === 'up') player.pressingUp = data.state;
 		else if (data.inputId === 'down') player.pressingDown = data.state;
-		else if (data.inputId === 'enter') player.generateProjectile = data.state;
+		else if (data.inputId === 'attack') player.generateProjectile = data.state;
+		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
 	});
 	// creates room
 	socket.on('sendCreateRoomData',function(data){
