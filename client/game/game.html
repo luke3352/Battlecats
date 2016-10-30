@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-	<canvas id="ctx" width="500" height="500" style="border: 1px solid #000000;"></canvas>
+	<canvas id="ctx" width="1000" height="700" style="border: 1px solid #000000;"></canvas>
 	
 	<div id="optionsSelectInGame">
 		<div class="rectangle">
@@ -28,10 +28,14 @@ $(document).ready(function() {
 	
 	// Updates Player In-Game Position
 	socket.on('newPositions', function(data) {
-		ctx.clearRect(0, 0, 500, 500);
-		for (var i = 0; i < data.length; i++) {
+		ctx.clearRect(0, 0, 1000, 700);
+		for(var i = 0; i < data.player.length; i++){
 			ctx.fillStyle = "#4169e1";
-			ctx.fillRect(data[i].x,data[i].y,data[i].width,data[i].height);	
+			ctx.fillRect(data.player[i].x,data.player[i].y,data.player[i].width,data.player[i].height);		
+			}
+		for(var i = 0 ; i < data.projectile.length; i++)	{
+			ctx.fillStyle = "#800080";
+			ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
 	});
 	document.onkeydown = function(event) {
@@ -92,6 +96,21 @@ $(document).ready(function() {
 			$(optionsSelectInGame).hide();
 		}
 	}
+	
+	document.onmousedown = function(event){
+        socket.emit('keyPress',{inputId:'attack',state:true});
+    }
+    document.onmouseup = function(event){
+        socket.emit('keyPress',{inputId:'attack',state:false});
+    }
+    document.onmousemove = function(event){
+        var x = -250 + event.clientX - 8;
+        var y = -250 + event.clientY - 8;
+        var angle = Math.atan2(y,x) / Math.PI * 180;
+        socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
+    }
+    
+	
 });
 </script>
 </body>

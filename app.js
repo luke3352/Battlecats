@@ -8,7 +8,7 @@ var mysql = require("mysql");
 // All HTML files
 app.get('/', function(req, res) { res.sendFile(path.join(__dirname + '/client/index.html')); });
 app.get('/login', function(req, res) { res.sendFile(path.join(__dirname + '/client/login/login.html')); });
-app.get('/createaccount', function(req, res){ res.sendFile(path.join(__dirname + '/client/createaccount/createaccount.html')); });
+app.get('/createAccount', function(req, res){ res.sendFile(path.join(__dirname + '/client/create-account/createAccount.html')); });
 app.get('/mainMenu', function(req, res) { res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html')); });
 app.get('/createRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html')); });
 app.get('/joinRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html')); });
@@ -22,6 +22,9 @@ app.use('/client', express.static(__dirname + '/client'));
 var User = 	require("./controllers/user.js");
 var Room = require("./controllers/room.js");
 var Player = require("./controllers/player.js");
+var Entity = require("./controllers/entity.js");
+var Weapon = require("./controllers/weapon.js");
+var Projectile = require("./controllers/projectile.js");
 
 var SOCKET_LIST = {};
 var ROOMS_LIST = {};
@@ -30,32 +33,24 @@ serv.listen(2000);
 console.log("Server started.");
 
 
-var verifypassword = function(username, password){
+var verifypassword = function(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
 		  password : '5rqZthHkdvd',
 		  database : 'db309la07'
 	});
-	var correct =1;
-	connection.connect(function(error){
-		if (!!error){
-			console.log('Error');
-		}
-		else{
-			console.log('Connected');
-		}
-		
-		
-		connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-			if (!err){
-				var string = JSON.stringify(rows);
-				var json = JSON.parse(string);
-				if (JSON.stringify(rows) === "[]"){
-					console.log("username was not in database... create new account");
-					correct = 0;
-				}
-				else{
+
+	connection.connect();
+	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+		if (!err){
+			var string = JSON.stringify(rows);
+			var json = JSON.parse(string);
+			if (JSON.stringify(rows) === "[]"){
+				console.log("username was not in database... create new account");
+				correct = 0;
+			}
+			else{
 				var correctpassword = json[0]._password;
 				console.log("entered password: " + password);
 				console.log("correct password: " + correctpassword)
@@ -67,16 +62,13 @@ var verifypassword = function(username, password){
 					console.log(false);
 					correct = 2;
 				}
-				}	
 			}
-			else{
-			  console.log('Error while performing Query.');
-			}
-		});
-		connection.end();
+			return callback(correct);
+		}
 	});
-	return correct;
-};
+	connection.end();
+}
+
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -100,6 +92,8 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'right') player.pressingRight = data.state;
 		else if (data.inputId === 'up') player.pressingUp = data.state;
 		else if (data.inputId === 'down') player.pressingDown = data.state;
+		else if (data.inputId === 'attack') player.generateProjectile = data.state;
+		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
 	});
 	
 	// creates room
@@ -125,14 +119,15 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-	     var correct = verifypassword(username, password);
-	     console.log(correct);
-	     sendCorrectPassword(correct);
+	     verifypassword(username, password, function(correct){
+	      	 sendCorrectPassword(username, correct);
+	    });  
     });	
 	
-	function sendCorrectPassword(correct) {
+	function sendCorrectPassword(username, correct) {
+		console.log(correct);
 		var correct = correct;
-		var sendpasswordverification = {correct: correct};
+		var sendpasswordverification = {correct: correct, username: username};
 		socket.emit('sendpasswordverification', sendpasswordverification)
 	}
 	
@@ -152,19 +147,13 @@ io.sockets.on('connection', function(socket) {
     });	 
 });
 
+
 setInterval(function() {
-	var pack = [];
-	for ( var i in Player.PLAYER_LIST) {
-		var player = Player.PLAYER_LIST[i];
-		player.updatePosition();
-		pack.push({
-			x : player.position.x,
-			y : player.position.y,
-			width : player.width,
-			height : player.height,
-			number : player.number
-		});
+	var pack = {
+		player:Player.updatePlayer(),
+		projectile:Projectile.update(),
 	}
+	
 	for ( var i in SOCKET_LIST) {
 		var socket = SOCKET_LIST[i];
 		// TODO

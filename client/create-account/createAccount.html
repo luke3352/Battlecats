@@ -24,10 +24,10 @@
 </style>
 </head>
 <body>
-<div id="login"> 
+<div id="createAccount"> 
 	<div class="rectangle">
 	<h1>Create New Account</h1>
-	<form id="formlogin" name="formlogin" action="/mainMenu" method="GET">
+	<form id="formCreateAccount" name="formCreateAccount" action="/mainMenu" method="GET">
 			<fieldset>
 				New Username:<br> <input type="text" id="newusername" required><br><br> 
 				New Password:<br> <input type="text" id="newpassword"><br><br> 
@@ -38,13 +38,13 @@
 </div>
 
 <script>
-$(document).ready(function() {
-	var socket = io();
+//$(document).ready(function() {
+//	var socket = io();
 
-	$("#buttonCreate").click(function() {
+//	$("#buttonCreate").click(function() {
 		//createAccount();
-		window.location.href = "/"; //this is just here for now
-	});
+//		window.location.href = "/"; //this is just here for now
+//	});
 	
 	//these functions don't work currently because I need to add the sockets on app.js
 	
@@ -70,7 +70,7 @@ $(document).ready(function() {
 	
 	
 	
-});
+//});
 </script>
 </body>
 </html>
