@@ -29,8 +29,8 @@ var HEIGHT = 500;
             self.toRemove = true;
         super_update();
 	
-		self.x += self.vel.x;
-		self.y += self.vel.y;
+		//self.x += self.vel.x;
+		//self.y += self.vel.y;
 		
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
 		for(var i in exports.PLAYER_LIST){
