@@ -132,7 +132,7 @@ io.sockets.on('connection', function(socket) {
 setInterval(function() {
 	var pack = {
 		player:Player.updatePlayer(),
-		projectile:Projectile.update(),
+		projectile:Player.update(),
 	}
 	
 	for ( var i in SOCKET_LIST) {
