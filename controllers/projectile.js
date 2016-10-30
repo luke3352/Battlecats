@@ -1,12 +1,12 @@
 var Entity = require("./Entity.js");
 var Player = require("./player.js");
 var exports = module.exports = {};
-//List of players
+//List of projectiles
 exports.PROJECTILES_LIST = {};
 //Entity constructor
 exports.Projectile = function(parent,angle){
-var WIDTH  = 500;
-var HEIGHT = 500;
+var WIDTH  = 1000;
+var HEIGHT = 700;
 
  var self = Entity.Entity();
 	self.id = Math.random();
@@ -31,25 +31,30 @@ var HEIGHT = 500;
 	
 		//self.x += self.vel.x;
 		//self.y += self.vel.y;
-		
+		//console.log("X: "+exports.PLAYER_LIST);
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
-		for(var i in exports.PLAYER_LIST){
+		for(var i in exports.PLAYER_LIST){console.log("Here");
 			var p = exports.PLAYER_LIST[i];
-			//HIT PLAYER
-			self.toRemove = true;
+			console.log("Player X: "+p.x+" Player Y: "+p.y+" Proj X: "+self.x+" Proj Y: "+self.y);
+			if((p.x-20 < self.x && p.x+20 > self.x) && (p.y-20 < self.x && p.x+20 > self.y)){
+				console.log("HIT")
+				//HIT PLAYER
+				self.toRemove = true;
+			}
+			
 		
 		}
-		//HIT TOP OF SCREEN, BOUNCES OFF
+		//HIT TOP OF SCREEN
 		if(0 > self.y || self.y + 20 > HEIGHT){
-				delete exports.PROJECTILES_LIST[self];
+				self.toRemove = true;
 		}
 		//OUT ON LEFT
 		if(0 > self.x + 20) {
-			delete exports.PROJECTILES_LIST[self];
+			self.toRemove = true;
 		}
 		//OUT ON RIGHT
 		else if(self.x > WIDTH) {
-			delete exports.PROJECTILES_LIST[self];
+			self.toRemove = true;
 		}
 	}
 	
@@ -79,5 +84,6 @@ exports.update = function(){
 			y:projectile.y
 		});
 	}	
+	
 	return pack;
 	}
