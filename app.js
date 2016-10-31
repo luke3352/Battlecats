@@ -92,9 +92,11 @@ io.sockets.on('connection', function(socket) {
 			//button toggle
 			if((pause == true) &&(data.state == true)){
 				pause = false;
+				console.log(pause);
 			}
-			if((pause == false) && (data.state == true)){
+			else if((pause == false) && (data.state == true)){
 				pause = true;
+				console.log(pause);
 			}
 		}
 	});
@@ -140,12 +142,16 @@ io.sockets.on('connection', function(socket) {
 
 
 setInterval(function() {
+	
+	//console.log(pause);
 	if(pause == false){
 		var pack = {
-			player:Player.updatePlayer(),
-			projectile:Player.update(),
+			
+				player:Player.updatePlayer(),
+				projectile:Player.update(),
+			
 		}
-		
+	}else var pack = {};
 		for ( var i in SOCKET_LIST) {
 			var socket = SOCKET_LIST[i];
 			// TODO
@@ -154,5 +160,5 @@ setInterval(function() {
 			
 			// PLAYER ROOM SOCKETS
 		}
-	}
+	
 }, 1000 / 25);
