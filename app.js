@@ -92,11 +92,9 @@ io.sockets.on('connection', function(socket) {
 			//button toggle
 			if((pause == true) &&(data.state == true)){
 				pause = false;
-				console.log(pause);
 			}
 			else if((pause == false) && (data.state == true)){
 				pause = true;
-				console.log(pause);
 			}
 		}
 	});
