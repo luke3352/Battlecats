@@ -37,7 +37,7 @@
 <body>
 <div id="login"> 
 	<div class="rectangle">
-		<form id="formlogin" name="formlogin" action="/mainMenu" method="GET">
+		<form id="formlogin" name="formlogin">
 			<fieldset>
 				<legend>login</legend> 
 				username:<br> <input type="text" id="username" required><br><br> 
@@ -76,8 +76,8 @@ $(document).ready(function() {
 			//was succesfully logged in, and can now have wins and 
 			//ranking added to its database
 			username = data.username; 
-			window.location.href = "/";
-			
+			window.location.href = "/mainMenu";
+			socket.emit('createUser', username);
 		}
 		else{
 			alert("Incorrect Password or Username");

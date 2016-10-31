@@ -70,33 +70,63 @@ var verifypassword = function(username, password, callback){
 }
 
 
-var io = require('socket.io')(serv, {});
+var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket) {
-	socket.id = Math.random();
-	SOCKET_LIST[socket.id] = socket;
-	
-	var player = Player.player(socket.id);
-	Player.PLAYER_LIST[socket.id] = player;
-	var user = User.user(socket.id);
-	User.USER_LIST[socket.id] = user;
+	var id = Math.floor(Math.random() * 999999999);
+	SOCKET_LIST[id] = socket;
+//	console.log(socket);
+	var user, player;
 	
 	socket.on('disconnect', function() {
 		delete SOCKET_LIST[socket.id];
-		delete Player.PLAYER_LIST[socket.id];
+		if(Player.PLAYER_LIST[socket.id]) delete Player.PLAYER_LIST[socket.id];
 		if(ROOMS_LIST[socket.id]) delete ROOMS_LIST[socket.id];
-//		delete Room.ROOMS_LIST[socket.id];
-	});
-
-	socket.on('keyPress', function(data) {
-		if (data.inputId === 'left') player.pressingLeft = data.state;
-		else if (data.inputId === 'right') player.pressingRight = data.state;
-		else if (data.inputId === 'up') player.pressingUp = data.state;
-		else if (data.inputId === 'down') player.pressingDown = data.state;
-		else if (data.inputId === 'attack') player.generateProjectile = data.state;
-		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
 	});
 	
-	// creates room
+	// CREATES DIFFERENT USERS
+	socket.on('createUser', function(data){
+		user = User.user(socket.id, data);
+		console.log(user);
+		User.USER_LIST[socket.id] = user;
+	});
+	socket.on('createPlayer', function(data){
+		player = Player.player(socket.id);
+		Player.PLAYER_LIST[socket.id] = player;
+	});
+	
+	// HANDLES JOINROOM MESSAGES
+    socket.on('sendJoinRoomMsgToServer',function(data){
+        var playerName = User.USER_LIST[socket.id];
+        console.log("Server Recieved Message");
+        io.to('JoinRoom').emit('addToJoinRoomChat', playerName + ': ' + data);
+        
+    });	 
+    
+	// JOINING ROOMS
+	socket.on('joinRoom', function(data){
+		console.log("joining room: ", data);
+		socket.join(data);
+	//	console.log(socket);
+	});
+	socket.on('leaveRoom', function(data){
+		console.log("leaving room: ", data);
+		socket.leave(data);
+	});
+    
+    // HANDLES INGAME INPUT
+	socket.on('keyPress', function(data) {
+		if(player){
+			if (data.inputId === 'left') player.pressingLeft = data.state;
+			else if (data.inputId === 'right') player.pressingRight = data.state;
+			else if (data.inputId === 'up') player.pressingUp = data.state;
+			else if (data.inputId === 'down') player.pressingDown = data.state;
+			else if (data.inputId === 'attack') player.generateProjectile = data.state;
+			else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
+		}
+	});
+	
+
+	// CREATES ROOMS
 	socket.on('sendCreateRoomData',function(data){
 		console.log("retrieving room data", room);
         var room = Room.room(socket.id, data);
@@ -116,6 +146,7 @@ io.sockets.on('connection', function(socket) {
         }	
     });
 	
+	// SOCKET LOGIN
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
@@ -128,23 +159,8 @@ io.sockets.on('connection', function(socket) {
 		console.log(correct);
 		var correct = correct;
 		var sendpasswordverification = {correct: correct, username: username};
-		socket.emit('sendpasswordverification', sendpasswordverification)
-	}
-	
-	
-	// HANDLES MESSAGES
-    socket.on('sendJoinRoomMsgToServer',function(data){
-        var playerName = ("" + socket.id).slice(2,7);
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('addToJoinRoomChat',playerName + ': ' + data);
-        }
-    });	 
-    socket.on('sendHostRoomMsgToServer',function(data){
-        var playerName = ("" + socket.id).slice(2,7);
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('addToHostRoomChat',playerName + ': ' + data);
-        }
-    });	 
+		socket.emit('sendpasswordverification', sendpasswordverification);
+	}	 
 });
 
 
@@ -156,10 +172,7 @@ setInterval(function() {
 	
 	for ( var i in SOCKET_LIST) {
 		var socket = SOCKET_LIST[i];
-		// TODO
-		// IN GAME SOCKETS
 		socket.emit('newPositions', pack);
-		
-		// PLAYER ROOM SOCKETS
+
 	}
 }, 1000 / 25);

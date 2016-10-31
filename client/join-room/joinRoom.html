@@ -38,7 +38,7 @@
 			<form id="chat-form">
 				<input id="chat-input" type="text" style="width: 500px"></input>
 			</form><br><br>
-			<form action="/characterSelect" method="GET">
+			<form onSubmit="return onSubmit();" action="/characterSelect" method="GET">
 				<input type="submit" style="align: 'left'" id="buttonCharacterSelect" value="Character Select"/>
 			</form>
 		</div>
@@ -46,10 +46,15 @@
 
 <script>
 $(document).ready(function() {
-	var socket = io();
-
+	var socket = io.connect();
+	socket.on('connect', function(){
+		socket.emit('joinRoom', 'JoinRoom');
+	});
+	
+	
 	var roomList = document.getElementById('room-list');
-	socket.emit('requestRoomsList');
+//	socket.emit('requestRoomsList');
+
 
 	socket.on('updateRoomsList',function(data){
 		console.log('UPDATE ROOM LIST', data);
@@ -63,15 +68,22 @@ $(document).ready(function() {
 	var chatForm = document.getElementById('chat-form');
 	
 	// Updates the chat	
-	socket.on('addToJoinRoomChat',function(data){
+	socket.on('addToJoinRoomChat', function(data){
+		console.log('adding to chat');
 		chatText.innerHTML += '<div>' + data + '</div>';
 	});
 
 	chatForm.onsubmit = function(e){
 		e.preventDefault();
+		console.log("submitting message");
 		socket.emit('sendJoinRoomMsgToServer',chatInput.value);
 		chatInput.value = '';      
 	}
+	
+//	function onSubmit(){
+//		socket.emit()	
+//		return true;
+//	}
 });
 </script>
 </body>
