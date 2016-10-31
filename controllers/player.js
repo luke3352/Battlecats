@@ -7,6 +7,8 @@ exports.PROJECTILES_LIST = {};
 //Player constructor
 var HEIGHT = 700;
 var WIDTH = 1000;
+var FIRERATE = 750;
+
 exports.player = function(id) {
 	var self = Entity.Entity();
 		self.weapon = {};
@@ -23,6 +25,9 @@ exports.player = function(id) {
 		self.hit = false;
 		self.HP = 10;
 		self.dead = false;
+		self.fireTime = new Date().getTime();
+		self.previousFireTime = 0;
+		
 		/*var super_update = self.update;
 		self.update = function(){
 			self.updatePosition();
@@ -65,10 +70,16 @@ exports.player = function(id) {
 					self.y += self.maxSpd;
 				}
 				if(self.generateProjectile){
-					var projectile = exports.Projectile(self.id,self.mouseAngle);
-					projectile.x = self.x;
-					projectile.y = self.y;
-					projectile.shoot(self.mouseAngle);
+					if(self.fireTime - self.previousFireTime > FIRERATE){
+						self.previousFireTime = self.fireTime;
+						self.fireTime = new Date().getTime();
+						var projectile = exports.Projectile(self.id,self.mouseAngle);
+						projectile.x = self.x;
+						projectile.y = self.y;
+						projectile.shoot(self.mouseAngle);
+					}
+					else self.fireTime = new Date().getTime();
+					
 				}
 			}
 				
@@ -153,7 +164,7 @@ var HEIGHT = 700;
 		if(0 > self.y || self.y + 20 > HEIGHT){
 				self.toRemove = true;
 		}
-		//OUT ON LEFTd
+		//OUT ON LEFT
 		if(0 > self.x + 20) {
 			self.toRemove = true;
 		}
