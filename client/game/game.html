@@ -64,7 +64,10 @@ $(document).ready(function() {
 			});
 		}
 		else if (event.keyCode === 9) { //tab
-			$(optionsSelectInGame).show();
+			socket.emit('keyPress', {
+				inputId : 'pause',
+				state : true
+			});
 		}
 	}
 	document.onkeyup = function(event) {
@@ -93,7 +96,10 @@ $(document).ready(function() {
 			});
 		}
 		else if (event.keyCode === 9) { //tab
-			$(optionsSelectInGame).hide();
+			socket.emit('keyPress', {
+				inputId : 'pause',
+				state : false
+			});
 		}
 	}
 	

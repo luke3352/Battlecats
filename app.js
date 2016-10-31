@@ -26,7 +26,7 @@ var Weapon = require("./controllers/weapon.js");
 var Projectile = require("./controllers/projectile.js");
 
 var SOCKET_LIST = {};
-
+var pause = false;
 serv.listen(2000);
 console.log("Server started.");
 
@@ -88,6 +88,15 @@ io.sockets.on('connection', function(socket) {
 		else if (data.inputId === 'down') player.pressingDown = data.state;
 		else if (data.inputId === 'attack') player.generateProjectile = data.state;
 		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
+		else if (data.inputId === 'pause'){
+			//button toggle
+			if((pause == true) &&(data.state == true)){
+				pause = false;
+			}
+			if((pause == false) && (data.state == true)){
+				pause = true;
+			}
+		}
 	});
 	// creates room
 	socket.on('sendCreateRoomData',function(data){
@@ -129,18 +138,21 @@ io.sockets.on('connection', function(socket) {
 });
 
 
+
 setInterval(function() {
-	var pack = {
-		player:Player.updatePlayer(),
-		projectile:Player.update(),
-	}
-	
-	for ( var i in SOCKET_LIST) {
-		var socket = SOCKET_LIST[i];
-		// TODO
-		// IN GAME SOCKETS
-		socket.emit('newPositions', pack);
+	if(pause == false){
+		var pack = {
+			player:Player.updatePlayer(),
+			projectile:Player.update(),
+		}
 		
-		// PLAYER ROOM SOCKETS
+		for ( var i in SOCKET_LIST) {
+			var socket = SOCKET_LIST[i];
+			// TODO
+			// IN GAME SOCKETS
+			socket.emit('newPositions', pack);
+			
+			// PLAYER ROOM SOCKETS
+		}
 	}
 }, 1000 / 25);
