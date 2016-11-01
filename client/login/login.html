@@ -40,8 +40,11 @@
 		<form id="formlogin" name="formlogin">
 			<fieldset>
 				<legend>login</legend> 
-				username:<br> <input type="text" id="username" required><br><br> 
-				password:<br> <input type="text" id="password"><br><br> 
+				<!-- username:<br> <input type="text" id="username" required><br><br> 
+				password:<br> <input type="text" id="password"><br><br> -->
+				<!-- FOR TESTING PURPOSES. SHOULD BE REMOVED. -->
+				username:<br> <input value="maddie" type="text" id="username" required><br><br> 
+				password:<br> <input value="morecats" type="text" id="password"><br><br> 
 			</fieldset>
 		</form>
 		<input type="submit" style="align: 'left'" id="buttonContinue" value="Continue"/>
@@ -76,8 +79,8 @@ $(document).ready(function() {
 			//was succesfully logged in, and can now have wins and 
 			//ranking added to its database
 			username = data.username; 
-			window.location.href = "/mainMenu";
 			socket.emit('createUser', username);
+			window.location.href = "/mainMenu";
 		}
 		else{
 			alert("Incorrect Password or Username");

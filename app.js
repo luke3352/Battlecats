@@ -69,44 +69,58 @@ var verifypassword = function(username, password, callback){
 	connection.end();
 }
 
-
+var numOfClient = 0;
+var user;
 var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket) {
+	var num = numOfClient++;
+//	console.log(num, " SOCKET: ", socket);
+	console.log(num, " CONNECTION ID: ", socket.id);
 	var id = Math.floor(Math.random() * 999999999);
+	socket.user = User.user(id);
 	SOCKET_LIST[id] = socket;
-//	console.log(socket);
 	var user, player;
 	
+	socket.getSocketUser = function(){
+		console.log(num, " GET SOCKET USER ID: ", socket.id);
+		console.log("GET SOCKET USER: ", socket.user);
+		return socket.user;
+	}
+	socket.setSocketUsername = function(name){
+		console.log(num, " SET SOCKET USERNAME ID: ", socket.id);
+		console.log("SET SOCKET USERNAME: ");
+		console.log("BEFORE: ", socket.user);
+		socket.user.username = name;
+		console.log("AFTER: ", socket.user);
+		socket.getSocketUser();
+	}
+	
 	socket.on('disconnect', function() {
-		delete SOCKET_LIST[socket.id];
-		if(Player.PLAYER_LIST[socket.id]) delete Player.PLAYER_LIST[socket.id];
-		if(ROOMS_LIST[socket.id]) delete ROOMS_LIST[socket.id];
+		console.log("DISCONNECT");
+		delete SOCKET_LIST[id];
+		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
+		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
 	});
 	
 	// CREATES DIFFERENT USERS
-	socket.on('createUser', function(data){
-		user = User.user(socket.id, data);
-		console.log(user);
-		User.USER_LIST[socket.id] = user;
+	socket.on('updateUser', function(data){
+		socket.setSocketUsername(data);
 	});
 	socket.on('createPlayer', function(data){
-		player = Player.player(socket.id);
-		Player.PLAYER_LIST[socket.id] = player;
+		player = Player.player(id);
+		Player.PLAYER_LIST[id] = player;
 	});
 	
 	// HANDLES JOINROOM MESSAGES
-    socket.on('sendJoinRoomMsgToServer',function(data){
-        var playerName = User.USER_LIST[socket.id];
-        console.log("Server Recieved Message");
-        io.to('JoinRoom').emit('addToJoinRoomChat', playerName + ': ' + data);
-        
+    socket.on('sendJoinRoomMsgToServer',function(msg){
+        var name = socket.getSocketUser().username;
+        io.to('JoinRoom').emit('addToJoinRoomChat', name + ': ' + msg);
     });	 
     
 	// JOINING ROOMS
 	socket.on('joinRoom', function(data){
 		console.log("joining room: ", data);
 		socket.join(data);
-	//	console.log(socket);
 	});
 	socket.on('leaveRoom', function(data){
 		console.log("leaving room: ", data);
@@ -115,7 +129,7 @@ io.sockets.on('connection', function(socket) {
     
     // HANDLES INGAME INPUT
 	socket.on('keyPress', function(data) {
-		if(player){
+		if(player) {
 			if (data.inputId === 'left') player.pressingLeft = data.state;
 			else if (data.inputId === 'right') player.pressingRight = data.state;
 			else if (data.inputId === 'up') player.pressingUp = data.state;
@@ -124,27 +138,27 @@ io.sockets.on('connection', function(socket) {
 			else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
 		}
 	});
-	
 
-	// CREATES ROOMS
+	// ROOMS
 	socket.on('sendCreateRoomData',function(data){
 		console.log("retrieving room data", room);
-        var room = Room.room(socket.id, data);
-        room.roomPlayers.push(Player.PLAYER_LIST[socket.id]);
-		ROOMS_LIST[socket.id] = room;
-		console.log("updating rooms list");
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('updateRoomsList', ROOMS_LIST);
-        }
+        var room = Room.room(id, data);
+        room.roomPlayers.push(Player.PLAYER_LIST[id]);
+        //JOIN HOSTING ROOM ROOM
+        socket.join(room.roomName);
+        io.sockets.adapter.rooms[room.roomName].room = room;
+        io.to('JoinRoom')
+        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
+
     });	
-	socket.on('requestSocketId', function(data){
-		SOCKET_LIST[socket.id].emit('currentSocketId', socket.id);
-	});
-	socket.on('requestRoomsList',function(data){
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('updateRoomsList', ROOMS_LIST);
-        }	
+	socket.on('requestRoomsList',function(){
+		console.log(num, " REQUEST ROOMS ID: ", socket.id);
+        io.to('JoinRoom')
+        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
     });
+	socket.on('requestSocketId', function(data){
+		SOCKET_LIST[id].emit('currentSocketId', id);
+	});
 	
 	// SOCKET LOGIN
 	socket.on('sendLoginData',function(data){
@@ -163,6 +177,16 @@ io.sockets.on('connection', function(socket) {
 	}	 
 });
 
+function filterRooms(rooms) {
+//	console.log("Rooms: ", rooms);
+	var roomsList = {};
+	for(var i in rooms){
+		if(rooms[i].room){
+			roomsList[rooms[i].room.roomName] = rooms[i].room;
+		}
+	}
+	return roomsList;
+}
 
 setInterval(function() {
 	var pack = {

@@ -49,15 +49,13 @@ $(document).ready(function() {
 	var socket = io.connect();
 	socket.on('connect', function(){
 		socket.emit('joinRoom', 'JoinRoom');
+		socket.emit('requestRoomsList');
 	});
 	
 	
 	var roomList = document.getElementById('room-list');
-//	socket.emit('requestRoomsList');
-
-
 	socket.on('updateRoomsList',function(data){
-		console.log('UPDATE ROOM LIST', data);
+		//console.log('UPDATE ROOM LIST', data);
 		for(var i in data){
 			roomList.innerHTML += '<li>' + data[i].roomName + '</li>';
 		}
@@ -69,13 +67,11 @@ $(document).ready(function() {
 	
 	// Updates the chat	
 	socket.on('addToJoinRoomChat', function(data){
-		console.log('adding to chat');
 		chatText.innerHTML += '<div>' + data + '</div>';
 	});
 
 	chatForm.onsubmit = function(e){
 		e.preventDefault();
-		console.log("submitting message");
 		socket.emit('sendJoinRoomMsgToServer',chatInput.value);
 		chatInput.value = '';      
 	}
