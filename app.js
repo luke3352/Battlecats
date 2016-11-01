@@ -29,7 +29,8 @@ var SOCKET_LIST = {};
 var pause = false;
 serv.listen(2000);
 console.log("Server started.");
-
+ var room = Room.room(1);
+var numPlayer=0;
 
 var verifypassword = function(username, password, callback){
 	var connection = mysql.createConnection({
@@ -73,7 +74,8 @@ io.sockets.on('connection', function(socket) {
 	socket.id = Math.random();
 	SOCKET_LIST[socket.id] = socket;
 
-	var player = Player.player(socket.id);
+	numPlayer++;
+	var player = Player.player(socket.id,numPlayer);
 	Player.PLAYER_LIST[socket.id] = player;
 
 	socket.on('disconnect', function() {
@@ -141,6 +143,7 @@ io.sockets.on('connection', function(socket) {
 
 setInterval(function() {
 	
+	Room.updateRoom();
 	//console.log(pause);
 	if(pause == false){
 		var pack = {

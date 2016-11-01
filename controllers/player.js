@@ -7,9 +7,9 @@ exports.PROJECTILES_LIST = {};
 //Player constructor
 var HEIGHT = 700;
 var WIDTH = 1000;
-var FIRERATE = 750;
+var FIRERATE = 500;
 
-exports.player = function(id) {
+exports.player = function(id,numPlayerInRoom) {
 	var self = Entity.Entity();
 		self.weapon = {};
 		self.character = {};
@@ -23,20 +23,27 @@ exports.player = function(id) {
 		self.maxSpd = 5;
 		self.generateProjectile = false;
 		self.hit = false;
-		self.HP = 10;
+		self.HP = 3;
 		self.dead = false;
 		self.fireTime = new Date().getTime();
 		self.previousFireTime = 0;
-		
-		/*var super_update = self.update;
-		self.update = function(){
-			self.updatePosition();
-			super_update();
-       
-			if(self.pressingAttack){
-				self.shootBullet(self.mouseAngle);
-			}
-		}*/
+		self.color = "#0000FF";
+		if(numPlayerInRoom == 1){
+			self.x = 100;
+			self.y = 100;
+		}
+		else if(numPlayerInRoom == 2){
+			self.x = 900;
+			self.y = 100;
+		}
+		else if(numPlayerInRoom == 3){
+			self.x = 100;
+			self.y = 600;
+		}
+		else if(numPlayerInRoom == 4){
+			self.x = 900;
+			self.y = 600;
+		}
 	
 		
 	// Check if players share the same position
@@ -53,10 +60,12 @@ exports.player = function(id) {
 					if(self.HP <= 0){
 						self.dead=true;
 						self.x=-250;
-						self.y=250;
+						self.y=-250;
+						
 					}
 				}
 				//checks what button is pressed and if player can move their; IE: can't leave map
+				
 				if (self.pressingRight && !(self.x > WIDTH-35)) {
 					self.x += self.maxSpd;
 				}
@@ -69,6 +78,23 @@ exports.player = function(id) {
 				if (self.pressingDown && !(self.y + 40 > HEIGHT+5)) {
 					self.y += self.maxSpd;
 				}
+				
+				/*for(var i in exports.PLAYER_LIST){
+					var p = exports.PLAYER_LIST[i];
+					
+					if (self.pressingRight && !(self.x > p.x-35) && !(self.x > WIDTH-35)) {
+						self.x += self.maxSpd;
+					}
+					if (self.pressingLeft && !(p.x - 35 > self.x - 5) && !(0 > self.x - 5)) {
+						self.x -= self.maxSpd;
+					}
+					if (self.pressingUp && !(p.y > self.y - 5) &&  !(0 > self.y - 5)) {
+						self.y -= self.maxSpd;
+					}
+					if (self.pressingDown && !(self.y + 40 > p.y+5) && !(self.y + 40 > HEIGHT+5)) {
+						self.y += self.maxSpd;
+					}
+				}*/
 				if(self.generateProjectile){
 					if(self.fireTime - self.previousFireTime > FIRERATE){
 						self.previousFireTime = self.fireTime;
@@ -83,13 +109,11 @@ exports.player = function(id) {
 				}
 			}
 				
-			function collision(self, enemy) {
-				
-			}
 			
 		
 		}
 	}
+	
 	exports.PLAYER_LIST[id] = self;
 	return self;
 	
@@ -112,7 +136,8 @@ exports.updatePlayer = function(){
 				x:player.x,
 				y:player.y,
 				width:player.width,
-				height:player.height
+				height:player.height,
+				color:player.color
 			});	
 		
 		count++;
@@ -136,6 +161,7 @@ var HEIGHT = 700;
 	self.timer = 0;
 	self.toRemove = false;
 	self.speed = 12;
+	self.color = exports.PLAYER_LIST[self.firedByID].color;
 	self.vel = {
 		x: 0,
 		y: 0
@@ -197,7 +223,8 @@ exports.update = function(){
         else
 		pack.push({ 
 			x:projectile.x, 
-			y:projectile.y
+			y:projectile.y,
+			color:projectile.color
 		});
 	}	
 	
