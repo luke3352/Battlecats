@@ -39,6 +39,10 @@ $(document).ready(function() {
 			ctx.fillStyle = data.projectile[i].color;
 			ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
+		//for(var i = 0 ; i < data.obstacle.length; i++)	{
+		//	ctx.fillStyle = "0000FF"
+		//	ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,20,20);		
+		//}
 	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d

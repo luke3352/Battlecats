@@ -43,7 +43,7 @@ $(document).ready(function() {
 
 	$("#buttonCreate").click(function() {
 		createAccount();
-		window.location.href = "/"; //this is just here for now
+		//window.location.href = "/"; //this is just here for now
 	});
 	
 	//these functions don't work currently because I need to add the sockets on app.js
@@ -59,12 +59,13 @@ $(document).ready(function() {
 	}
 	
 	socket.on('verifynewaccount', function(data){
-		var verified = data.verified;
-		if (verified === true){
-			window.location.href = "/";
+		var verified = data.value;
+		if (verified === 1){
+			alert("the username was added");
+			//window.location.href = "/";
 		}
 		else{
-			alert("Username already exists, please login");
+			alert("Username already exists - please login or create a new account using a different username");
 		}
 	});
 });	
