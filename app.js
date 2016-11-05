@@ -24,6 +24,7 @@ var Player = require("./controllers/player.js");
 var Entity = require("./controllers/entity.js");
 var Weapon = require("./controllers/weapon.js");
 var Projectile = require("./controllers/projectile.js");
+var Obstacles = require("./controllers/obstacles.js");
 
 var SOCKET_LIST = {};
 var pause = false;
@@ -129,6 +130,8 @@ io.sockets.on('connection', function(socket) {
 	}
 	
 	
+	
+	
 	// HANDLES MESSAGES
     socket.on('sendMsgToServer',function(data){
         var playerName = ("" + socket.id).slice(2,7);
@@ -140,17 +143,24 @@ io.sockets.on('connection', function(socket) {
 });
 
 
-
+function createObstacles(){
+		
+		var obstacle = Obstacles.obstacles(0);
+		obstacle.x = 300;
+		obstacle.y = 300;
+}
+	
+	createObstacles();
+	
 setInterval(function() {
 	
 	Room.updateRoom();
 	//console.log(pause);
 	if(pause == false){
 		var pack = {
-			
-				player:Player.updatePlayer(),
-				projectile:Player.update(),
-			
+			player:Player.updatePlayer(),
+			projectile:Player.update(),
+			obstacles:Obstacles.update(),
 		}
 	}else var pack = {};
 		for ( var i in SOCKET_LIST) {
