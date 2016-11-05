@@ -67,6 +67,35 @@ var verifypassword = function(username, password, callback){
 	connection.end();
 }
 
+var create_new_account = function(username, password, callback){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+
+	connection.connect();
+	connection.query("SELECT * from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+		if (!err){
+			var string = JSON.stringify(rows);
+			var json = JSON.parse(string);
+			//console.log(json.stringify(rows));
+			if (json.stringify(rows) === "[]"){
+				console.log("putting into query");
+				connection.query("INSERT INTO shelves VALUES ('" + username+  "', '" + password + "', '0', '0');",  function(err, result) {
+				});
+			}
+			else{
+				console.log("username is already in database");
+				value = 0;
+			}
+			return callback(value);
+		}
+	});
+	connection.end();
+}
+
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -123,10 +152,22 @@ io.sockets.on('connection', function(socket) {
 		console.log(correct);
 		var correct = correct;
 		var sendpasswordverification = {correct: correct, username: username};
-		socket.emit('sendpasswordverification', sendpasswordverification)
+		socket.emit('sendpasswordverification', sendpasswordverification);
 	}
 	
+	socket.on('sendNewAccountData', function(data){
+		var username = data.username;
+		var password = data.password;
+		create_new_account(username, password, function(value){
+			verifycreateAccount(value);
+		});
+	})
 	
+	function verifycreateAccount(value){
+		var value = value; 
+		var verifynewaccount = {value: value};
+		socket.emit('verifynewaccount', verifynewaccount);
+	}
 	// HANDLES MESSAGES
     socket.on('sendMsgToServer',function(data){
         var playerName = ("" + socket.id).slice(2,7);

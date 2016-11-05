@@ -28,7 +28,16 @@
 	<div id="characterSelect">
 		<div class="rectangle">
 			<p align="Center">CHARACTER SELECT</p><br><br>
-			<p align="Center">Pick a Color!</p><br><br><br>
+			<p align="Center">Select a cat!</p><br><br>
+			
+			<img id = "cat2" src="/client/cats/Cat2.png" style = "width: 100px" hspace="20">
+			<img id = "cat3" src="/client/cats/Cat3.png" style = "width: 100px" hspace="20">
+			<img id = "cat4" src="/client/cats/Cat4.png" style = "width: 100px" hspace="20">
+			<img id = "cat6" src="/client/cats/Cat6.png" style = "width: 100px" hspace="20">
+			<img id = "cat7" src="/client/cats/Cat7.png" style = "width: 100px" hspace="20">
+			<img id = "cat8" src="/client/cats/Cat8.png" style = "width: 100px" hspace="20">
+			<br>
+			
 			<form action="/weaponSelect" method="GET">
 				<input type="submit" style="align: 'left'" id="buttonWeaponSelect" value="Weapon Select"/>
 			</form>
@@ -37,7 +46,16 @@
 
 <script>
 $(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("cat2").addEventListener('click',function ()
+    {
+     alert("hello");
+     //validation code to see State field is mandatory.  
+    }  ); 
+});
 
+//if cat is selected by another player send that to socket info and then make cat id hidden to other players
+//with an alert or message "cat 3 has already been selected and is now unavailable"
 	
 });
 </script>
