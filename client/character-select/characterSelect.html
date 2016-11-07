@@ -5,6 +5,18 @@
 
 
 <style>
+.button{
+	padding: 10px 17px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  margin:auto;
+  display:block;
+}
 #picture {
 	position: absolute;
 }
@@ -20,24 +32,55 @@
 .rectangle {
 	top: 0px;
 	left: 0px;
-}		
+}	
+h1{
+	font-size: 30px;
+	text-align: center;
+}	
+p {
+    font-size: 30px;
+    text-align: center;
+    
+}
 	
 </style>
 </head>
 <body>
 	<div id="characterSelect">
 		<div class="rectangle">
-			<p align="Center">CHARACTER SELECT</p><br><br>
-			<p align="Center">Pick a Color!</p><br><br><br>
+			<h1 id = "title">CHARACTER SELECT</h1>
+			<p >Select a cat:</p><br><br>
+			
+			<img id = "cat2" src="/client/cats/Cat2.png" style = "width: 100px" hspace="20">
+			<img id = "cat3" src="/client/cats/Cat3.png" style = "width: 100px" hspace="20">
+			<img id = "cat4" src="/client/cats/Cat4.png" style = "width: 100px" hspace="20">
+			<img id = "cat6" src="/client/cats/Cat6.png" style = "width: 100px" hspace="20">
+			<img id = "cat7" src="/client/cats/Cat7.png" style = "width: 100px" hspace="20">
+			<img id = "cat8" src="/client/cats/Cat8.png" style = "width: 100px" hspace="20">
+			<br>
+			
 			<form action="/weaponSelect" method="GET">
-				<input type="submit" style="align: 'left'" id="buttonWeaponSelect" value="Weapon Select"/>
+			<br><br><br>
+				<input type="submit" style="align: 'left'" class = "button"id="buttonWeaponSelect" value="Weapon Select"/>
 			</form>
 		</div>
 	</div>
 
 <script>
 $(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("cat2").addEventListener('click',function ()
+    {
+    
+    //not working ...
+     alert("clicked on cat");
+    
+    
+    }  ); 
+});
 
+//if cat is selected by another player send that to socket info and then make cat id hidden to other players
+//with an alert or message "cat 3 has already been selected and is now unavailable"
 	
 });
 </script>

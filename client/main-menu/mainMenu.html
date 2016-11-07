@@ -4,6 +4,30 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <style>
+.button{
+	padding: 10px 17px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  margin:auto;
+  display:block;
+}
+.userInfo{
+	padding: 5px 10px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+}
+#title{
+	font-size: 30px;
+}
 #picture {
 	position: absolute;
 }
@@ -20,41 +44,50 @@
 	top: 0px;
 	left: 0px;
 }	
-#buttonJoin {
-	margin-left: 370px;
-	margin-top: 350px;
-}	
+
+
 </style>
 </head>
 <body>
 	<div id="SelectRoom"> 
 		<div class="rectangle">
-			<p align="Center">BATTLE CATS</p>
+			<button class = "userInfo" id="usernameDisplay"></button>
+		
+			<h1 align="Center" id = "title">BATTLE CATS</h1>
 			<form action="/joinRoom" method="GET">
-				<input type="submit" id="buttonJoin" value="Join Room"/>
+			<br>
+				<input class = "button" type="submit" id="buttonJoin" value="Join Room"/>
+				<br>
 			</form>
 			<form action="/createRoom" method="GET">			
-				<input type="submit" id="buttonCreate" value="Create Room"/>
+				<input class = "button" type="submit" id="buttonCreate" value="Create Room"/>
+				<br>
 			</form>
-			<button id="buttonOptions">Options</button>
+			<button id="howToPlay" class = "button">How to Play</button>
 		</div>
 	</div>
-	<div id="optionsSelect">
+	<div id="howToPlayPage">
 		<div class="rectangle">
-			<p align="Center">OPTIONS</p>
-			<button style="align: 'left'" id="buttonBack">Back</button>
+			<p align="Center" id = "title">How to Play</p>
+			<button style="align: 'left'" class = "button" id="return_to_main">Back</button>
 		</div>
 	</div>
 <script>
 $(document).ready(function() {
-	$(optionsSelect).hide();
-	$("#buttonOptions").click(function() {
+	//use cookies to display the username
+	//if time: make it a button that says "Account Info"
+	//and when clicked is displays/drops down the username,
+	// wins, and experience... for now make automatic username
+	//$("#usernameDisplay").html($('#username').val());
+	$("#usernameDisplay").html("username");
+	$(howToPlayPage).hide();
+	$("#howToPlay").click(function() {
 		$(SelectRoom).hide();
-		$(optionsSelect).show();
+		$(howToPlayPage).show();
 	});
-	$("#buttonBack").click(function() {
+	$("#return_to_main").click(function() {
 		$(SelectRoom).show();
-		$(optionsSelect).hide();
+		$(howToPlayPage).hide();
 	});
 });
 </script>

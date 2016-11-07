@@ -5,6 +5,18 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <style>
+.button{
+	padding: 10px 17px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  position: relative;
+    left: 8px;
+}
 #picture {
 	position: absolute;
 }
@@ -21,53 +33,57 @@
 	top: 0px;
 	left: 0px;
 }
+#legend{
+	font-size: 30px;
+}
 </style>
 </head>
 <body>
 <div id="createAccount"> 
 	<div class="rectangle">
-	<h1>Create New Account</h1>
 	<form id="formCreateAccount" name="formCreateAccount" action="/mainMenu" method="GET">
 			<fieldset>
+				<legend id = "legend">Create New Account</legend>
 				New Username:<br> <input type="text" id="newusername" required><br><br> 
 				New Password:<br> <input type="text" id="newpassword"><br><br> 
 			</fieldset>
 		</form>
-		<input type="submit" style="align: 'left'" id="buttonCreate" value="Create Account"/>
+		<br>
+		<input type="submit" style="align: 'left'" id="buttonCreate" class = "button" value="Create Account"/>
+		<button type="button" style="align: 'left'" id= "goto_home" class = "button" onclick = "window.location.href = '/startPage';">Return to Main Menu</button>
 	</div>
 </div>
 
 <script>
-//$(document).ready(function() {
-//	var socket = io();
+$(document).ready(function() {
+	var socket = io();
 
-//	$("#buttonCreate").click(function() {
-		//createAccount();
-//		window.location.href = "/"; //this is just here for now
-//	});
+	$("#buttonCreate").click(function() {
+		createAccount();
+	});
 	
 	//these functions don't work currently because I need to add the sockets on app.js
 	
-	//function createAccount() {
+	function createAccount() {
 		//gathers data from the login form
-	//	var newusername = document.getElementById("newusername").value;
-	//	var newpassword = document.getElementById("newpassword").value;
+		var newusername = document.getElementById("newusername").value;
+		var newpassword = document.getElementById("newpassword").value;
 		//puts data into string for sending
-	//	var sendLoginData = {newusername: newusername, newpassword: newpassword };	
-	//	socket.emit('sendNewAccounData', sendNewAccountData);
-	//	console.log("new account data sent");
-//	}
-//	
-	//socket.on('verifynewaccount', function(data){
-//		var verified = data.verified;
-//		if (verified == true){
-//			window.location.href = "/";
-//		}
-//		else{
-//			alert("Username already exists, please login");
-//		}
-//	});
+		var sendNewAccountData = {newusername: newusername, newpassword: newpassword };	
+		socket.emit('sendNewAccountData', sendNewAccountData);
+		console.log("new account data sent");
+	}
 	
+	socket.on('verifynewaccount', function(data){
+		var verified = data.value;
+		if (verified === 1){
+			window.location.href = "/mainMenu";
+		}
+		else{
+			alert("Username already exists - please login or create a new account using a different username");
+		}
+	});
+});	
 	
 	
 //});

@@ -21,6 +21,8 @@
 	</div>
 
 <script>
+var pauseGame = false;
+
 $(document).ready(function() {
 	var socket = io();
 
@@ -30,13 +32,17 @@ $(document).ready(function() {
 	socket.on('newPositions', function(data) {
 		ctx.clearRect(0, 0, 1000, 700);
 		for(var i = 0; i < data.player.length; i++){
-			ctx.fillStyle = "#4169e1";
+			ctx.fillStyle = data.player[i].color;
 			ctx.fillRect(data.player[i].x,data.player[i].y,data.player[i].width,data.player[i].height);		
 			}
 		for(var i = 0 ; i < data.projectile.length; i++)	{
-			ctx.fillStyle = "#800080";
+			ctx.fillStyle = data.projectile[i].color;
 			ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
+		//for(var i = 0 ; i < data.obstacle.length; i++)	{
+		//	ctx.fillStyle = "0000FF"
+		//	ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,20,20);		
+		//}
 	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
@@ -63,8 +69,20 @@ $(document).ready(function() {
 				state : true
 			});
 		}
-		else if (event.keyCode === 9) { //tab
-			$(optionsSelectInGame).show();
+		else if (event.keyCode === 81) { //p
+			socket.emit('keyPress', {
+				inputId : 'pause',
+				state : true
+			});//button toggle
+			if((pauseGame == true) &&(data.state == true)){
+				pauseGame = false;
+				$(optionsSelectInGame).hide();
+			}
+			else if((pauseGame == false) && (data.state == true)){
+				pauseGame = true;
+				$(optionsSelectInGame).show();
+			}
+			
 		}
 	}
 	document.onkeyup = function(event) {
@@ -93,7 +111,11 @@ $(document).ready(function() {
 			});
 		}
 		else if (event.keyCode === 9) { //tab
-			$(optionsSelectInGame).hide();
+			socket.emit('keyPress', {
+				inputId : 'pause',
+				state : false
+			});
+			
 		}
 	}
 	
