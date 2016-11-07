@@ -33,7 +33,7 @@ var pause = false;
 
 serv.listen(2000);
 console.log("Server started.");
- var room = Room.room(1);
+var room = Room.room(1);
 var numPlayer=0;
 
 var verifypassword = function(username, password, callback){
@@ -233,7 +233,6 @@ io.sockets.on('connection', function(socket) {
 
     });	
 	socket.on('requestRoomsList',function(){
-		console.log(num, " REQUEST ROOMS ID: ", socket.id);
         io.to('JoinRoom')
         	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
     });
