@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<style>
+.button{
+	padding: 10px 17px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  margin:auto;
+  display:block;
+}
+#title{
+	font-size: 36px;
+}
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}	
+
+</style>
+</head>
+<body>
+	<div id="startPage"> 
+		<div class="rectangle">
+			<h1 align="Center" id = "title">Welcome to Battle Cats</h1>
+			<form action="/login" method="GET">
+			<br>
+				<input class = "button" type="submit" id="login" value="Login"/>
+				<br>
+			</form>
+			<form action="/createAccount" method="GET">		
+				<p align = 'center'>Don't have any account yet?</p>	
+				<input class = "button" type="submit" id="createAccout" value="Create Account"/>
+				<br>
+			</form>
+			<button id="aboutButton" class = "button" style="font-size: '11'">About the Game</button>
+		</div>
+	</div>
+	<div id="aboutGame">
+		<div class="rectangle">
+			<p align = "center">Text about the game</p>
+			<p align = "center">maybe make this a pop up box rather than a new div</p>
+			<button class = "button" style="align: 'left'" id="return_to_main">Back</button>
+		</div>
+	</div>
+<script>
+$(document).ready(function() {
+	$(aboutGame).hide();
+	$("#aboutButton").click(function() {
+		$(startPage).hide();
+		$(aboutGame).show();
+	});
+	$("#return_to_main").click(function() {
+		$(startPage).show();
+		$(aboutGame).hide();
+	});
+});
+</script>
+</body>
+</html>

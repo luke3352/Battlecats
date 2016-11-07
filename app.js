@@ -15,7 +15,7 @@ app.get('/joinRoom', function(req, res) { res.sendFile(path.join(__dirname + '/c
 app.get('/characterSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/character-select/characterSelect.html')); });
 app.get('/weaponSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html')); });
 app.get('/game', function(req, res) { res.sendFile(path.join(__dirname + '/client/game/game.html')); });
-
+app.get('/startPage', function(req, res) { res.sendFile(path.join(__dirname + '/client/start-page/startPage.html'));});
 app.use('/client', express.static(__dirname + '/client'));
 
 var User = 	require("./controllers/user.js");

@@ -5,6 +5,16 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <style>
+.button{
+	padding: 10px 17px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+}
 #picture {
 	position: absolute;
 }
@@ -20,21 +30,24 @@
 .rectangle {
 	top: 0px;
 	left: 0px;
-}		
+}	
+#title{
+	font-size: 30px;
+}	
 </style>
 </head>
 <body>
 	<div id="joinRoom">
 		<div class="rectangle">
-			<p align="Center">JOIN ROOM</p>
+			<h1 align="Center" id = "title">JOIN ROOM</h1>
 			<div id="chat-text" style="width: 500px; height: 100px; overflow-y: scroll">
 				<div>Enter a message!</div>
 			</div>
 			<form id="chat-form">
 				<input id="chat-input" type="text" style="width: 500px"></input>
-			</form><br><br>
+			</form><br>
 			<form action="/characterSelect" method="GET">
-				<input type="submit" style="align: 'left'" id="buttonCharacterSelect" value="Character Select"/>
+				<input type="submit" style="align: 'left'" class ="button"id="buttonCharacterSelect" value="Character Select"/>
 			</form>
 		</div>
 	</div>
