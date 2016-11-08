@@ -219,11 +219,12 @@ io.sockets.on('connection', function(socket) {
 	
 	function verifycreateAccount(value, username, password){
 		var value = value; 
+		console.log(value);
 		if (value === 1){
 			add_account(username, password);
 		}
 		var verifiednewaccount = {value: value};
-		socket.emit('verifiednewaccount', verifynewaccount);
+		socket.emit('verifiednewaccount', verifiednewaccount);
 	}
 
 });
@@ -266,6 +267,9 @@ function verifypassword(username, password, callback){
 	console.log('end the connection')
 	connection.end();
 }
+
+//VERIFIES NEW ACCOUNT DOESN'T PREVIOUS EXIST AND
+//PASSWORD FITS ALL THREE REQUIREMENTS
 function check_account(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
@@ -280,8 +284,17 @@ function check_account(username, password, callback){
 			console.log(JSON.stringify(rows));
 			if (JSON.stringify(rows) === "[]"){
 				console.log("putting into query");
-				//addingAccount(username, password, connection);
-				value = 1; 
+				if (username === ""){
+					value = 3;
+				}
+				//password verification, regexp wrong
+				else if (!(password.match(RegExp(/^.{6,}$/)) && (password.match(RegExp(/[0-9]/))) &&  (password.match(RegExp(/[A-Z]/))))){
+					value = 2;
+				}
+				else{
+					value = 1;
+				}
+				console.log(value);
 			}
 			else{
 				console.log("username is already in database");
@@ -293,6 +306,8 @@ function check_account(username, password, callback){
 	console.log("end connection");
 	connection.end();
 }
+
+//ADD NEW ACCOUNT TO DATABASE
 function add_account(username, password){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',

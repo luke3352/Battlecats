@@ -76,11 +76,18 @@ $(document).ready(function() {
 	
 	socket.on('verifiednewaccount', function(data){
 		var verified = data.value;
-		if (verified === 1){
+		console.log(verified);
+		if (verified == 1){
 			window.location.href = "/mainMenu";
 		}
-		else{
+		else if (verified === 0){
 			alert("Username already exists - please login or create a new account using a different username");
+		}
+		else if (verified === 2){
+			alert("Make sure password fits these requirements\n1. Minimum of 6 characters\n2. Minimum of one numeric character\n3. Minimum of one uppercase letter");
+		}
+		else{
+			alert("Username can not be empty");
 		}
 	});
 });	
