@@ -25,11 +25,18 @@
 #CreateRoom {
 	float: left;
 }
-
-#buttonCreateGame {
-	margin-left: 400px;
-	margin-top: 350px;
-}	
+.button{
+	padding: 10px 17px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  margin:auto;
+  display:block;
+}
 </style>
 </head>
 <body>
@@ -56,7 +63,7 @@
 				</select> 
 				<select id="gameModeValue" class="1-100"></select><br><br>
 				Items: <input type="checkbox" id="items"><br><br><br>
-				<input type="submit" style="align: 'left'" id="buttonCreateGame" value="Create Game"/>
+				<input type="submit" style="align: 'left'" class= "button" value="Create Game"/>
 			</form>
 		</div>
 	</div>
