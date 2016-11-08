@@ -56,15 +56,18 @@
 <script>
 $(document).ready(function() {
 	var socket = io();
-
+	//sessionStorage.clear();
 	$("#buttonContinue").click(function() {
 		getloginFormData();
 	});
-	
+	document.getElementById("username").value = sessionStorage.username;
+	document.getElementById("password").value = sessionStorage.password;
 	function getloginFormData() {
 		//gathers data from the login form
 		var username = document.getElementById("username").value;
 		var password = document.getElementById("password").value;
+		sessionStorage.setItem('username', username);		
+		sessionStorage.setItem('password', password);
 		//puts data into string for sending
 		var sendLoginData = {username: username, password: password };	
 		socket.emit('sendLoginData', sendLoginData);
@@ -82,6 +85,8 @@ $(document).ready(function() {
 			//ranking added to its database
 			username = data.username; 
 			socket.emit('createUser', username);
+			
+			
 			window.location.href = "/mainMenu";
 
 		}

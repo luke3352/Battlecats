@@ -64,7 +64,7 @@
 <script>
 $(document).ready(function() {
 	var publicCheckBox = false;
-		
+	var roomID = Math.floor(Math.random() * 999999999);	
 	$("#public").click(function() {
 		if (publicCheckBox == false) {
 			$(password).hide();
@@ -84,29 +84,30 @@ $(document).ready(function() {
 		}
 	});
 	var socket = io();
-	socket.emit('requestSocketId');
 	
-	socket.on('currentSocketId', function(id){
-		$("#buttonCreateGame").click(function() {
-			var roomID = id;
-			$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
-			getroomFormData(roomID);
-		});	
-	});
+	$("#buttonCreateGame").click(function() {
+		$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
+		sessionStorage.setItem("roomID", roomID);
+		getRoomFormData(roomID);
+	});	
+
 	
-	function getroomFormData(){
+	function getRoomFormData(){
 		//gathers data from the create room form
-		var data = {
-			gameName : 		document.getElementById("gamename").value,
-			publicBoolean : document.getElementById("public").value,
+		var room = {
+			id:				roomID,
+			host: 			sessionStorage.getItem("username"),
+			roomName : 		document.getElementById("gamename").value,
+			isPublic : 		document.getElementById("public").value,
 			password : 		document.getElementById("password").value,
-			numPlayers : 	document.getElementById("numPlayers").value,
+			numOfPlayers : 	document.getElementById("numPlayers").value,
 			gameMode : 		document.getElementById("gameMode").value,
-			gameModeValue : document.getElementById("gameModeValue").value,
+			gameModeVal : 	document.getElementById("gameModeValue").value,
 			items : 		document.getElementById("items").value
 		};
-		console.log("emitting data: ", data);
-		socket.emit('sendCreateRoomData',data);
+		sessionStorage.setItem("roomConfig", room);
+		console.log("emitting data: ", room);
+		socket.emit('sendCreateRoomData', room);
 		
 	}
 });

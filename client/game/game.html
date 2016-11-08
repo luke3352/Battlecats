@@ -29,6 +29,15 @@ $(document).ready(function() {
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 	
+	var user = sessionStorage.getItem("username");
+	var gameID = sessionStorage.getItem("gameID");
+	var gameConfig = sessionStorage.getItem("roomConfig");
+	console.log()
+	
+	socket.on('connect', function(){
+		socket.emit('startGame', ("game-"+gameID), user, gameConfig);
+	});
+	
 	// Updates Player In-Game Position
 	socket.on('newPositions', function(data) {
 		ctx.clearRect(0, 0, 1000, 700);
