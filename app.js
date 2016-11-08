@@ -35,169 +35,17 @@ serv.listen(2000);
 console.log("Server started.");
 //var room = Room.room(1);
 
-//VERIFIES LOGIN PASSWORD
-var verifypassword = function(username, password, callback){
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-
-	connection.connect();
-	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-		if (!err){
-			var string = JSON.stringify(rows);
-			var json = JSON.parse(string);
-			if (JSON.stringify(rows) === "[]"){
-				console.log("username was not in database... create new account");
-				correct = 0;
-			}
-			else{
-				var correctpassword = json[0]._password;
-				console.log("entered password: " + password);
-				console.log("correct password: " + correctpassword)
-				if (password === correctpassword){
-					console.log(true);
-					console.log('correct password set');
-					correct = 1; 
-				}
-				else{
-					console.log(false);
-					correct = 2;
-				}
-			}
-			return callback(correct);
-		}
-	});
-	connection.end();
-}
-
-//CHECKS DATABASE FOR PREVIOUS ACCOUNTS -- AVOIDS DUPLICATION
-var check_account = function(username, password, callback){
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-	console.log(username);
-	connection.connect();
-	connection.query("SELECT * from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-		if (!err){
-			console.log(JSON.stringify(rows));
-			if (JSON.stringify(rows) === "[]"){
-				console.log("putting into query");
-				value = 1; 
-			}
-			else{
-				console.log("username is already in database");
-				value = 0;
-			}
-			return callback(value);
-		}
-	});
-	console.log("end connection");
-	connection.end();
-}
-
-//ADD A NEW ACCOUNT TO THE DATABASE
-var add_account = function(username, password){
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-	console.log(username);
-	connection.connect();
-	var userinfo = [username,password, '0', '0']
-	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?", userinfo, function(err, result) {
-	});
-	console.log("end connection");
-	connection.end();
-}
+//DATABASE FUNCTIONS FOR LOGIN
+var verifypassword = verifypassword;
+var check_account = check_account;
+var add_account = add_account; 
+var getRoomsList = getRoomsList;
+var getRoomObject = getRoomObject;
+var deleteRoom = deleteRoom;
+var addRoom = addRoom;
+var startGame = startGame;
 
 
-//GETS ROOMS LIST FROM DATABASE
-var getRoomsList = function(callback){
-	
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-	
-	connection.connect();
-	connection.query("SELECT * from Rooms", function(err, rows, fields) {
-		if (!err){
-			var roomslist = JSON.stringify(rows);
-//			if (JSON.stringify(rows) === "[]"){
-//				//this means that there is nothing in the room tables
-//			}
-			console.log(roomslist);
-			return callback(roomslist);
-		}
-	});
-	console.log('end the connection');
-	connection.end();
-};
-
-//GETS SPECIFIC ROOM OBJECT FROM DATABASE GIVEN THE ID
-var getRoomObject = function(RoomId, callback){
-	
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-	
-	connection.connect();
-	connection.query("SELECT Room_Object from Rooms WHERE Room_Id ="+ "'" + RoomId + "'" +";", function(err, rows, fields) {
-		if (!err){
-			var roomobject = JSON.stringify(rows);
-//			if (JSON.stringify(rows) === "[]"){
-//				//this means that there isn't a room with that ID
-//			}
-			console.log(roomobject);
-			return callback(roomobject);
-		}
-	});
-	console.log('end the connection');
-	connection.end();
-};
-
-//DELETE ROOM FROM DATABASE
-var deleteRoom = function(roomId){
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-	connection.connect();
-	var roominfo = [roomId]
-	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
-	});
-	connection.end();
-}
-
-//ADD ROOM TO DATABASE
-var addRoom = function(roomId, roomObject){
-	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
-	});
-	connection.connect();
-	var roominfo = [roomId,roomObject]
-	connection.query("INSERT INTO Rooms SET Room_Id = ?, Room_Object = ?", roominfo, function(err, result) {
-	});
-	connection.end();
-}
 
 
 
@@ -460,6 +308,85 @@ function add_account(username, password){
 	connection.end();
 }
 
+//GETS ROOMS LIST FROM DATABASE
+var getRoomsList = function(callback){
+	
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	
+	connection.connect();
+	connection.query("SELECT * from Rooms", function(err, rows, fields) {
+		if (!err){
+			var roomslist = JSON.stringify(rows);
+//			if (JSON.stringify(rows) === "[]"){
+//				//this means that there is nothing in the room tables
+//			}
+			console.log(roomslist);
+			return callback(roomslist);
+		}
+	});
+	console.log('end the connection');
+	connection.end();
+};
+
+//GETS SPECIFIC ROOM OBJECT FROM DATABASE GIVEN THE ID
+var getRoomObject = function(RoomId, callback){
+	
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	
+	connection.connect();
+	connection.query("SELECT Room_Object from Rooms WHERE Room_Id ="+ "'" + RoomId + "'" +";", function(err, rows, fields) {
+		if (!err){
+			var roomobject = JSON.stringify(rows);
+//			if (JSON.stringify(rows) === "[]"){
+//				//this means that there isn't a room with that ID
+//			}
+			console.log(roomobject);
+			return callback(roomobject);
+		}
+	});
+	console.log('end the connection');
+	connection.end();
+};
+
+//DELETE ROOM FROM DATABASE
+var deleteRoom = function(roomId){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	connection.connect();
+	var roominfo = [roomId]
+	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
+	});
+	connection.end();
+}
+
+//ADD ROOM TO DATABASE
+var addRoom = function(roomId, roomObject){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	connection.connect();
+	var roominfo = [roomId,roomObject]
+	connection.query("INSERT INTO Rooms SET Room_Id = ?, Room_Object = ?", roominfo, function(err, result) {
+	});
+	connection.end();
+}
 
 function startGame(gameID, user, socket, gameConfig){
 	var player = Player.player(user);
