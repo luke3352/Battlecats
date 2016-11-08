@@ -24,6 +24,7 @@
   outline: none;
   color: black;
   background-color: white;
+  
 }
 #title{
 	font-size: 30px;
@@ -44,15 +45,22 @@
 	top: 0px;
 	left: 0px;
 }	
-
+.alert {
+    background-color: white; /* Red */
+    color: black;
+    position: absolute;
+    margin-bottom: 15px;
+    margin-right: 893px;
+}
 
 </style>
 </head>
 <body>
 	<div id="SelectRoom"> 
 		<div class="rectangle">
-			<button class = "userInfo" id="usernameDisplay"></button>
-		
+			<button class = "userInfo" id = "infoButton">Account Info</button>
+			<div class="alert" id = "userInfo">
+			</div>
 			<h1 align="Center" id = "title">BATTLE CATS</h1>
 			<form action="/joinRoom" method="GET">
 			<br>
@@ -79,7 +87,23 @@ $(document).ready(function() {
 	//and when clicked is displays/drops down the username,
 	// wins, and experience... for now make automatic username
 	//$("#usernameDisplay").html($('#username').val());
-	$("#usernameDisplay").html("username");
+	$(userInfo).hide();
+	var userInfoOn = false;
+	$("#infoButton").click(function(){
+		if (userInfoOn === false){
+		$("#userInfo").show();
+		userInfoOn = true;
+		}
+		else{
+		$("#userInfo").hide();
+		userInfoOn = false;
+		}
+	});
+	var user = sessionStorage.getItem("username");
+	//need to adjust login connect and add experience and wins to callback
+	var experience = "";
+	var wins = "";
+	$("#userInfo").html("username: " + user + "\nexperience: " + experience + "\nwins: " + wins);
 	$(howToPlayPage).hide();
 	$("#howToPlay").click(function() {
 		$(SelectRoom).hide();

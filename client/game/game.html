@@ -8,16 +8,30 @@
 #picture {
 	position: absolute;
 }
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc; 
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}
+#title{
+	font-size: 30px;
+}
 </style>
 </head>
 <body>
 	<canvas id="ctx" width="1000" height="700" style="border: 1px solid #000000;"></canvas>
 	
-	<div id="optionsSelectInGame">
-		<div class="rectangle">
-			<p align="Center">OPTIONS</p>
-			<button style="align: 'left'" id="buttonBackInGame">Back</button>
-		</div>
+	<div id="optionsSelectInGame" class="rectangle">
+			<p align="Center" id= "title">OPTIONS</p>
+			<p align="Center"> Push "q" to return to the game</p>
 	</div>
 
 <script>
@@ -25,7 +39,7 @@ var pauseGame = false;
 
 $(document).ready(function() {
 	var socket = io();
-
+	$(optionsSelectInGame).hide();
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 	
@@ -86,13 +100,13 @@ $(document).ready(function() {
 				inputId : 'pause',
 				state : true
 			});//button toggle
-			if((pauseGame == true) &&(data.state == true)){
+			if((pauseGame === true)){
+				$("#optionsSelectInGame").hide();
 				pauseGame = false;
-				$(optionsSelectInGame).hide();
 			}
-			else if((pauseGame == false) && (data.state == true)){
+			else {
+				$("#optionsSelectInGame").show();
 				pauseGame = true;
-				$(optionsSelectInGame).show();
 			}
 			
 		}

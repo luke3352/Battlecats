@@ -195,14 +195,15 @@ io.sockets.on('connection', function(socket) {
 		 var username = data.username;
 	     var password = data.password;
 	     verifypassword(username, password, function(correct){
-	      	 sendCorrectPassword(username, correct);
+	      	 sendCorrectPassword(username, password, correct);
 	    });  
     });	
 	
-	function sendCorrectPassword(username, correct) {
+	function sendCorrectPassword(username, password, correct) {
 		console.log(correct);
 		var correct = correct;
-		var sendpasswordverification = {correct: correct, username: username};
+		var password = password;
+		var sendpasswordverification = {correct: correct, username: username, password: password};
 		socket.emit('sendpasswordverification', sendpasswordverification);
 
 	}

@@ -65,8 +65,6 @@ $(document).ready(function() {
 		//gathers data from the login form
 		var username = document.getElementById("username").value;
 		var password = document.getElementById("password").value;
-		sessionStorage.setItem('username', username);		
-		sessionStorage.setItem('password', password);
 		//puts data into string for sending
 		var sendLoginData = {username: username, password: password };	
 		socket.emit('sendLoginData', sendLoginData);
@@ -79,13 +77,11 @@ $(document).ready(function() {
 			alert("Username does not exist, Create new account");
 		}
 		else if (correct === 1){
-			//this needs to be passed and set to show that the username
-			//was succesfully logged in, and can now have wins and 
-			//ranking added to its database
 			username = data.username; 
+			password = data.password;
 			socket.emit('createUser', username);
-			
-			
+			sessionStorage.setItem('username', username);		
+			sessionStorage.setItem('password', password);
 			window.location.href = "/mainMenu";
 
 		}
