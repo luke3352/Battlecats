@@ -33,8 +33,7 @@ var pause = false;
 
 serv.listen(2000);
 console.log("Server started.");
-var room = Room.room(1);
-var numPlayer=0;
+//var room = Room.room(1);
 
 //VERIFIES LOGIN PASSWORD
 var verifypassword = function(username, password, callback){
@@ -118,6 +117,7 @@ var add_account = function(username, password){
 	console.log("end connection");
 	connection.end();
 }
+
 
 //GETS ROOMS LIST FROM DATABASE
 var getRoomsList = function(callback){
@@ -209,27 +209,13 @@ io.sockets.on('connection', function(socket) {
 //	SOCKET_LIST[id] = socket;
 //	var user, player;
 //	
-//	socket.getSocketUser = function(){
-//		console.log(num, " GET SOCKET USER ID: ", socket.id);
-//		console.log("GET SOCKET USER: ", socket.user);
-//		return socket.user;
-//	}
-//	socket.setSocketUsername = function(name){
-//		console.log(num, " SET SOCKET USERNAME ID: ", socket.id);
-//		console.log("SET SOCKET USERNAME: ");
-//		console.log("BEFORE: ", socket.user);
-//		socket.user.username = name;
-//		console.log("AFTER: ", socket.user);
-//		socket.getSocketUser();
-//	}
-	
+
 	//socket.id = Math.random();
 	var id = socket.id;
 	SOCKET_LIST[socket.id] = socket;
 
-	numPlayer++;
-	var player = Player.player(socket.id,numPlayer);
-	Player.PLAYER_LIST[socket.id] = player;
+	
+	//Player.PLAYER_LIST[socket.id] = player;
 
 	socket.on('disconnect', function() {
 		console.log("DISCONNECT");
@@ -238,7 +224,9 @@ io.sockets.on('connection', function(socket) {
 		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
 	});
 	
-	// CREATES DIFFERENT USERS
+	///////////////////////////
+	// USER CREATION SOCKETS //
+	///////////////////////////
 	socket.on('updateUser', function(data){
 		socket.setSocketUsername(data);
 	});
@@ -246,14 +234,10 @@ io.sockets.on('connection', function(socket) {
 		player = Player.player(id);
 		Player.PLAYER_LIST[id] = player;
 	});
-	
-	// HANDLES JOINROOM MESSAGES
-    socket.on('sendJoinRoomMsgToServer',function(msg){
-        var name = socket.getSocketUser().username;
-        io.to('JoinRoom').emit('addToJoinRoomChat', name + ': ' + msg);
-    });	 
     
-	// JOINING ROOMS
+	///////////////////////////
+	// GENERIC JOINING ROOMS //
+	///////////////////////////
 	socket.on('joinRoom', function(data){
 		console.log("joining room: ", data);
 		socket.join(data);
@@ -310,48 +294,55 @@ io.sockets.on('connection', function(socket) {
 	///////////////////////////////////////////////////
 	///////////////////////////////////////////////////    	
     
-    // HANDLES INGAME INPUT
-	socket.on('keyPress', function(data) {
+    ////////////////
+    // START GAME //
+    ////////////////
+    socket.on('startGame', function(id, user, gameConfig){
+    	//socket.emit('joinRoom', id);
+    	startGame(id, user, socket, gameConfig);
+    });
 
-		if (data.inputId === 'left') player.pressingLeft = data.state;
-		else if (data.inputId === 'right') player.pressingRight = data.state;
-		else if (data.inputId === 'up') player.pressingUp = data.state;
-		else if (data.inputId === 'down') player.pressingDown = data.state;
-		else if (data.inputId === 'attack') player.generateProjectile = data.state;
-		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
-		else if (data.inputId === 'pause'){
-			//button toggle
-			if((pause == true) &&(data.state == true)){
-				pause = false;
-			}
-			else if((pause == false) && (data.state == true)){
-				pause = true;
-			}
-
-		}
-	});
-
-	// ROOMS
+	///////////////////////
+	// HOST ROOM SOCKETS //
+	///////////////////////
 	socket.on('sendCreateRoomData',function(data){
-		console.log("retrieving room data", room);
-        var room = Room.room(id, data);
-        room.roomPlayers.push(Player.PLAYER_LIST[id]);
-        //JOIN HOSTING ROOM ROOM
-        socket.join(room.roomName);
-        io.sockets.adapter.rooms[room.roomName].room = room;
-        io.to('JoinRoom')
-        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
-
+		//console.log("retrieving room data", room);
+		/////////////////////////////
+		//ADD ROOM DATA TO DATABASE//
+		/////////////////////////////
+        //var room = Room.room(data);
+        //room.roomPlayers.push(Player.PLAYER_LIST[id]);
+        io.to('JoinRoom').emit('updateRoomsList', data);
     });	
+	socket.on('hostRoomConnection', function(id, user){
+		io.to(id).emit('addToHostRoomChat', user + ': has connected.');
+	});
+    socket.on('sendHostRoomMsgToServer',function(user, msg, id){
+        io.to(id).emit('addToHostRoomChat', user + ': ' + msg);
+    });	 
+
+    
+    ///////////////////////
+	// JOIN ROOM SOCKETS //
+    ///////////////////////
+	socket.on('joinRoomConnection', function(user){
+		///////////////////////////////////
+		//RETRIEVE ROOMLIST FROM DATABASE//
+		///////////////////////////////////
+		io.to('JoinRoom').emit('addToJoinRoomChat', user + ': has connected.');
+	});
 	socket.on('requestRoomsList',function(){
         io.to('JoinRoom')
         	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
     });
-	socket.on('requestSocketId', function(data){
-		SOCKET_LIST[id].emit('currentSocketId', id);
-	});
-	
-	// SOCKET LOGIN
+	// HANDLES JOINROOM MESSAGES
+    socket.on('sendJoinRoomMsgToServer',function(user, msg){
+        io.to('JoinRoom').emit('addToJoinRoomChat', user + ': ' + msg);
+    });	 
+
+	///////////////////
+	// LOGIN SOCKETS //
+    ///////////////////
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
@@ -386,55 +377,133 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('verifiednewaccount', verifynewaccount);
 	}
 
-	// HANDLES MESSAGES
-    socket.on('sendMsgToServer',function(data){
-        var playerName = ("" + socket.id).slice(2,7);
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
-        }
-    });	 
-	
-
 });
 
-function filterRooms(rooms) {
-//	console.log("Rooms: ", rooms);
-	var roomsList = {};
-	for(var i in rooms){
-		if(rooms[i].room){
-			roomsList[rooms[i].room.roomName] = rooms[i].room;
+function verifypassword(username, password, callback){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+
+	connection.connect();
+	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+		if (!err){
+			var string = JSON.stringify(rows);
+			var json = JSON.parse(string);
+			if (JSON.stringify(rows) === "[]"){
+				console.log("username was not in database... create new account");
+				correct = 0;
+			}
+			else{
+				var correctpassword = json[0]._password;
+				console.log("entered password: " + password);
+				console.log("correct password: " + correctpassword)
+				if (password === correctpassword){
+					console.log(true);
+					console.log('correct password set');
+					correct = 1; 
+				}
+				else{
+					console.log(false);
+					correct = 2;
+				}
+			}
+			console.log('return callback');
+			return callback(correct);
 		}
-	}
-	return roomsList;
+	});
+	console.log('end the connection')
+	connection.end();
+}
+function check_account(username, password, callback){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	console.log(username);
+	connection.connect();
+	connection.query("SELECT * from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+		if (!err){
+			console.log(JSON.stringify(rows));
+			if (JSON.stringify(rows) === "[]"){
+				console.log("putting into query");
+				//addingAccount(username, password, connection);
+				value = 1; 
+			}
+			else{
+				console.log("username is already in database");
+				value = 0;
+			}
+			return callback(value);
+		}
+	});
+	console.log("end connection");
+	connection.end();
+}
+function add_account(username, password){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	console.log(username);
+	connection.connect();
+	var userinfo = [username,password, '0', '0']
+	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?", userinfo, function(err, result) {
+	});
+	console.log("end connection");
+	connection.end();
 }
 
-function createObstacles(){
-		
+
+function startGame(gameID, user, socket, gameConfig){
+	var player = Player.player(user);
+	var room = Room.room(gameConfig);
+    room.roomPlayers.push(player);
+    socket.join(gameID);
+	function createObstacles(){
 		var obstacle = Obstacles.obstacles(0);
 		obstacle.x = 300;
 		obstacle.y = 300;
-}
-	
+	}
+		
 	createObstacles();
-	
-setInterval(function() {
-
-	Room.updateRoom();
-	//console.log(pause);
-	if(pause == false){
-		var pack = {
-			player:Player.updatePlayer(),
-			projectile:Player.update(),
-			obstacles:Obstacles.update(),
+		
+	setInterval(function() {
+		Room.updateRoom();
+		if(pause == false){
+			var pack = {
+				player: Player.updatePlayer(),
+				projectile: Player.update(),
+				obstacles: Obstacles.update(),
+			}
 		}
-	}else var pack = {};
-		for ( var i in SOCKET_LIST) {
-			var socket = SOCKET_LIST[i];
-			// TODO
-			// IN GAME SOCKETS
-			socket.emit('newPositions', pack);
-			
-			// PLAYER ROOM SOCKETS
-		}
+		else var pack = {};
+		
+        io.to(gameID).emit('newPositions', pack);
+        
+	}, 1000 / 25);
 	
-}, 1000 / 25);
+	socket.on('keyPress', function(data) {
+		if (data.inputId === 'left') player.pressingLeft = data.state;
+		else if (data.inputId === 'right') player.pressingRight = data.state;
+		else if (data.inputId === 'up') player.pressingUp = data.state;
+		else if (data.inputId === 'down') player.pressingDown = data.state;
+		else if (data.inputId === 'attack') player.generateProjectile = data.state;
+		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
+		else if (data.inputId === 'pause'){
+			//button toggle
+			if((pause == true) &&(data.state == true)){
+				pause = false;
+			}
+			else if((pause == false) && (data.state == true)){
+				pause = true;
+			}
+		}
+	});
+}

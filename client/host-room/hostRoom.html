@@ -43,10 +43,22 @@
 <script>
 $(document).ready(function() {
 	var socket = io();
-
+	
+	var user = sessionStorage.getItem("username");
+	var gameID = location.search.split('id=')[1];
+	sessionStorage.setItem("roomID", gameID);
+	var game = sessionStorage.getItem("roomConfig");
+	console.log("user: ", user);
+	console.log("gameID: ", gameID);
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');
+	
+	socket.on('connect', function(){
+		socket.emit('joinRoom', gameID);
+		socket.emit('hostRoomConnection', gameID, user);
+	});
+	
 	
 	// Updates the chat	
 	socket.on('addToHostRoomChat',function(data){
@@ -55,7 +67,7 @@ $(document).ready(function() {
 	
 	chatForm.onsubmit = function(e){
 		e.preventDefault();
-		socket.emit('sendHostRoomMsgToServer',chatInput.value);
+		socket.emit('sendHostRoomMsgToServer', user, chatInput.value, gameID);
 		chatInput.value = '';      
 	}
 });
