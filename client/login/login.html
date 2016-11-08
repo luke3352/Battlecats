@@ -56,12 +56,11 @@
 <script>
 $(document).ready(function() {
 	var socket = io();
-	//sessionStorage.clear();
+	sessionStorage.clear();
 	$("#buttonContinue").click(function() {
 		getloginFormData();
 	});
-	document.getElementById("username").value = sessionStorage.username;
-	document.getElementById("password").value = sessionStorage.password;
+
 	function getloginFormData() {
 		//gathers data from the login form
 		var username = document.getElementById("username").value;
