@@ -35,7 +35,22 @@
 	top: 0px;
 	left: 0px;
 }	
-
+.display, .inforectangle {
+	position: absolute;
+	z-index: 9998;
+	width: 800px;
+	height: 560px;
+	border-radius: 20px;
+	background-color: #ffff99;
+	border: 2px solid #ccc;
+}	
+.inforectangle{
+top: 75px;
+	left: 100px;
+}
+.p{
+	font-size: 20px;
+}
 </style>
 </head>
 <body>
@@ -55,23 +70,26 @@
 			<button id="aboutButton" class = "button" style="font-size: '11'">About the Game</button>
 		</div>
 	</div>
-	<div id="aboutGame">
-		<div class="rectangle">
-			<h1 align = "center" id = "title">About the Game</h1>
-			<p align = "center">Text about the game</p>
-			<button class = "button" style="align: 'left'" id="return_to_main">Back</button>
+	<div id = "background" class = "rectangle">
+		<div id="aboutGame" class = "inforectangle">
+			<h1 align="Center" id = "title">About the GAme</h1>
+			<p align="center">Text about the game -- will need to insert images</p>
+			<button style="align: 'left'" class = "button" id="return_to_main">Back</button>
 		</div>
 	</div>
 <script>
 $(document).ready(function() {
 	$(aboutGame).hide();
+	$(background).hide();
 	$("#aboutButton").click(function() {
 		$(startPage).hide();
 		$(aboutGame).show();
+		$(background).show();
 	});
 	$("#return_to_main").click(function() {
 		$(startPage).show();
 		$(aboutGame).hide();
+		$(background).hide();
 	});
 });
 </script>

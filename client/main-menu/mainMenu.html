@@ -41,18 +41,33 @@
 	background-color: #f4d942;
 	border: 2px solid #ccc;
 }
+.display, .inforectangle {
+	position: absolute;
+	z-index: 9998;
+	width: 800px;
+	height: 560px;
+	border-radius: 20px;
+	background-color: #ffff99;
+	border: 2px solid #ccc;
+}	
+.inforectangle{
+top: 75px;
+	left: 100px;
+}
 .rectangle {
 	top: 0px;
 	left: 0px;
-}	
+}
 .alert {
-    background-color: white; /* Red */
+    background-color: white;
     color: black;
     position: absolute;
     margin-bottom: 15px;
     margin-right: 893px;
 }
-
+.p{
+	font-size: 20px;
+}
 </style>
 </head>
 <body>
@@ -74,9 +89,10 @@
 			<button id="howToPlay" class = "button">How to Play</button>
 		</div>
 	</div>
-	<div id="howToPlayPage">
-		<div class="rectangle">
-			<p align="Center" id = "title">How to Play</p>
+	<div id = "background" class = "rectangle">
+		<div id="howToPlayPage" class = "inforectangle">
+			<h1 align="Center" id = "title">How to Play</h1>
+			<p align="center">Text about how to play -- will need to insert images</p>
 			<button style="align: 'left'" class = "button" id="return_to_main">Back</button>
 		</div>
 	</div>
@@ -88,6 +104,7 @@ $(document).ready(function() {
 	// wins, and experience... for now make automatic username
 	//$("#usernameDisplay").html($('#username').val());
 	$(userInfo).hide();
+	$(background).hide();
 	var userInfoOn = false;
 	$("#infoButton").click(function(){
 		if (userInfoOn === false){
@@ -108,10 +125,12 @@ $(document).ready(function() {
 	$("#howToPlay").click(function() {
 		$(SelectRoom).hide();
 		$(howToPlayPage).show();
+		$(background).show();
 	});
 	$("#return_to_main").click(function() {
 		$(SelectRoom).show();
 		$(howToPlayPage).hide();
+		$(background).hide();
 	});
 });
 </script>

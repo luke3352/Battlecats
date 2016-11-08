@@ -24,15 +24,35 @@
 #title{
 	font-size: 30px;
 }
+.display, .inforectangle {
+	position: absolute;
+	z-index: 9998;
+	width: 800px;
+	height: 560px;
+	border-radius: 20px;
+	background-color: #ffff99;
+	border: 2px solid #ccc;
+}	
+.inforectangle{
+top: 75px;
+	left: 100px;
+}
+.p{
+	font-size: 20px;
+}
 </style>
 </head>
 <body>
 	<canvas id="ctx" width="1000" height="700" style="border: 1px solid #000000;"></canvas>
 	
-	<div id="optionsSelectInGame" class="rectangle">
-			<p align="Center" id= "title">OPTIONS</p>
+	<div id = "background" class = "rectangle">
+		<div id="optionsSelectInGame" class = "inforectangle">
+			<h1 align="Center" id = "title">OPTIONS</h1>
+			<p align="center">Options to do things</p>
 			<p align="Center"> Push "q" to return to the game</p>
+		</div>
 	</div>
+	
 
 <script>
 var pauseGame = false;
@@ -40,6 +60,7 @@ var pauseGame = false;
 $(document).ready(function() {
 	var socket = io();
 	$(optionsSelectInGame).hide();
+	$(background).hide();
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 	
@@ -102,10 +123,12 @@ $(document).ready(function() {
 			});//button toggle
 			if((pauseGame === true)){
 				$("#optionsSelectInGame").hide();
+				$(background).hide();
 				pauseGame = false;
 			}
 			else {
 				$("#optionsSelectInGame").show();
+				$(background).show();
 				pauseGame = true;
 			}
 			
