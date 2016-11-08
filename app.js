@@ -36,6 +36,7 @@ console.log("Server started.");
 var room = Room.room(1);
 var numPlayer=0;
 
+//VERIFIES LOGIN PASSWORD
 var verifypassword = function(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
@@ -67,14 +68,13 @@ var verifypassword = function(username, password, callback){
 					correct = 2;
 				}
 			}
-			console.log('return callback');
 			return callback(correct);
 		}
 	});
-	console.log('end the connection')
 	connection.end();
 }
 
+//CHECKS DATABASE FOR PREVIOUS ACCOUNTS -- AVOIDS DUPLICATION
 var check_account = function(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
@@ -89,7 +89,6 @@ var check_account = function(username, password, callback){
 			console.log(JSON.stringify(rows));
 			if (JSON.stringify(rows) === "[]"){
 				console.log("putting into query");
-				//addingAccount(username, password, connection);
 				value = 1; 
 			}
 			else{
@@ -103,6 +102,7 @@ var check_account = function(username, password, callback){
 	connection.end();
 }
 
+//ADD A NEW ACCOUNT TO THE DATABASE
 var add_account = function(username, password){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
@@ -118,6 +118,88 @@ var add_account = function(username, password){
 	console.log("end connection");
 	connection.end();
 }
+
+//GETS ROOMS LIST FROM DATABASE
+var getRoomsList = function(callback){
+	
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	
+	connection.connect();
+	connection.query("SELECT * from Rooms", function(err, rows, fields) {
+		if (!err){
+			var roomslist = JSON.stringify(rows);
+//			if (JSON.stringify(rows) === "[]"){
+//				//this means that there is nothing in the room tables
+//			}
+			console.log(roomslist);
+			return callback(roomslist);
+		}
+	});
+	console.log('end the connection');
+	connection.end();
+};
+
+//GETS SPECIFIC ROOM OBJECT FROM DATABASE GIVEN THE ID
+var getRoomObject = function(RoomId, callback){
+	
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	
+	connection.connect();
+	connection.query("SELECT Room_Object from Rooms WHERE Room_Id ="+ "'" + RoomId + "'" +";", function(err, rows, fields) {
+		if (!err){
+			var roomobject = JSON.stringify(rows);
+//			if (JSON.stringify(rows) === "[]"){
+//				//this means that there isn't a room with that ID
+//			}
+			console.log(roomobject);
+			return callback(roomobject);
+		}
+	});
+	console.log('end the connection');
+	connection.end();
+};
+
+//DELETE ROOM FROM DATABASE
+var deleteRoom = function(roomId){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	connection.connect();
+	var roominfo = [roomId]
+	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
+	});
+	connection.end();
+}
+
+//ADD ROOM TO DATABASE
+var addRoom = function(roomId, roomObject){
+	var connection = mysql.createConnection({
+		  host     : 'mysql.cs.iastate.edu',
+		  user     : 'dbu309la07',
+		  password : '5rqZthHkdvd',
+		  database : 'db309la07'
+	});
+	connection.connect();
+	var roominfo = [roomId,roomObject]
+	connection.query("INSERT INTO Rooms SET Room_Id = ?, Room_Object = ?", roominfo, function(err, result) {
+	});
+	connection.end();
+}
+
+
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -186,15 +268,44 @@ io.sockets.on('connection', function(socket) {
 	///////////// DATABASE AND ROOMSLIST //////////////
 	///////////////////////////////////////////////////
 	///////////////////////////////////////////////////
+	
     socket.on('getRoomsListFromDatabase', function(){
-    	
+    	console.log("recieved emit");
+    	getRoomsList(function(roomslist){
+    		returnRoomsList(roomslist);
+    		console.log("roomsList in the callback" + roomslist);
+    	});
     });
-    socket.on('updateRoomsListInDatabase', function(){
+    
+    function returnRoomsList(roomslist){
+    	return roomslist;
+    	//here you'll probably want to emit this string instead of 
+    	//return it, but this is where you'll do that!
     	
+    }
+   
+    socket.on('addRoomToDatabase', function(data){
+    	roomId = data.roomId;
+    	roomObject = data.roomObject;
+    	addRoom(roomId, roomObject);
     });
-    socket.on('getRoomObjectFromDatabase', function(){
-    	
+    socket.on('deleteRoomFromDatabase', function(data){
+        roomId = data.roomId;
+        deleteRoom(roomId);
     });
+ 
+    socket.on('getRoomObjectFromDatabase', function(data){
+    	roomId = data.roomId;
+    	console.log(roomId);
+    	getRoomObject(roomId, function(roomobject){
+    		returnRoomObject(roomobject);
+    	});
+    });
+    function returnRoomObject(roomobject){
+    	return roomobject;
+    	//again this is where you'll emit or do what you want with this
+    	//roomObject
+    }
     ///////////////////////////////////////////////////
 	///////////////////////////////////////////////////
 	///////////////////////////////////////////////////    	
@@ -257,6 +368,7 @@ io.sockets.on('connection', function(socket) {
 
 	}
 	
+	//CREATE ACCOUNT
 	socket.on('sendNewAccountData', function(data){
 		var username = data.newusername;
 		var password = data.newpassword;
@@ -270,9 +382,8 @@ io.sockets.on('connection', function(socket) {
 		if (value === 1){
 			add_account(username, password);
 		}
-		var verifynewaccount = {value: value};
-		socket.emit('verifynewaccount', verifynewaccount);
-		console.log("verifycreateAccount socket emmited");
+		var verifiednewaccount = {value: value};
+		socket.emit('verifiednewaccount', verifynewaccount);
 	}
 
 	// HANDLES MESSAGES

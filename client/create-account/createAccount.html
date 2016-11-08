@@ -74,7 +74,7 @@ $(document).ready(function() {
 		console.log("new account data sent");
 	}
 	
-	socket.on('verifynewaccount', function(data){
+	socket.on('verifiednewaccount', function(data){
 		var verified = data.value;
 		if (verified === 1){
 			window.location.href = "/mainMenu";
