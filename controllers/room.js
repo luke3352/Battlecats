@@ -6,27 +6,18 @@ var exports = module.exports = {};
 var room = null;
 exports.ROOMS_LIST = {};
 //Handles room settings
-exports.room = function(id, data) {
+exports.room = function(data) {
 	var self = {
-		id: id,
-//		roomName: data.gameName, 
-//		isPublic: data.publicBoolean, // Public or private
-//		password: data.password,
-//		numOfPlayers: data.numPlayers, // Default selection
-		roomPlayers: [], // Players have different options
-//		gameMode: data.gameMode, // default game mode is stock
-//		gameModeVal: data.gameModeValue, // either stock or time
-//		items: data.items, // items disabled for now
-//	};
-		numOfPlayers: 4, // Default selection
-		pressingStart: false, // Other buttons like this
-		isPublic: false, // Public or private
-		roomName: "", 
-		password: "",
-		gameMode: 1, // default game mode is stock
-		gameModeVal: 3, // either stock or time
-		items: false, // items disabled for now
-		numPlayersAlive: 4
+		id: 			data.id,
+		host: 			data.host,
+		roomName: 		data.roomName, 
+		isPublic: 		data.isPublic, // Public or private
+		password: 		data.password,
+		numOfPlayers: 	data.numOfPlayers, // Default selection
+		roomPlayers: 	[], // Players have different options
+		gameMode: 		data.gameMode, // default game mode is stock
+		gameModeVal: 	data.gameModeVal, // either stock or time
+		items: 			data.items, // items disabled for now
 	};
 	
 	self.checkLiving = function(){

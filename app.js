@@ -33,10 +33,165 @@ var pause = false;
 
 serv.listen(2000);
 console.log("Server started.");
-var room = Room.room(1);
-var numPlayer=0;
+//var room = Room.room(1);
 
-var verifypassword = function(username, password, callback){
+// DATABASE FUNCTIONS FOR LOGIN
+var verifypassword = verifypassword;
+var check_account = check_account;
+var add_account = add_account; 
+
+var startGame = startGame;
+
+var io = require('socket.io')(serv, {});
+io.sockets.on('connection', function(socket) {
+//	console.log(num, " CONNECTION ID: ", socket.id);
+//	var id = Math.floor(Math.random() * 999999999);
+//	socket.user = User.user(id);
+//	SOCKET_LIST[id] = socket;
+//	var user, player;
+//	
+
+	//socket.id = Math.random();
+	var id = socket.id;
+	SOCKET_LIST[socket.id] = socket;
+
+	
+	//Player.PLAYER_LIST[socket.id] = player;
+
+	socket.on('disconnect', function() {
+		console.log("DISCONNECT");
+		if(SOCKET_LIST[id]) delete SOCKET_LIST[id];
+		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
+		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
+	});
+	
+	///////////////////////////
+	// USER CREATION SOCKETS //
+	///////////////////////////
+	socket.on('updateUser', function(data){
+		socket.setSocketUsername(data);
+	});
+	socket.on('createPlayer', function(data){
+		player = Player.player(id);
+		Player.PLAYER_LIST[id] = player;
+	});
+    
+	///////////////////////////
+	// GENERIC JOINING ROOMS //
+	///////////////////////////
+	socket.on('joinRoom', function(data){
+		console.log("joining room: ", data);
+		socket.join(data);
+	});
+	socket.on('leaveRoom', function(data){
+		console.log("leaving room: ", data);
+		socket.leave(data);
+	});
+	
+	///////////////////////////////////////////////////
+	///////////////////////////////////////////////////
+	///////////// DATABASE AND ROOMSLIST //////////////
+	///////////////////////////////////////////////////
+	///////////////////////////////////////////////////
+    socket.on('getRoomsListFromDatabase', function(){
+    	
+    });
+    socket.on('updateRoomsListInDatabase', function(){
+    	
+    });
+    socket.on('getRoomObjectFromDatabase', function(){
+    	
+    });
+    ///////////////////////////////////////////////////
+	///////////////////////////////////////////////////
+	///////////////////////////////////////////////////    	
+    
+    ////////////////
+    // START GAME //
+    ////////////////
+    socket.on('startGame', function(id, user, gameConfig){
+    	//socket.emit('joinRoom', id);
+    	startGame(id, user, socket, gameConfig);
+    });
+
+	///////////////////////
+	// HOST ROOM SOCKETS //
+	///////////////////////
+	socket.on('sendCreateRoomData',function(data){
+		//console.log("retrieving room data", room);
+		/////////////////////////////
+		//ADD ROOM DATA TO DATABASE//
+		/////////////////////////////
+        //var room = Room.room(data);
+        //room.roomPlayers.push(Player.PLAYER_LIST[id]);
+        io.to('JoinRoom').emit('updateRoomsList', data);
+    });	
+	socket.on('hostRoomConnection', function(id, user){
+		io.to(id).emit('addToHostRoomChat', user + ': has connected.');
+	});
+    socket.on('sendHostRoomMsgToServer',function(user, msg, id){
+        io.to(id).emit('addToHostRoomChat', user + ': ' + msg);
+    });	 
+
+    
+    ///////////////////////
+	// JOIN ROOM SOCKETS //
+    ///////////////////////
+	socket.on('joinRoomConnection', function(user){
+		///////////////////////////////////
+		//RETRIEVE ROOMLIST FROM DATABASE//
+		///////////////////////////////////
+		io.to('JoinRoom').emit('addToJoinRoomChat', user + ': has connected.');
+	});
+	socket.on('requestRoomsList',function(){
+        io.to('JoinRoom')
+        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
+    });
+	// HANDLES JOINROOM MESSAGES
+    socket.on('sendJoinRoomMsgToServer',function(user, msg){
+        io.to('JoinRoom').emit('addToJoinRoomChat', user + ': ' + msg);
+    });	 
+
+	///////////////////
+	// LOGIN SOCKETS //
+    ///////////////////
+	socket.on('sendLoginData',function(data){
+		 var username = data.username;
+	     var password = data.password;
+	     verifypassword(username, password, function(correct){
+	      	 sendCorrectPassword(username, correct);
+	    });  
+    });	
+	
+	function sendCorrectPassword(username, correct) {
+		console.log(correct);
+		var correct = correct;
+		var sendpasswordverification = {correct: correct, username: username};
+		socket.emit('sendpasswordverification', sendpasswordverification);
+
+	}
+	
+	socket.on('sendNewAccountData', function(data){
+		var username = data.newusername;
+		var password = data.newpassword;
+		check_account(username, password, function(value){
+			verifycreateAccount(value, username, password);
+		});
+	})
+	
+	function verifycreateAccount(value, username, password){
+		var value = value; 
+		if (value === 1){
+			add_account(username, password);
+		}
+		var verifynewaccount = {value: value};
+		socket.emit('verifynewaccount', verifynewaccount);
+		console.log("verifycreateAccount socket emmited");
+	}
+
+});
+
+function verifypassword(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
@@ -74,8 +229,7 @@ var verifypassword = function(username, password, callback){
 	console.log('end the connection')
 	connection.end();
 }
-
-var check_account = function(username, password, callback){
+function check_account(username, password, callback){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
@@ -102,8 +256,7 @@ var check_account = function(username, password, callback){
 	console.log("end connection");
 	connection.end();
 }
-
-var add_account = function(username, password){
+function add_account(username, password){
 	var connection = mysql.createConnection({
 		  host     : 'mysql.cs.iastate.edu',
 		  user     : 'dbu309la07',
@@ -119,89 +272,36 @@ var add_account = function(username, password){
 	connection.end();
 }
 
-var io = require('socket.io')(serv, {});
-io.sockets.on('connection', function(socket) {
-//	console.log(num, " CONNECTION ID: ", socket.id);
-//	var id = Math.floor(Math.random() * 999999999);
-//	socket.user = User.user(id);
-//	SOCKET_LIST[id] = socket;
-//	var user, player;
-//	
-//	socket.getSocketUser = function(){
-//		console.log(num, " GET SOCKET USER ID: ", socket.id);
-//		console.log("GET SOCKET USER: ", socket.user);
-//		return socket.user;
-//	}
-//	socket.setSocketUsername = function(name){
-//		console.log(num, " SET SOCKET USERNAME ID: ", socket.id);
-//		console.log("SET SOCKET USERNAME: ");
-//		console.log("BEFORE: ", socket.user);
-//		socket.user.username = name;
-//		console.log("AFTER: ", socket.user);
-//		socket.getSocketUser();
-//	}
-	
-	//socket.id = Math.random();
-	var id = socket.id;
-	SOCKET_LIST[socket.id] = socket;
 
-	numPlayer++;
-	var player = Player.player(socket.id,numPlayer);
-	Player.PLAYER_LIST[socket.id] = player;
-
-	socket.on('disconnect', function() {
-		console.log("DISCONNECT");
-		if(SOCKET_LIST[id]) delete SOCKET_LIST[id];
-		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
-		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
-	});
+function startGame(gameID, user, socket, gameConfig){
+	var player = Player.player(user);
+	var room = Room.room(gameConfig);
+    room.roomPlayers.push(player);
+    socket.join(gameID);
+	function createObstacles(){
+		var obstacle = Obstacles.obstacles(0);
+		obstacle.x = 300;
+		obstacle.y = 300;
+	}
+		
+	createObstacles();
+		
+	setInterval(function() {
+		Room.updateRoom();
+		if(pause == false){
+			var pack = {
+				player: Player.updatePlayer(),
+				projectile: Player.update(),
+				obstacles: Obstacles.update(),
+			}
+		}
+		else var pack = {};
+		
+        io.to(gameID).emit('newPositions', pack);
+        
+	}, 1000 / 25);
 	
-	// CREATES DIFFERENT USERS
-	socket.on('updateUser', function(data){
-		socket.setSocketUsername(data);
-	});
-	socket.on('createPlayer', function(data){
-		player = Player.player(id);
-		Player.PLAYER_LIST[id] = player;
-	});
-	
-	// HANDLES JOINROOM MESSAGES
-    socket.on('sendJoinRoomMsgToServer',function(msg){
-        var name = socket.getSocketUser().username;
-        io.to('JoinRoom').emit('addToJoinRoomChat', name + ': ' + msg);
-    });	 
-    
-	// JOINING ROOMS
-	socket.on('joinRoom', function(data){
-		console.log("joining room: ", data);
-		socket.join(data);
-	});
-	socket.on('leaveRoom', function(data){
-		console.log("leaving room: ", data);
-		socket.leave(data);
-	});
-	
-	///////////////////////////////////////////////////
-	///////////////////////////////////////////////////
-	///////////// DATABASE AND ROOMSLIST //////////////
-	///////////////////////////////////////////////////
-	///////////////////////////////////////////////////
-    socket.on('getRoomsListFromDatabase', function(){
-    	
-    });
-    socket.on('updateRoomsListInDatabase', function(){
-    	
-    });
-    socket.on('getRoomObjectFromDatabase', function(){
-    	
-    });
-    ///////////////////////////////////////////////////
-	///////////////////////////////////////////////////
-	///////////////////////////////////////////////////    	
-    
-    // HANDLES INGAME INPUT
 	socket.on('keyPress', function(data) {
-
 		if (data.inputId === 'left') player.pressingLeft = data.state;
 		else if (data.inputId === 'right') player.pressingRight = data.state;
 		else if (data.inputId === 'up') player.pressingUp = data.state;
@@ -216,114 +316,6 @@ io.sockets.on('connection', function(socket) {
 			else if((pause == false) && (data.state == true)){
 				pause = true;
 			}
-
 		}
 	});
-
-	// ROOMS
-	socket.on('sendCreateRoomData',function(data){
-		console.log("retrieving room data", room);
-        var room = Room.room(id, data);
-        room.roomPlayers.push(Player.PLAYER_LIST[id]);
-        //JOIN HOSTING ROOM ROOM
-        socket.join(room.roomName);
-        io.sockets.adapter.rooms[room.roomName].room = room;
-        io.to('JoinRoom')
-        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
-
-    });	
-	socket.on('requestRoomsList',function(){
-        io.to('JoinRoom')
-        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
-    });
-	socket.on('requestSocketId', function(data){
-		SOCKET_LIST[id].emit('currentSocketId', id);
-	});
-	
-	// SOCKET LOGIN
-	socket.on('sendLoginData',function(data){
-		 var username = data.username;
-	     var password = data.password;
-	     verifypassword(username, password, function(correct){
-	      	 sendCorrectPassword(username, correct);
-	    });  
-    });	
-	
-	function sendCorrectPassword(username, correct) {
-		console.log(correct);
-		var correct = correct;
-		var sendpasswordverification = {correct: correct, username: username};
-		socket.emit('sendpasswordverification', sendpasswordverification);
-
-	}
-	
-	socket.on('sendNewAccountData', function(data){
-		var username = data.newusername;
-		var password = data.newpassword;
-		check_account(username, password, function(value){
-			verifycreateAccount(value, username, password);
-		});
-	})
-	
-	function verifycreateAccount(value, username, password){
-		var value = value; 
-		if (value === 1){
-			add_account(username, password);
-		}
-		var verifynewaccount = {value: value};
-		socket.emit('verifynewaccount', verifynewaccount);
-		console.log("verifycreateAccount socket emmited");
-	}
-
-	// HANDLES MESSAGES
-    socket.on('sendMsgToServer',function(data){
-        var playerName = ("" + socket.id).slice(2,7);
-        for(var i in SOCKET_LIST){
-            SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
-        }
-    });	 
-	
-
-});
-
-function filterRooms(rooms) {
-//	console.log("Rooms: ", rooms);
-	var roomsList = {};
-	for(var i in rooms){
-		if(rooms[i].room){
-			roomsList[rooms[i].room.roomName] = rooms[i].room;
-		}
-	}
-	return roomsList;
 }
-
-function createObstacles(){
-		
-		var obstacle = Obstacles.obstacles(0);
-		obstacle.x = 300;
-		obstacle.y = 300;
-}
-	
-	createObstacles();
-	
-setInterval(function() {
-
-	Room.updateRoom();
-	//console.log(pause);
-	if(pause == false){
-		var pack = {
-			player:Player.updatePlayer(),
-			projectile:Player.update(),
-			obstacles:Obstacles.update(),
-		}
-	}else var pack = {};
-		for ( var i in SOCKET_LIST) {
-			var socket = SOCKET_LIST[i];
-			// TODO
-			// IN GAME SOCKETS
-			socket.emit('newPositions', pack);
-			
-			// PLAYER ROOM SOCKETS
-		}
-	
-}, 1000 / 25);

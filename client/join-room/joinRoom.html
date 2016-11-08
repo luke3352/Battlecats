@@ -25,7 +25,7 @@
 	height: 700px;
 	border-radius: 20px;
 	background-color: #f4d942;
-	border: 2px solid #ccc;
+	border: 2px solid #ccc; 
 }
 .rectangle {
 	top: 0px;
@@ -40,10 +40,10 @@
 	<div id="joinRoom">
 		<div class="rectangle">
 			<p align="Center">JOIN ROOM</p>
-			<div style="width: 500px; height: 100px; overflow-y: scroll">
-				<ul id="room-list">
+			<div id="room-list" style="width: 500px; height: 100px; overflow-y: scroll">
+				<form action="/hostRoom" method="GET">
 				
-				</ul>
+				</form>
 			</div>
 			<div id="chat-text" style="width: 500px; height: 100px; overflow-y: scroll">
 				<div>Enter a message!</div>
@@ -61,18 +61,21 @@
 <script>
 $(document).ready(function() {
 	var socket = io.connect();
+	var user = sessionStorage.getItem("username");
 	socket.on('connect', function(){
 		socket.emit('joinRoom', 'JoinRoom');
-		socket.emit('requestRoomsList');
+		socket.emit('joinRoomConnection', user);
 	});
 	
-	
-	var roomList = document.getElementById('room-list');
-	socket.on('updateRoomsList',function(data){
-		//console.log('UPDATE ROOM LIST', data);
-		for(var i in data){
-			roomList.innerHTML += '<li>' + data[i].roomName + '</li>';
-		}
+	socket.on('updateRoomsList',function(room){
+		console.log('UPDATE ROOM LIST', room);
+		
+		var id = room.id;
+		document.getElementById('room-list').innerHTML += 
+			'<form id="form'+id+'" action="/hostRoom" method="GET">'
+			+room.roomName + ':<input type="submit" id="'+id+
+			'" value="Join Room"><input type="hidden" name="id" value="'+id+'"></form>';
+		
 	});
 	
 	var chatText = document.getElementById('chat-text');
@@ -86,7 +89,7 @@ $(document).ready(function() {
 
 	chatForm.onsubmit = function(e){
 		e.preventDefault();
-		socket.emit('sendJoinRoomMsgToServer',chatInput.value);
+		socket.emit('sendJoinRoomMsgToServer', user, chatInput.value);
 		chatInput.value = '';      
 	}
 	
