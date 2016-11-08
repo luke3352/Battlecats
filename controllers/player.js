@@ -24,25 +24,40 @@ exports.player = function(id,numPlayerInRoom) {
 		self.generateProjectile = false;
 		self.hit = false;
 		self.HP = 3;
+		self.healthBarX = 200;
+		self.healthBarY = 30;
 		self.dead = false;
 		self.fireTime = new Date().getTime();
 		self.previousFireTime = 0;
 		self.color = "#0000FF";
+		self.numPlayer = numPlayerInRoom;
 		if(numPlayerInRoom == 1){
 			self.x = 100;
 			self.y = 100;
+			self.healthBarX = 5;
+			self.healthBarY = 10;
+			self.color = "#CC0000";
 		}
 		else if(numPlayerInRoom == 2){
 			self.x = 900;
 			self.y = 100;
+			self.healthBarX = 875;
+			self.healthBarY = 10;
+			self.color = "#00CC00";
 		}
 		else if(numPlayerInRoom == 3){
 			self.x = 100;
 			self.y = 600;
+			self.healthBarX = 5;
+			self.healthBarY = 670;
+			self.color = "#0000FF";
 		}
 		else if(numPlayerInRoom == 4){
 			self.x = 900;
 			self.y = 600;
+			self.healthBarX = 875;
+			self.healthBarY = 670;
+			self.color = "#CC0066";
 		}
 	
 		
@@ -137,6 +152,9 @@ exports.updatePlayer = function(){
 				y:player.y,
 				width:player.width,
 				height:player.height,
+				HP:player.HP,
+				healthX:player.healthBarX,
+				healthY:player.healthBarY,
 				color:player.color
 			});	
 		
