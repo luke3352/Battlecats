@@ -57,23 +57,30 @@
 
 <script>
 $(document).ready(function() {
-	var socket = io();
-	
 	var user = sessionStorage.getItem("username");
 	var gameID = location.search.split('id=')[1];
 	sessionStorage.setItem("roomID", gameID);
-	var game = sessionStorage.getItem("roomConfig");
+	
 	console.log("user: ", user);
 	console.log("gameID: ", gameID);
+
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');
 	
+	var socket = io();
+	
 	socket.on('connect', function(){
 		socket.emit('joinRoom', gameID);
 		socket.emit('hostRoomConnection', gameID, user);
+		socket.emit("getRoomObjectFromDatabase", gameID);
+		$('form').append("<input type='hidden' name='id' value='"+ gameID +"'>");
 	});
 	
+	socket.on("retrieveRoomConfig", function(config) {
+		console.log("retrieveRoomConfig",config);
+		sessionStorage.setItem("roomConfig", config);
+	});
 	
 	// Updates the chat	
 	socket.on('addToHostRoomChat',function(data){

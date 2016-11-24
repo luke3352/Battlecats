@@ -85,12 +85,17 @@ $(document).ready(function() {
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 	
-	var user = sessionStorage.getItem("username");
-	var gameID = sessionStorage.getItem("gameID");
-	var gameConfig = sessionStorage.getItem("roomConfig");
-	console.log()
+
 	
 	socket.on('connect', function(){
+		var user = sessionStorage.getItem("username");
+		var gameID = sessionStorage.getItem("roomID");
+		var gameConfig = sessionStorage.getItem("roomConfig");
+		//$('form').append("<input type='hidden' name='id' value='"+ gameID +"'>");
+
+		console.log("Inside Game: ");
+		console.log("user: ", user, " gameID: ", gameID, " gameConfig: ", gameConfig);
+		socket.emit('joinRoom', ("game-"+gameID));
 		socket.emit('startGame', ("game-"+gameID), user, gameConfig);
 	});
 	

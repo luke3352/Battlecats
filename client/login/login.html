@@ -56,7 +56,12 @@
 <script>
 $(document).ready(function() {
 	var socket = io();
+	//commented out for testing purposes
+	var autoUsername = sessionStorage.getItem("username");
+	var autoPassword = sessionStorage.getItem("password");
 	sessionStorage.clear();
+	$("#username").val(autoUsername);
+	$("#password").val(autoPassword);
 	$("#buttonContinue").click(function() {
 		getloginFormData();
 	});

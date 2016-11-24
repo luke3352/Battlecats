@@ -65,17 +65,20 @@ $(document).ready(function() {
 	socket.on('connect', function(){
 		socket.emit('joinRoom', 'JoinRoom');
 		socket.emit('joinRoomConnection', user);
+		socket.emit('getRoomsListFromDatabase');
 	});
 	
-	socket.on('updateRoomsList',function(room){
-		console.log('UPDATE ROOM LIST', room);
-		
-		var id = room.id;
-		document.getElementById('room-list').innerHTML += 
-			'<form id="form'+id+'" action="/hostRoom" method="GET">'
-			+room.roomName + ':<input type="submit" id="'+id+
-			'" value="Join Room"><input type="hidden" name="id" value="'+id+'"></form>';
-		
+	socket.on('updateRoomsList',function(rooms){
+		console.log('UPDATE ROOM LIST', rooms);
+		document.getElementById('room-list').innerHTML = "";
+		for(var i = 0; i < rooms.length; i++){
+			var id = rooms[i].Room_Id;
+			var roomName = JSON.parse(rooms[i].Room_Object).roomName;
+			document.getElementById('room-list').innerHTML += 
+				'<form id="form'+id+'" action="/hostRoom" method="GET">'
+				+roomName + ':<input type="submit" id="'+id+
+				'" value="Join Room"><input type="hidden" name="id" value="'+id+'"></form>';
+		}
 	});
 	
 	var chatText = document.getElementById('chat-text');
@@ -92,11 +95,6 @@ $(document).ready(function() {
 		socket.emit('sendJoinRoomMsgToServer', user, chatInput.value);
 		chatInput.value = '';      
 	}
-	
-//	function onSubmit(){
-//		socket.emit()	
-//		return true;
-//	}
 });
 </script>
 </body>

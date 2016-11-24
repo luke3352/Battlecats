@@ -9,15 +9,17 @@ exports.ROOMS_LIST = {};
 exports.room = function(data) {
 	var self = {
 		id: 			data.id,
-		host: 			data.host,
-		roomName: 		data.roomName, 
-		isPublic: 		data.isPublic, // Public or private
-		password: 		data.password,
-		numOfPlayers: 	data.numOfPlayers, // Default selection
 		roomPlayers: 	[], // Players have different options
+		numOfPlayers: 	data.numOfPlayers, // Default selection
+		//host: 			data.host,
+		pressingStart: false, //added for database
+		isPublic: 		data.isPublic, // Public or private
+		roomName: 		data.roomName, 
+		password: 		data.password,
 		gameMode: 		data.gameMode, // default game mode is stock
 		gameModeVal: 	data.gameModeVal, // either stock or time
 		items: 			data.items, // items disabled for now
+		numPlayersAlive: 4
 	};
 	
 	self.checkLiving = function(){
@@ -31,6 +33,5 @@ exports.room = function(data) {
 
 
 exports.updateRoom = function(){
-	
-		room.checkLiving();
+	room.checkLiving();
 }

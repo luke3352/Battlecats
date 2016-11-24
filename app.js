@@ -33,7 +33,6 @@ var pause = false;
 
 serv.listen(2000);
 console.log("Server started.");
-//var room = Room.room(1);
 
 //DATABASE FUNCTIONS FOR LOGIN
 var verifypassword = verifypassword;
@@ -46,41 +45,16 @@ var addRoom = addRoom;
 var startGame = startGame;
 
 
-
-
-
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
-//	console.log(num, " CONNECTION ID: ", socket.id);
-//	var id = Math.floor(Math.random() * 999999999);
-//	socket.user = User.user(id);
-//	SOCKET_LIST[id] = socket;
-//	var user, player;
-//	
-
-	//socket.id = Math.random();
 	var id = socket.id;
 	SOCKET_LIST[socket.id] = socket;
-
-	
-	//Player.PLAYER_LIST[socket.id] = player;
 
 	socket.on('disconnect', function() {
 		console.log("DISCONNECT");
 		if(SOCKET_LIST[id]) delete SOCKET_LIST[id];
 		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
 		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
-	});
-	
-	///////////////////////////
-	// USER CREATION SOCKETS //
-	///////////////////////////
-	socket.on('updateUser', function(data){
-		socket.setSocketUsername(data);
-	});
-	socket.on('createPlayer', function(data){
-		player = Player.player(id);
-		Player.PLAYER_LIST[id] = player;
 	});
     
 	///////////////////////////
@@ -95,30 +69,24 @@ io.sockets.on('connection', function(socket) {
 		socket.leave(data);
 	});
 	
-	///////////////////////////////////////////////////
-	///////////////////////////////////////////////////
-	///////////// DATABASE AND ROOMSLIST //////////////
-	///////////////////////////////////////////////////
-	///////////////////////////////////////////////////
-	
+	////////////////////////////
+	// DATABASE AND ROOMSLIST //
+	////////////////////////////
     socket.on('getRoomsListFromDatabase', function(){
     	console.log("recieved emit");
     	getRoomsList(function(roomslist){
     		returnRoomsList(roomslist);
-    		console.log("roomsList in the callback" + roomslist);
+    		//console.log("roomsList in the callback" + roomslist);
     	});
     });
     
     function returnRoomsList(roomslist){
-    	return roomslist;
-    	//here you'll probably want to emit this string instead of 
-    	//return it, but this is where you'll do that!
-    	
+    	socket.emit("updateRoomsList", JSON.parse(roomslist));
     }
    
     socket.on('addRoomToDatabase', function(data){
-    	roomId = data.roomId;
-    	roomObject = data.roomObject;
+    	roomId = data.id + "";
+    	roomObject = JSON.stringify(data);
     	addRoom(roomId, roomObject);
     });
     socket.on('deleteRoomFromDatabase', function(data){
@@ -126,40 +94,29 @@ io.sockets.on('connection', function(socket) {
         deleteRoom(roomId);
     });
  
-    socket.on('getRoomObjectFromDatabase', function(data){
-    	roomId = data.roomId;
-    	console.log(roomId);
-    	getRoomObject(roomId, function(roomobject){
+    socket.on('getRoomObjectFromDatabase', function(roomID){
+    	//console.log(roomID);
+    	getRoomObject((roomID + ""), function(roomobject){
     		returnRoomObject(roomobject);
     	});
     });
     function returnRoomObject(roomobject){
-    	return roomobject;
-    	//again this is where you'll emit or do what you want with this
-    	//roomObject
-    }
-    ///////////////////////////////////////////////////
-	///////////////////////////////////////////////////
-	///////////////////////////////////////////////////    	
+    	socket.emit("retrieveRoomConfig", JSON.parse(JSON.parse(roomobject)[0].Room_Object));
+    } 	
     
     ////////////////
     // START GAME //
     ////////////////
     socket.on('startGame', function(id, user, gameConfig){
-    	//socket.emit('joinRoom', id);
     	startGame(id, user, socket, gameConfig);
     });
 
 	///////////////////////
 	// HOST ROOM SOCKETS //
 	///////////////////////
-	socket.on('sendCreateRoomData',function(data){
-		//console.log("retrieving room data", room);
-		/////////////////////////////
-		//ADD ROOM DATA TO DATABASE//
-		/////////////////////////////
-        //var room = Room.room(data);
-        //room.roomPlayers.push(Player.PLAYER_LIST[id]);
+	socket.on('sendCreateRoomData',function(data, user){
+        var room = Room.room(data);
+        room.roomPlayers.push(user);        
         io.to('JoinRoom').emit('updateRoomsList', data);
     });	
 	socket.on('hostRoomConnection', function(id, user){
@@ -174,15 +131,8 @@ io.sockets.on('connection', function(socket) {
 	// JOIN ROOM SOCKETS //
     ///////////////////////
 	socket.on('joinRoomConnection', function(user){
-		///////////////////////////////////
-		//RETRIEVE ROOMLIST FROM DATABASE//
-		///////////////////////////////////
 		io.to('JoinRoom').emit('addToJoinRoomChat', user + ': has connected.');
 	});
-	socket.on('requestRoomsList',function(){
-        io.to('JoinRoom')
-        	.emit('updateRoomsList', filterRooms(io.sockets.adapter.rooms));
-    });
 	// HANDLES JOINROOM MESSAGES
     socket.on('sendJoinRoomMsgToServer',function(user, msg){
         io.to('JoinRoom').emit('addToJoinRoomChat', user + ': ' + msg);
@@ -267,7 +217,6 @@ function verifypassword(username, password, callback){
 	console.log('end the connection')
 	connection.end();
 }
-
 //VERIFIES NEW ACCOUNT DOESN'T PREVIOUS EXIST AND
 //PASSWORD FITS ALL THREE REQUIREMENTS
 function check_account(username, password, callback){
@@ -306,7 +255,6 @@ function check_account(username, password, callback){
 	console.log("end connection");
 	connection.end();
 }
-
 //ADD NEW ACCOUNT TO DATABASE
 function add_account(username, password){
 	var connection = mysql.createConnection({
@@ -323,7 +271,6 @@ function add_account(username, password){
 	console.log("end connection");
 	connection.end();
 }
-
 //GETS ROOMS LIST FROM DATABASE
 var getRoomsList = function(callback){
 	
@@ -341,14 +288,13 @@ var getRoomsList = function(callback){
 //			if (JSON.stringify(rows) === "[]"){
 //				//this means that there is nothing in the room tables
 //			}
-			console.log(roomslist);
+			//console.log(roomslist);
 			return callback(roomslist);
 		}
 	});
 	console.log('end the connection');
 	connection.end();
 };
-
 //GETS SPECIFIC ROOM OBJECT FROM DATABASE GIVEN THE ID
 var getRoomObject = function(RoomId, callback){
 	
@@ -366,14 +312,13 @@ var getRoomObject = function(RoomId, callback){
 //			if (JSON.stringify(rows) === "[]"){
 //				//this means that there isn't a room with that ID
 //			}
-			console.log(roomobject);
+			//console.log(roomobject);
 			return callback(roomobject);
 		}
 	});
 	console.log('end the connection');
 	connection.end();
 };
-
 //DELETE ROOM FROM DATABASE
 var deleteRoom = function(roomId){
 	var connection = mysql.createConnection({
@@ -388,7 +333,6 @@ var deleteRoom = function(roomId){
 	});
 	connection.end();
 }
-
 //ADD ROOM TO DATABASE
 var addRoom = function(roomId, roomObject){
 	var connection = mysql.createConnection({
@@ -398,17 +342,23 @@ var addRoom = function(roomId, roomObject){
 		  database : 'db309la07'
 	});
 	connection.connect();
-	var roominfo = [roomId,roomObject]
+	var roominfo = [roomId,roomObject];
+	
 	connection.query("INSERT INTO Rooms SET Room_Id = ?, Room_Object = ?", roominfo, function(err, result) {
 	});
 	connection.end();
 }
 
 function startGame(gameID, user, socket, gameConfig){
+	console.log("inside startGame.");
+	console.log("gameID: ", gameID); 
+	console.log("user: ",  user); 
+	//console.log("socket: ",  socket); 
+	console.log("gameConfig: ", gameConfig);
 	var player = Player.player(user);
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
-    socket.join(gameID);
+
 	function createObstacles(){
 		var obstacle = Obstacles.obstacles(0);
 		obstacle.x = 300;
@@ -427,7 +377,7 @@ function startGame(gameID, user, socket, gameConfig){
 			}
 		}
 		else var pack = {};
-		
+		console.log("gameID:",gameID);
         io.to(gameID).emit('newPositions', pack);
         
 	}, 1000 / 25);

@@ -63,7 +63,7 @@
 				</select> 
 				<select id="gameModeValue" class="1-100"></select><br><br>
 				Items: <input type="checkbox" id="items"><br><br><br>
-				<input type="submit" style="align: 'left'" class= "button" value="Create Game"/>
+				<input id="buttonCreateGame" type="submit" style="align: 'left'" class= "button" value="Create Game"/>
 			</form>
 		</div>
 	</div>
@@ -93,17 +93,18 @@ $(document).ready(function() {
 	var socket = io();
 	
 	$("#buttonCreateGame").click(function() {
+		console.log("inside #buttonCreateGame");
 		$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
 		sessionStorage.setItem("roomID", roomID);
 		getRoomFormData(roomID);
 	});	
 
 	
-	function getRoomFormData(){
+	function getRoomFormData(id){
 		//gathers data from the create room form
 		var room = {
-			id:				roomID,
-			host: 			sessionStorage.getItem("username"),
+			id:				id,
+			//host: 			sessionStorage.getItem("username"),
 			roomName : 		document.getElementById("gamename").value,
 			isPublic : 		document.getElementById("public").value,
 			password : 		document.getElementById("password").value,
@@ -114,7 +115,8 @@ $(document).ready(function() {
 		};
 		sessionStorage.setItem("roomConfig", room);
 		console.log("emitting data: ", room);
-		socket.emit('sendCreateRoomData', room);
+		socket.emit('addRoomToDatabase', room);
+		socket.emit('sendCreateRoomData', room, sessionStorage.getItem("username"));
 		
 	}
 });

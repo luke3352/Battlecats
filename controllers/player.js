@@ -14,7 +14,6 @@ exports.player = function(id,numPlayerInRoom) {
 		self.weapon = {};
 		self.character = {};
 		self.id = id;
-		//self.number = "" + Math.floor(10 * Math.random());
 		self.pressingRight = false;
 		self.pressingLeft = false;
 		self.pressingUp = false;
@@ -67,8 +66,7 @@ exports.player = function(id,numPlayerInRoom) {
 			
 			for ( var i in exports.PLAYER_LIST) {
 				
-				if(self.hit == true)
-				{
+				if(self.hit == true) {
 					self.HP--;
 					self.hit = false;
 					
