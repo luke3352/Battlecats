@@ -144,16 +144,20 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-	     verifypassword(username, password, function(correct){
-	      	 sendCorrectPassword(username, password, correct);
+	     verifypassword(username, password, function(correct, experience, wins){
+	    	 console.log("experience: " + experience);
+	    	 console.log("wins: " + wins);
+	      	 sendCorrectPassword(username, password, correct, experience, wins);
 	    });  
     });	
 	
-	function sendCorrectPassword(username, password, correct) {
+	function sendCorrectPassword(username, password, correct, experience, wins) {
 		console.log(correct);
 		var correct = correct;
 		var password = password;
-		var sendpasswordverification = {correct: correct, username: username, password: password};
+		var experience = experience;
+		var wins = wins;
+		var sendpasswordverification = {correct: correct, username: username, password: password, experience: experience, wins: wins};
 		socket.emit('sendpasswordverification', sendpasswordverification);
 
 	}
@@ -188,10 +192,13 @@ function verifypassword(username, password, callback){
 	});
 
 	connection.connect();
-	connection.query("SELECT _password from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
+	connection.query("SELECT * from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
 		if (!err){
 			var string = JSON.stringify(rows);
 			var json = JSON.parse(string);
+			var correct;
+			var experience; 
+			var wins;
 			if (JSON.stringify(rows) === "[]"){
 				console.log("username was not in database... create new account");
 				correct = 0;
@@ -204,14 +211,19 @@ function verifypassword(username, password, callback){
 					console.log(true);
 					console.log('correct password set');
 					correct = 1; 
+					experience = json[0].experience;
+					wins = json[0].wins;
+					console.log(experience);
+					console.log(wins);
 				}
 				else{
 					console.log(false);
+					console.log('incorrect password set');
 					correct = 2;
 				}
 			}
 			console.log('return callback');
-			return callback(correct);
+			return callback(correct, experience, wins);
 		}
 	});
 	console.log('end the connection')

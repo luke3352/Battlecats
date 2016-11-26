@@ -124,8 +124,8 @@ $(document).ready(function() {
 	});
 	var user = sessionStorage.getItem("username");
 	//need to adjust login connect and add experience and wins to callback
-	var experience = "";
-	var wins = "";
+	var experience = sessionStorage.getItem("experience");
+	var wins = sessionStorage.getItem("wins");
 	$("#userInfo").html("username: " + user + "\nexperience: " + experience + "\nwins: " + wins);
 	$(howToPlayPage).hide();
 	$("#howToPlay").click(function() {
