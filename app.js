@@ -28,6 +28,7 @@ var Projectile = require("./controllers/projectile.js");
 var Obstacles = require("./controllers/obstacles.js");
 
 var pause = false;
+var numPlayer = 0;
 
 serv.listen(2000);
 console.log("Server started.");
@@ -41,7 +42,7 @@ var getRoomObject = getRoomObject;
 var deleteRoom = deleteRoom;
 var addRoom = addRoom;
 var startGame = startGame;
-var numPlayer=0;
+
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -49,7 +50,10 @@ io.sockets.on('connection', function(socket) {
 	var currentRoom;
 	socket.on('disconnect', function() {
 		console.log("DISCONNECT");
-		if(currentRoom) socket.leave(currentRoom);
+		if(currentRoom){
+			console.log(socket.id," is disconnecting from ", currentRoom);
+			socket.leave(currentRoom);
+		}
 		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
 	});
     
@@ -364,15 +368,14 @@ function startGame(gameID, user, gameConfig, socket){
 	console.log("user: ",  user); 
 	//console.log("socket: ",  socket); 
 	console.log("gameConfig: ", gameConfig);
-
-	var player = Player.player(socket.id);
+	
 	numPlayer++;
+	var player = Player.player(socket.id, numPlayer);
+	
 
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
-    console.log("attaching nickname");
-    socket.username = user;
-    console.log("is this the error?");
+
 	function createObstacles(){
 		var obstacle = Obstacles.obstacles(0);
 		obstacle.x = 300;
