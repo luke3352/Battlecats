@@ -112,6 +112,7 @@ $(document).ready(function() {
 			//ctx.fillStyle = data.player[i].color;	
 			var catimage = sessionStorage.getItem("image");
 			var image = document.getElementById(catimage);
+			ctx.fillStyle = data.player[i].color;
 			ctx.fillRect(data.player[i].x,data.player[i].y,92,92);
 			ctx.drawImage(image, data.player[i].x, data.player[i].y, 90,90);
 			ctx.fillRect(data.player[i].healthX, data.player[i].healthY, data.player[i].HP*40, 20);		

@@ -43,7 +43,7 @@ var getRoomObject = getRoomObject;
 var deleteRoom = deleteRoom;
 var addRoom = addRoom;
 var startGame = startGame;
-
+var numPlayer=0;
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -367,7 +367,8 @@ function startGame(gameID, user, socket, gameConfig){
 	console.log("user: ",  user); 
 	//console.log("socket: ",  socket); 
 	console.log("gameConfig: ", gameConfig);
-	var player = Player.player(user);
+	numPlayer++;
+	var player = Player.player(user,numPlayer);
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
 
