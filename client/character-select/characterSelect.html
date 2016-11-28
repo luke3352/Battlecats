@@ -37,10 +37,14 @@ h1{
 	font-size: 30px;
 	text-align: center;
 }	
-p {
+.selectcat {
     font-size: 30px;
     text-align: center;
     
+}
+
+#cat2 {
+}
 }
 	
 </style>
@@ -49,52 +53,52 @@ p {
 	<div id="characterSelect">
 		<div class="rectangle">
 			<h1 id = "title">CHARACTER SELECT</h1>
-			<p >Select a cat:</p><br><br>
+			<p class = "selectcat">Select a cat:</p><br><br>
 			
+			<img id = "cat1" src="/client/cats/Cat1.png" style = "width: 100px" hspace="20">
 			<img id = "cat2" src="/client/cats/Cat2.png" style = "width: 100px" hspace="20">
 			<img id = "cat3" src="/client/cats/Cat3.png" style = "width: 100px" hspace="20">
 			<img id = "cat4" src="/client/cats/Cat4.png" style = "width: 100px" hspace="20">
+			<img id = "cat5" src="/client/cats/Cat5.png" style = "width: 100px" hspace="20">
 			<img id = "cat6" src="/client/cats/Cat6.png" style = "width: 100px" hspace="20">
-			<img id = "cat7" src="/client/cats/Cat7.png" style = "width: 100px" hspace="20">
-			<img id = "cat8" src="/client/cats/Cat8.png" style = "width: 100px" hspace="20">
+			<pre>     cat 1                cat 2                 cat 3             cat 4               cat 5                 cat 6</pre>
 			<br>
-			
+			<p id = "catselection" class = "selectcat"> </p>
 			<form action="/weaponSelect" method="GET">
-			<br><br><br>
-				<input type="submit" style="align: 'left'" class = "button"id="buttonWeaponSelect" value="Weapon Select"/>
+				<input type="submit" style="align: 'left'" class = "button" id="buttonWeaponSelect" value="Weapon Select"/>
 			</form>
 		</div>
 	</div>
 
 <script>
 $(document).ready(function() {
-	//var roomID = sessionStorage.getItem("roomID");
-	//$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById("cat2").addEventListener('click',function ()
-    {
-    
-    //not working ...
-    //this needs to be more modular
-     alert("clicked on cat 2");
-    
-    
-    }  ); document.getElementById("cat3").addEventListener('click',function ()
-    {
-    
-     alert("clicked on cat 3");
-    
-    
-    }  ); 
-    document.getElementById("cat1").addEventListener('click',function ()
-    {
-    
-     alert("clicked on cat 1");
-    
-    
-    }  ); 
-});
+	var roomID = sessionStorage.getItem("roomID");
+	$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
+	 document.getElementById('cat1').addEventListener('click', function (e) {
+	 	sessionStorage.setItem('image', document.getElementById('cat2'));
+    	document.getElementById("catselection").innerHTML = "Cat 1 Selected";
+  	 });
+  	 document.getElementById('cat2').addEventListener('click', function (e) {
+    	document.getElementById("catselection").innerHTML = "Cat 2 Selected";
+  	 });
+  	 document.getElementById('cat3').addEventListener('click', function (e) {
+    	document.getElementById("catselection").innerHTML = "Cat 3 Selected";
+  	 });
+  	 document.getElementById('cat4').addEventListener('click', function (e) {
+    	document.getElementById("catselection").innerHTML = "Cat 4 Selected";
+  	 });
+  	 document.getElementById('cat5').addEventListener('click', function (e) {
+    	document.getElementById("catselection").innerHTML = "Cat 5 Selected";
+  	 });
+  	 document.getElementById('cat6').addEventListener('click', function (e) {
+    	document.getElementById("catselection").innerHTML = "Cat 6 Selected";
+  	 });
+  	
+  	 //verifyCat(){
+  	 	//call a socket to see if cat is already selected 
+  	 	//if not socket emit the character select
+  	 	//socket.emit()
+  	 //}
 
 //if cat is selected by another player send that to socket info and then make cat id hidden to other players
 //with an alert or message "cat 3 has already been selected and is now unavailable"

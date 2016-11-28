@@ -29,6 +29,7 @@ exports.player = function(id,numPlayerInRoom) {
 		self.fireTime = new Date().getTime();
 		self.previousFireTime = 0;
 		self.color = "#0000FF";
+		self.image = sessionStorage.getItem("image");
 		self.numPlayer = numPlayerInRoom;
 		if(numPlayerInRoom == 1){
 			self.x = 100;
@@ -121,8 +122,6 @@ exports.player = function(id,numPlayerInRoom) {
 					
 				}
 			}
-				
-			
 		
 		}
 	}
@@ -153,7 +152,7 @@ exports.updatePlayer = function(){
 				HP:player.HP,
 				healthX:player.healthBarX,
 				healthY:player.healthBarY,
-				color:player.color
+				//color:player.color
 			});	
 		
 		count++;

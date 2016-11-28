@@ -51,8 +51,8 @@
 	border: 2px solid #ccc;
 }	
 .inforectangle{
-top: 75px;
-	left: 100px;
+top: 12px;
+left: 100px;
 }
 .rectangle {
 	top: 0px;
@@ -104,11 +104,6 @@ top: 75px;
 	</div>
 <script>
 $(document).ready(function() {
-	//use cookies to display the username
-	//if time: make it a button that says "Account Info"
-	//and when clicked is displays/drops down the username,
-	// wins, and experience... for now make automatic username
-	//$("#usernameDisplay").html($('#username').val());
 	$(userInfo).hide();
 	$(background).hide();
 	var userInfoOn = false;
@@ -126,7 +121,8 @@ $(document).ready(function() {
 	//need to adjust login connect and add experience and wins to callback
 	var experience = sessionStorage.getItem("experience");
 	var wins = sessionStorage.getItem("wins");
-	$("#userInfo").html("username: " + user + "\nexperience: " + experience + "\nwins: " + wins);
+	var button = '<button id = "logout" onclick = "logout()">Log Out</button>'
+	$("#userInfo").html("username: " + user + "\nexperience: " + experience + "\nwins: " + wins + "\n" + button);
 	$(howToPlayPage).hide();
 	$("#howToPlay").click(function() {
 		$(SelectRoom).hide();
@@ -138,6 +134,10 @@ $(document).ready(function() {
 		$(howToPlayPage).hide();
 		$(background).hide();
 	});
+	function logout(){
+		alert("abc");
+	}
+	
 });
 </script>
 </body>
