@@ -56,7 +56,14 @@ top: 75px;
 </head>
 <body>
 	<canvas id="ctx" width="1000" height="700" style="border: 1px solid #000000;"></canvas>
-	
+	<div style="display:none;">
+		<img id = "cat1" src="/client/cats/Cat1.png">
+		<img id = "Cat2" src="/client/cats/Cat2.png">
+		<img id = "Cat3" src="/client/cats/Cat3.png">
+		<img id = "Cat4" src="/client/cats/Cat4.png" width="30" height="30">
+		<img id = "Cat5" src="/client/cats/Cat5.png" width="30" height="30">
+		<img id = "Cat6" src="/client/cats/Cat6.png" width="30" height="30">
+	</div>
 	<div id = "background" class = "rectangle">
 		<div id="optionsSelectInGame" class = "inforectangle">
 			<h1 align="Center" id = "title">OPTIONS</h1>
@@ -83,8 +90,7 @@ $(document).ready(function() {
 	$(optionsSelectInGame).hide();
 	$(background).hide();
 	var ctx = document.getElementById("ctx").getContext("2d");
-	ctx.font = '30px Arial';
-	
+	//ctx.font = '30px Arial';
 
 	
 	socket.on('connect', function(){
@@ -103,10 +109,12 @@ $(document).ready(function() {
 	socket.on('newPositions', function(data) {
 		ctx.clearRect(0, 0, 1000, 700);
 		for(var i = 0; i < data.player.length; i++){
-			ctx.fillStyle = data.player[i].color;
-			ctx.fillRect(data.player[i].x,data.player[i].y,data.player[i].width,data.player[i].height);	
+			//ctx.fillStyle = data.player[i].color;	
+			var catimage = sessionStorage.getItem("image");
+			var image = document.getElementById(catimage);
+			ctx.fillRect(data.player[i].x,data.player[i].y,92,92);
+			ctx.drawImage(image, data.player[i].x, data.player[i].y, 90,90);
 			ctx.fillRect(data.player[i].healthX, data.player[i].healthY, data.player[i].HP*40, 20);		
-			
 			}
 		for(var i = 0 ; i < data.projectile.length; i++)	{
 			ctx.fillStyle = data.projectile[i].color;

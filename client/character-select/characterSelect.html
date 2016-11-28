@@ -75,22 +75,27 @@ $(document).ready(function() {
 	var roomID = sessionStorage.getItem("roomID");
 	$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
 	 document.getElementById('cat1').addEventListener('click', function (e) {
-	 	sessionStorage.setItem('image', document.getElementById('cat2'));
+	 	sessionStorage.setItem('image', 'Cat1');
     	document.getElementById("catselection").innerHTML = "Cat 1 Selected";
   	 });
   	 document.getElementById('cat2').addEventListener('click', function (e) {
+  	  	sessionStorage.setItem('image', 'Cat2');
     	document.getElementById("catselection").innerHTML = "Cat 2 Selected";
   	 });
   	 document.getElementById('cat3').addEventListener('click', function (e) {
+  	 	sessionStorage.setItem('image', 'Cat3');
     	document.getElementById("catselection").innerHTML = "Cat 3 Selected";
   	 });
   	 document.getElementById('cat4').addEventListener('click', function (e) {
+    	sessionStorage.setItem('image', 'Cat4');
     	document.getElementById("catselection").innerHTML = "Cat 4 Selected";
   	 });
   	 document.getElementById('cat5').addEventListener('click', function (e) {
+    	sessionStorage.setItem('image', 'Cat5');
     	document.getElementById("catselection").innerHTML = "Cat 5 Selected";
   	 });
   	 document.getElementById('cat6').addEventListener('click', function (e) {
+    	sessionStorage.setItem('image', 'Cat6');
     	document.getElementById("catselection").innerHTML = "Cat 6 Selected";
   	 });
   	
