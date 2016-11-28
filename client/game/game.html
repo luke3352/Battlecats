@@ -49,13 +49,19 @@
 top: 75px;
 	left: 100px;
 }
-.p{
+.hint{
 	font-size: 20px;
+	font-family: arial;
+	border: 2px solid #ccc;
+	position: absolute;
+	width: 230px;
+	height: 23px;
 }
 </style>
 </head>
 <body>
 	<canvas id="ctx" width="1000" height="700" style="border: 1px solid #000000;"></canvas>
+	<p class = "hint" align = "center">Press q to view Options</p>
 	<div style="display:none;">
 		<img id = "Cat1" src="/client/cats/Cat1.png">
 		<img id = "Cat2" src="/client/cats/Cat2.png">
@@ -113,8 +119,8 @@ $(document).ready(function() {
 			var catimage = sessionStorage.getItem("image");
 			var image = document.getElementById(catimage);
 			ctx.fillStyle = data.player[i].color;
-			ctx.fillRect(data.player[i].x,data.player[i].y,92,92);
 			ctx.drawImage(image, data.player[i].x, data.player[i].y, 90,90);
+			ctx.drawImage(image, data.player[i].healthX - 40, data.player[i].healthY - 10, 50,50);
 			ctx.fillRect(data.player[i].healthX, data.player[i].healthY, data.player[i].HP*40, 20);		
 			}
 		for(var i = 0 ; i < data.projectile.length; i++)	{
