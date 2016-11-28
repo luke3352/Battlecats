@@ -21,10 +21,8 @@ exports.Entity = function(){
 		self.updatePosition();
 	}
 	self.updatePosition = function(){
-		if(self.spdX)
-		self.x += self.spdX;
-		if(self.spdY)
-		self.y += self.spdY;
+		if(self.spdX) self.x += self.spdX;
+		if(self.spdY) self.y += self.spdY;
 	}
 	return self;
 }
