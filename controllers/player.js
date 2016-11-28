@@ -138,28 +138,34 @@ exports.getPlayerList = function() {
 }
 
 // Updates each player's position
-exports.updatePlayer = function(){
+exports.updatePlayer = function(clients){
 	
 	var pack = [];
-	var count = 0;
-	for(var i in exports.PLAYER_LIST){
-		var player = exports.PLAYER_LIST[i];
-			player.updatePosition();
-			pack.push({
-				x:player.x,
-				y:player.y,
-				width:player.width,
-				height:player.height,
-				HP:player.HP,
-				healthX:player.healthBarX,
-				healthY:player.healthBarY,
-				color:player.color
-			});	
+	//var count = 0;
+	//for(var i in exports.PLAYER_LIST){
+		//var player = exports.PLAYER_LIST[i];
+	//console.log("clients: ",clients);
+	Object.keys(clients.sockets).forEach( function(socketId){
+		//console.log("clients socket Id: " + socketId );
 		
-		count++;
-	}
+		var player = exports.PLAYER_LIST[socketId];
+		//console.log("Player in list: ", player);
+		player.updatePosition();
+		pack.push({
+			x:player.x,
+			y:player.y,
+			width:player.width,
+			height:player.height,
+			HP:player.HP,
+			healthX:player.healthBarX,
+			healthY:player.healthBarY,
+			color:player.color
+		});	
+	});
+		//count++;
+	//}
 	
-	count = 0;
+	//count = 0;
 	return pack;
 }
 

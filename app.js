@@ -108,7 +108,7 @@ io.sockets.on('connection', function(socket) {
     // START GAME //
     ////////////////
     socket.on('startGame', function(id, user, gameConfig){
-    	startGame(id, user, socket, gameConfig);
+    	startGame(id, user, gameConfig, socket);
     });
 
 	///////////////////////
@@ -361,16 +361,18 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-function startGame(gameID, user, socket, gameConfig){
+function startGame(gameID, user, gameConfig, socket){
 	console.log("inside startGame.");
 	console.log("gameID: ", gameID); 
 	console.log("user: ",  user); 
 	//console.log("socket: ",  socket); 
 	console.log("gameConfig: ", gameConfig);
-	var player = Player.player(user);
+	var player = Player.player(socket.id);
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
-
+    console.log("attaching nickname");
+    socket.username = user;
+    console.log("is this the error?");
 	function createObstacles(){
 		var obstacle = Obstacles.obstacles(0);
 		obstacle.x = 300;
@@ -380,16 +382,22 @@ function startGame(gameID, user, socket, gameConfig){
 	createObstacles();
 		
 	setInterval(function() {
+		
+		
 		Room.updateRoom();
 		if(pause == false){
-			var pack = {
-				player: Player.updatePlayer(),
-				projectile: Player.update(),
-				obstacles: Obstacles.update(),
+			var clients = io.sockets.adapter.rooms[gameID];
+			//console.log("Clients: ", clients);
+			if(clients) {
+				var pack = {
+					player: Player.updatePlayer(clients),
+					projectile: Player.update(),
+					obstacles: Obstacles.update(),
+				};
 			}
 		}
 		else var pack = {};
-		console.log("gameID:",gameID);
+		//console.log("gameID:",gameID);
         io.to(gameID).emit('newPositions', pack);
         
 	}, 1000 / 25);
