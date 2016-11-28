@@ -141,31 +141,23 @@ exports.getPlayerList = function() {
 exports.updatePlayer = function(clients){
 	
 	var pack = [];
-	//var count = 0;
-	//for(var i in exports.PLAYER_LIST){
-		//var player = exports.PLAYER_LIST[i];
-	//console.log("clients: ",clients);
 	Object.keys(clients.sockets).forEach( function(socketId){
-		//console.log("clients socket Id: " + socketId );
-		
 		var player = exports.PLAYER_LIST[socketId];
-		//console.log("Player in list: ", player);
-		player.updatePosition();
-		pack.push({
-			x:player.x,
-			y:player.y,
-			width:player.width,
-			height:player.height,
-			HP:player.HP,
-			healthX:player.healthBarX,
-			healthY:player.healthBarY,
-			color:player.color
-		});	
+		if(player){
+			player.updatePosition();
+			pack.push({
+				x:player.x,
+				y:player.y,
+				width:player.width,
+				height:player.height,
+				HP:player.HP,
+				healthX:player.healthBarX,
+				healthY:player.healthBarY,
+				color:player.color
+			});	
+		}
+		else console.log("Player at ", socketId, " is undefined");
 	});
-		//count++;
-	//}
-	
-	//count = 0;
 	return pack;
 }
 

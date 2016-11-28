@@ -27,8 +27,6 @@ var Weapon = require("./controllers/weapon.js");
 var Projectile = require("./controllers/projectile.js");
 var Obstacles = require("./controllers/obstacles.js");
 
-var SOCKET_LIST = {};
-var ROOMS_LIST = {};
 var pause = false;
 
 serv.listen(2000);
@@ -48,13 +46,11 @@ var numPlayer=0;
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
 	var id = socket.id;
-	SOCKET_LIST[socket.id] = socket;
-
+	var currentRoom;
 	socket.on('disconnect', function() {
 		console.log("DISCONNECT");
-		if(SOCKET_LIST[id]) delete SOCKET_LIST[id];
+		if(currentRoom) socket.leave(currentRoom);
 		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
-		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
 	});
     
 	///////////////////////////
@@ -63,6 +59,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('joinRoom', function(data){
 		console.log("joining room: ", data);
 		socket.join(data);
+		currentRoom = data;
 	});
 	socket.on('leaveRoom', function(data){
 		console.log("leaving room: ", data);
@@ -385,12 +382,9 @@ function startGame(gameID, user, gameConfig, socket){
 	createObstacles();
 		
 	setInterval(function() {
-		
-		
 		Room.updateRoom();
 		if(pause == false){
 			var clients = io.sockets.adapter.rooms[gameID];
-			//console.log("Clients: ", clients);
 			if(clients) {
 				var pack = {
 					player: Player.updatePlayer(clients),
@@ -400,7 +394,6 @@ function startGame(gameID, user, gameConfig, socket){
 			}
 		}
 		else var pack = {};
-		//console.log("gameID:",gameID);
         io.to(gameID).emit('newPositions', pack);
         
 	}, 1000 / 25);
