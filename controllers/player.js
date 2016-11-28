@@ -33,7 +33,7 @@ exports.player = function(id,numPlayerInRoom) {
 		if(numPlayerInRoom == 1){
 			self.x = 100;
 			self.y = 100;
-			self.healthBarX = 55;
+			self.healthBarX = 50;
 			self.healthBarY = 10;
 			self.color = "#CC0000";
 		}
@@ -47,7 +47,7 @@ exports.player = function(id,numPlayerInRoom) {
 		else if(numPlayerInRoom == 3){
 			self.x = 100;
 			self.y = 600;
-			self.healthBarX = 55;
+			self.healthBarX = 50;
 			self.healthBarY = 670;
 			self.color = "#0000FF";
 		}
@@ -63,83 +63,42 @@ exports.player = function(id,numPlayerInRoom) {
 	// Check if players share the same position
 	self.updatePosition = function() {
 		if(self.dead == false){
-			
-			for ( var i in exports.PLAYER_LIST) {
+			if(self.hit == true) {
+				self.HP--;
+				self.hit = false;
 				
-				if(self.hit == true) {
-					self.HP--;
-					self.hit = false;
-					
-					if(self.HP <= 0){
-						self.dead=true;
-						self.x=-250;
-						self.y=-250;
-						
-					}
-				}
-				//checks what button is pressed and if player can move their; IE: can't leave map
-				
-				if (self.pressingRight && !(self.x > WIDTH-92)) {
-					self.x += self.maxSpd;
-				}
-				if (self.pressingLeft && !(0 > self.x - 5)) {
-					self.x -= self.maxSpd;
-				}
-				if (self.pressingUp && !(0 > self.y - 5)) {
-					self.y -= self.maxSpd;
-				}
-				if (self.pressingDown && !(self.y + 40 > HEIGHT-55)) {
-					self.y += self.maxSpd;
-				}
-				
-				/*for(var i in exports.PLAYER_LIST){
-					var p = exports.PLAYER_LIST[i];
-					
-					if (self.pressingRight && !(self.x > p.x-35) && !(self.x > WIDTH-35)) {
-						self.x += self.maxSpd;
-					}
-					if (self.pressingLeft && !(p.x - 35 > self.x - 5) && !(0 > self.x - 5)) {
-						self.x -= self.maxSpd;
-					}
-					if (self.pressingUp && !(p.y > self.y - 5) &&  !(0 > self.y - 5)) {
-						self.y -= self.maxSpd;
-					}
-					if (self.pressingDown && !(self.y + 40 > p.y+5) && !(self.y + 40 > HEIGHT+5)) {
-						self.y += self.maxSpd;
-					}
-				}*/
-				if(self.generateProjectile){
-					if(self.fireTime - self.previousFireTime > FIRERATE){
-						self.previousFireTime = self.fireTime;
-						self.fireTime = new Date().getTime();
-						var projectile = exports.Projectile(self.id,self.mouseAngle);
-						projectile.x = self.x;
-						projectile.y = self.y;
-						projectile.shoot(self.mouseAngle);
-					}
-					else self.fireTime = new Date().getTime();
-					
+				if(self.HP <= 0) {
+					self.dead=true;
+					self.x=-250;
+					self.y=-250;
 				}
 			}
-				
+			//checks what button is pressed and if player can move their; IE: can't leave map
+			if (self.pressingRight && !(self.x > WIDTH-92)) self.x += self.maxSpd;
+			if (self.pressingLeft && !(0 > self.x - 5)) self.x -= self.maxSpd;
+			if (self.pressingUp && !(0 > self.y - 5)) self.y -= self.maxSpd;
+			if (self.pressingDown && !(self.y + 40 > HEIGHT-55)) self.y += self.maxSpd;
 			
-		
+			if(self.generateProjectile){
+				if(self.fireTime - self.previousFireTime > FIRERATE){
+					self.previousFireTime = self.fireTime;
+					self.fireTime = new Date().getTime();
+					var projectile = exports.Projectile(self.id,self.mouseAngle);
+					projectile.x = self.x;
+					projectile.y = self.y;
+					projectile.shoot(self.mouseAngle);
+				}
+				else self.fireTime = new Date().getTime();
+				
+			}
 		}
 	}
-	
 	exports.PLAYER_LIST[id] = self;
 	return self;
-	
-}
-
-exports.getPlayerList = function() {
-    console.log("here");
-     return exports.PLAYER_LIST;
 }
 
 // Updates each player's position
 exports.updatePlayer = function(clients){
-	
 	var pack = [];
 	Object.keys(clients.sockets).forEach( function(socketId){
 		var player = exports.PLAYER_LIST[socketId];
@@ -155,8 +114,7 @@ exports.updatePlayer = function(clients){
 				healthY:player.healthBarY,
 				color:player.color
 			});	
-		}
-		else console.log("Player at ", socketId, " is undefined");
+		} else console.log("Player at ", socketId, " is undefined");
 	});
 	return pack;
 }
@@ -182,36 +140,28 @@ var HEIGHT = 700;
 	};
  
 	var super_update = self.update;
-	self.update = function(){
-		if(self.timer++ > 100)
-            self.toRemove = true;
+	self.update = function(clients){
+		if(self.timer++ > 100) self.toRemove = true;
         super_update();
-	
-
+        
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
-		for(var i in exports.PLAYER_LIST){
-			var player = exports.PLAYER_LIST[i];			
+		//for(var i in exports.PLAYER_LIST){
+        Object.keys(clients.sockets).forEach( function(socketId){
+			var player = exports.PLAYER_LIST[socketId];			
 			if((self.x >=player.x-20 && self.x<=player.x+92) && 
 			(self.y >=player.y-20 && self.y<=player.y+92) && (self.firedByID != player.id)){
 				//HIT PLAYER
 				player.hit = true;
 				self.toRemove = true;
 			}
-			
-		
-		}
+		});
 		//HIT TOP OF SCREEN
-		if(0 > self.y || self.y + 20 > HEIGHT){
-				self.toRemove = true;
-		}
+		if(0 > self.y || self.y + 20 > HEIGHT) self.toRemove = true;
 		//OUT ON LEFT
-		if(0 > self.x + 20) {
-			self.toRemove = true;
-		}
+		if(0 > self.x + 20) self.toRemove = true;
 		//OUT ON RIGHT
-		else if(self.x > WIDTH) {
-			self.toRemove = true;
-		}
+		else if(self.x > WIDTH) self.toRemove = true;
+		
 	}
 	
 	//fires the projectile
@@ -227,20 +177,23 @@ var HEIGHT = 700;
 	return self;
 }
 
-exports.update = function(){
+exports.update = function(clients){
 	var pack = [];
 	for(var i in exports.PROJECTILES_LIST){
 		var projectile = exports.PROJECTILES_LIST[i];
-		projectile.update();
-	    if(projectile.toRemove)
-            delete exports.PROJECTILES_LIST[i];
-        else
-		pack.push({ 
-			x:projectile.x, 
-			y:projectile.y,
-			color:projectile.color
+		Object.keys(clients.sockets).forEach( function(socketId){
+			if(projectile.firedByID === socketId){
+				projectile.update(clients);
+			    if(projectile.toRemove)
+		            delete exports.PROJECTILES_LIST[i];
+		        else
+				pack.push({ 
+					x:projectile.x, 
+					y:projectile.y,
+					color:projectile.color
+				});
+			}
 		});
 	}	
-	
 	return pack;
-	}
+}

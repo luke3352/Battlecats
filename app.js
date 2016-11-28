@@ -391,7 +391,7 @@ function startGame(gameID, user, gameConfig, socket){
 			if(clients) {
 				var pack = {
 					player: Player.updatePlayer(clients),
-					projectile: Player.update(),
+					projectile: Player.update(clients),
 					obstacles: Obstacles.update(),
 				};
 			}
