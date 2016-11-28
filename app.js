@@ -43,7 +43,7 @@ var getRoomObject = getRoomObject;
 var deleteRoom = deleteRoom;
 var addRoom = addRoom;
 var startGame = startGame;
-
+var numPlayer=0;
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
@@ -367,7 +367,10 @@ function startGame(gameID, user, gameConfig, socket){
 	console.log("user: ",  user); 
 	//console.log("socket: ",  socket); 
 	console.log("gameConfig: ", gameConfig);
+
 	var player = Player.player(socket.id);
+	numPlayer++;
+
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
     console.log("attaching nickname");

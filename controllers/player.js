@@ -199,8 +199,8 @@ var HEIGHT = 700;
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
 		for(var i in exports.PLAYER_LIST){
 			var player = exports.PLAYER_LIST[i];			
-			if((self.x >=player.x-20 && self.x<=player.x+20) && 
-			(self.y >=player.y-20 && self.y<=player.y+20) && (self.firedByID != player.id)){
+			if((self.x >=player.x-WIDTH && self.x<=player.x+WIDTH) && 
+			(self.y >=player.y-HEIGHT && self.y<=player.y+HEIGHT) && (self.firedByID != player.id)){
 				//HIT PLAYER
 				player.hit = true;
 				self.toRemove = true;
