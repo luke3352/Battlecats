@@ -27,9 +27,8 @@ var Weapon = require("./controllers/weapon.js");
 var Projectile = require("./controllers/projectile.js");
 var Obstacles = require("./controllers/obstacles.js");
 
-var SOCKET_LIST = {};
-var ROOMS_LIST = {};
 var pause = false;
+var numPlayer = 0;
 
 serv.listen(2000);
 console.log("Server started.");
@@ -43,18 +42,19 @@ var getRoomObject = getRoomObject;
 var deleteRoom = deleteRoom;
 var addRoom = addRoom;
 var startGame = startGame;
-var numPlayer=0;
+
 
 var io = require('socket.io')(serv, {});
 io.sockets.on('connection', function(socket) {
 	var id = socket.id;
-	SOCKET_LIST[socket.id] = socket;
-
+	var currentRoom;
 	socket.on('disconnect', function() {
 		console.log("DISCONNECT");
-		if(SOCKET_LIST[id]) delete SOCKET_LIST[id];
+		if(currentRoom){
+			console.log(socket.id," is disconnecting from ", currentRoom);
+			socket.leave(currentRoom);
+		}
 		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
-		if(ROOMS_LIST[id]) delete ROOMS_LIST[id];
 	});
     
 	///////////////////////////
@@ -63,6 +63,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('joinRoom', function(data){
 		console.log("joining room: ", data);
 		socket.join(data);
+		currentRoom = data;
 	});
 	socket.on('leaveRoom', function(data){
 		console.log("leaving room: ", data);
@@ -108,7 +109,7 @@ io.sockets.on('connection', function(socket) {
     // START GAME //
     ////////////////
     socket.on('startGame', function(id, user, gameConfig){
-    	startGame(id, user, socket, gameConfig);
+    	startGame(id, user, gameConfig, socket);
     });
 
 	///////////////////////
@@ -361,14 +362,17 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-function startGame(gameID, user, socket, gameConfig){
+function startGame(gameID, user, gameConfig, socket){
 	console.log("inside startGame.");
 	console.log("gameID: ", gameID); 
 	console.log("user: ",  user); 
 	//console.log("socket: ",  socket); 
 	console.log("gameConfig: ", gameConfig);
+	
 	numPlayer++;
-	var player = Player.player(user,numPlayer);
+	var player = Player.player(socket.id, numPlayer);
+	
+
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
 
@@ -383,14 +387,16 @@ function startGame(gameID, user, socket, gameConfig){
 	setInterval(function() {
 		Room.updateRoom();
 		if(pause == false){
-			var pack = {
-				player: Player.updatePlayer(),
-				projectile: Player.update(),
-				obstacles: Obstacles.update(),
+			var clients = io.sockets.adapter.rooms[gameID];
+			if(clients) {
+				var pack = {
+					player: Player.updatePlayer(clients),
+					projectile: Player.update(),
+					obstacles: Obstacles.update(),
+				};
 			}
 		}
 		else var pack = {};
-		console.log("gameID:",gameID);
         io.to(gameID).emit('newPositions', pack);
         
 	}, 1000 / 25);

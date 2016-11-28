@@ -138,12 +138,12 @@ exports.getPlayerList = function() {
 }
 
 // Updates each player's position
-exports.updatePlayer = function(){
+exports.updatePlayer = function(clients){
 	
 	var pack = [];
-	var count = 0;
-	for(var i in exports.PLAYER_LIST){
-		var player = exports.PLAYER_LIST[i];
+	Object.keys(clients.sockets).forEach( function(socketId){
+		var player = exports.PLAYER_LIST[socketId];
+		if(player){
 			player.updatePosition();
 			pack.push({
 				x:player.x,
@@ -155,11 +155,9 @@ exports.updatePlayer = function(){
 				healthY:player.healthBarY,
 				color:player.color
 			});	
-		
-		count++;
-	}
-	
-	count = 0;
+		}
+		else console.log("Player at ", socketId, " is undefined");
+	});
 	return pack;
 }
 
