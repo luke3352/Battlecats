@@ -79,7 +79,7 @@ exports.player = function(id,numPlayerInRoom) {
 				}
 				//checks what button is pressed and if player can move their; IE: can't leave map
 				
-				if (self.pressingRight && !(self.x > WIDTH-35)) {
+				if (self.pressingRight && !(self.x > WIDTH-92)) {
 					self.x += self.maxSpd;
 				}
 				if (self.pressingLeft && !(0 > self.x - 5)) {
@@ -88,7 +88,7 @@ exports.player = function(id,numPlayerInRoom) {
 				if (self.pressingUp && !(0 > self.y - 5)) {
 					self.y -= self.maxSpd;
 				}
-				if (self.pressingDown && !(self.y + 40 > HEIGHT+5)) {
+				if (self.pressingDown && !(self.y + 40 > HEIGHT-55)) {
 					self.y += self.maxSpd;
 				}
 				
@@ -193,8 +193,8 @@ var HEIGHT = 700;
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
 		for(var i in exports.PLAYER_LIST){
 			var player = exports.PLAYER_LIST[i];			
-			if((self.x >=player.x-WIDTH && self.x<=player.x+WIDTH) && 
-			(self.y >=player.y-HEIGHT && self.y<=player.y+HEIGHT) && (self.firedByID != player.id)){
+			if((self.x >=player.x-20 && self.x<=player.x+92) && 
+			(self.y >=player.y-20 && self.y<=player.y+92) && (self.firedByID != player.id)){
 				//HIT PLAYER
 				player.hit = true;
 				self.toRemove = true;
