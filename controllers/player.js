@@ -33,7 +33,7 @@ exports.player = function(id,numPlayerInRoom) {
 		if(numPlayerInRoom == 1){
 			self.x = 100;
 			self.y = 100;
-			self.healthBarX = 5;
+			self.healthBarX = 50;
 			self.healthBarY = 10;
 			self.color = "#CC0000";
 		}
@@ -47,7 +47,7 @@ exports.player = function(id,numPlayerInRoom) {
 		else if(numPlayerInRoom == 3){
 			self.x = 100;
 			self.y = 600;
-			self.healthBarX = 5;
+			self.healthBarX = 50;
 			self.healthBarY = 670;
 			self.color = "#0000FF";
 		}
