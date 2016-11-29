@@ -79,7 +79,7 @@ $(document).ready(function() {
 	
 	socket.on("retrieveRoomConfig", function(config) {
 		console.log("retrieveRoomConfig",config);
-		sessionStorage.setItem("roomConfig", config);
+		sessionStorage.setItem("roomConfig", JSON.stringify(config));
 	});
 	
 	// Updates the chat	

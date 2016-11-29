@@ -363,11 +363,11 @@ var addRoom = function(roomId, roomObject){
 }
 
 function startGame(gameID, user, gameConfig, socket){
-	console.log("inside startGame.");
+	/*console.log("inside startGame.");
 	console.log("gameID: ", gameID); 
 	console.log("user: ",  user); 
 	//console.log("socket: ",  socket); 
-	console.log("gameConfig: ", gameConfig);
+	console.log("gameConfig: ", gameConfig);*/
 	
 	numPlayer++;
 	var player = Player.player(socket.id, numPlayer);
@@ -383,21 +383,47 @@ function startGame(gameID, user, gameConfig, socket){
 	}
 		
 	createObstacles();
-		
+	var countDown = false;
+	var roomID = "game-"+gameID;
+	var previousNumOfPlayers;
 	setInterval(function() {
 		Room.updateRoom();
 		if(pause == false){
-			var clients = io.sockets.adapter.rooms[gameID];
-			if(clients) {
-				var pack = {
-					player: Player.updatePlayer(clients),
-					projectile: Player.update(clients),
-					obstacles: Obstacles.update(),
-				};
+			var clients = io.sockets.adapter.rooms["game-"+gameID];
+			if(clients){
+				if(!countDown){ //Starts countdown
+					var currentNumOfPlayers = Object.keys(clients.sockets).length;
+					if(currentNumOfPlayers == room.numOfPlayers) {
+//						console.log("Inside Countdown");
+//						function countDownFunc(i, callback) {
+//							console.log("inside countDownFunc");
+//						    callback = callback || function(){};
+//						    var int = setInterval(function() {
+//						        io.to(roomID).emit('countdown', i);
+//						        i-- || (clearInterval(int), callback());
+//						    }, 1000);
+//						}
+//						countDownFunc(5);
+						countDown = true;
+					}
+					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
+						console.log("Inside Waiting on");
+						console.log("curr ", currentNumOfPlayers);
+						console.log("gameConfig ", room.numOfPlayers);
+						var waitingOn = room.numOfPlayers - currentNumOfPlayers;
+						io.to(roomID).emit('waiting', waitingOn);
+					}
+					previousNumOfPlayers = currentNumOfPlayers;
+				}else{
+					var pack = {
+						player: Player.updatePlayer(clients),
+						projectile: Player.update(clients),
+						obstacles: Obstacles.update(),
+					};
+					io.to(roomID).emit('newPositions', pack);
+				}
 			}
 		}
-		else var pack = {};
-        io.to(gameID).emit('newPositions', pack);
         
 	}, 1000 / 25);
 	

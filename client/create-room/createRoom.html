@@ -113,7 +113,7 @@ $(document).ready(function() {
 			gameModeVal : 	document.getElementById("gameModeValue").value,
 			items : 		document.getElementById("items").value
 		};
-		sessionStorage.setItem("roomConfig", room);
+		//sessionStorage.setItem("roomConfig", JSON.stringify(room));
 		console.log("emitting data: ", room);
 		socket.emit('addRoomToDatabase', room);
 		socket.emit('sendCreateRoomData', room, sessionStorage.getItem("username"));

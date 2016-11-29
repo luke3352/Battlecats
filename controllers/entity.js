@@ -12,8 +12,8 @@ exports.Entity = function(){
 		spdX:0,
 		speed : 12,
 		vel : {
-		x: 0,
-		y: 0
+			x: 0,
+			y: 0
 		},
 		id:""
 	};

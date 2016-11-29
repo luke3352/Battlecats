@@ -96,13 +96,14 @@ $(document).ready(function() {
 	socket.on('connect', function(){
 		var user = sessionStorage.getItem("username");
 		var gameID = sessionStorage.getItem("roomID");
-		var gameConfig = sessionStorage.getItem("roomConfig");
+		var gameConfig = JSON.parse(sessionStorage.getItem("roomConfig"));
+		console.log(gameConfig);
 		//$('form').append("<input type='hidden' name='id' value='"+ gameID +"'>");
 
 		console.log("Inside Game: ");
 		console.log("user: ", user, " gameID: ", gameID, " gameConfig: ", gameConfig);
 		socket.emit('joinRoom', ("game-"+gameID));
-		socket.emit('startGame', ("game-"+gameID), user, gameConfig);
+		socket.emit('startGame', gameID, user, gameConfig);
 	});
 	
 	// Updates Player In-Game Position
@@ -126,6 +127,17 @@ $(document).ready(function() {
 		//	ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,20,20);		
 		//}
 	});
+	socket.on('waiting', function(numWait){
+		console.log("Inside waiting");
+		ctx.clearRect(0, 0, 1000, 700);
+		ctx.fillStyle = "#00CC00";
+		ctx.font="20px Georgia";
+		ctx.fillText("Waiting for " + numWait + " more players.",10, 50);
+	});
+//	socket.on('countdown', function(count){
+//		ctx.font="20px Georgia";
+//		ctx.fillText(count, 10, 50);
+//	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
 			socket.emit('keyPress', {
