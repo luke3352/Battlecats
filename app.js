@@ -421,8 +421,9 @@ function startGame(gameID, user, gameConfig, socket){
 					//Check if all but one players are dead
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
-						if(Player.PLAYER_LIST[socketId].dead)
+						if(Player.PLAYER_LIST[socketId].dead){
 							numPlayersAlive--;
+						}
 					});
 					if(numPlayersAlive > 1){
 						var pack = {
