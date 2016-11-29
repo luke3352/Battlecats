@@ -343,8 +343,6 @@ var deleteRoom = function(roomId){
 	connection.connect();
 	var roominfo = [roomId]
 	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
-		console.log("err: ", err);
-		console.log("result: ", result);
 	});
 	connection.end();
 }
@@ -372,7 +370,7 @@ function startGame(gameID, user, gameConfig, socket){
 	console.log("gameConfig: ", gameConfig);*/
 	
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer);
+	var player = Player.player(socket.id, numPlayer, user);
 	
 
 	var room = Room.room(gameConfig);
