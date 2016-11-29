@@ -17,6 +17,7 @@ app.get('/characterSelect', function(req, res) { res.sendFile(path.join(__dirnam
 app.get('/weaponSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html')); });
 app.get('/game', function(req, res) { res.sendFile(path.join(__dirname + '/client/game/game.html')); });
 app.get('/startPage', function(req, res) { res.sendFile(path.join(__dirname + '/client/start-page/startPage.html'));});
+app.get('/endGame', function(req, res) { res.sendFile(path.join(__dirname + '/client/end-game/endGame.html'));});
 app.use('/client', express.static(__dirname + '/client'));
 
 var User = 	require("./controllers/user.js");

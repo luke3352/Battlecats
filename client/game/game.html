@@ -146,6 +146,7 @@ $(document).ready(function() {
 //	});
 	socket.on('endGame', function(){
 		console.log("GAME OVER");
+		window.location.href = "/endGame";
 	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
