@@ -11,6 +11,8 @@ var FIRERATE = 500;
 
 exports.player = function(id,numPlayerInRoom) {
 	var self = Entity.Entity();
+		self.width = 92;
+		self.height = 92;
 		self.weapon = {};
 		self.character = {};
 		self.id = id;
@@ -73,11 +75,61 @@ exports.player = function(id,numPlayerInRoom) {
 					self.y=-250;
 				}
 			}
-			//checks what button is pressed and if player can move their; IE: can't leave map
-			if (self.pressingRight && !(self.x > WIDTH-92)) self.x += self.maxSpd;
-			if (self.pressingLeft && !(0 > self.x - 5)) self.x -= self.maxSpd;
-			if (self.pressingUp && !(0 > self.y - 5)) self.y -= self.maxSpd;
-			if (self.pressingDown && !(self.y + 40 > HEIGHT-55)) self.y += self.maxSpd;
+			var moveRight = false;
+			var moveLeft = false;
+			var moveUp = false;
+			var moveDown = false;
+				
+			for ( var i in exports.PLAYER_LIST) {
+				var p = exports.PLAYER_LIST[i];
+				if (self.pressingRight && self.id != p.id){
+					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x)) && !(self.x > WIDTH-92)) {
+						moveRight = true;
+					} else { 
+							moveRight =false; 
+							break;
+					}
+				}else if(self.pressingRight && (self.id == p.id)  && !(self.x > WIDTH-92)){moveRight=true;}
+			}
+		
+			for ( var i in exports.PLAYER_LIST) {
+				var p = exports.PLAYER_LIST[i];
+				if (self.pressingLeft && self.id != p.id){
+					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x)) && !(0 > self.x - 5)) {
+						moveLeft = true;
+					} else {
+							moveLeft = false;
+							break;
+					}
+				}else if(self.pressingLeft && (self.id == p.id) && !(0 > self.x - 5)){moveLeft=true;}
+			}
+			for ( var i in exports.PLAYER_LIST) {
+				var p = exports.PLAYER_LIST[i];
+				if (self.pressingUp && self.id != p.id){
+					if(!((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(0 > self.y - 5)) {
+						moveUp = true;
+					} else {
+						moveUp= false;
+						break;
+					}
+				}else if(self.pressingUp && (self.id == p.id) && !(0 > self.y - 5)){moveUp=true;}
+			}
+			for ( var i in exports.PLAYER_LIST) {
+				var p = exports.PLAYER_LIST[i];
+				if (self.pressingDown && self.id != p.id){
+					if(!((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(self.y + 40 > HEIGHT-55)) {
+						moveDown = true;
+					} else {
+						moveDown = false; 
+						break;
+					}
+				}else if(self.pressingDown && (self.id == p.id) && !(self.y + 40 > HEIGHT-55)){moveDown=true;}
+			}
+		
+			if(moveRight==true){self.x += self.maxSpd; moveRight=false;}
+			if(moveLeft==true){self.x -= self.maxSpd; moveLeft=false;}
+			if(moveUp==true){self.y -= self.maxSpd; moveUp=false;}
+			if(moveDown==true){self.y += self.maxSpd; moveDown=false;}
 			
 			if(self.generateProjectile){
 				if(self.fireTime - self.previousFireTime > FIRERATE){
