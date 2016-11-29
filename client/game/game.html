@@ -144,6 +144,9 @@ $(document).ready(function() {
 //		ctx.font="20px Georgia";
 //		ctx.fillText(count, 10, 50);
 //	});
+	socket.on('endGame', function(){
+		console.log("GAME OVER");
+	});
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
 			socket.emit('keyPress', {

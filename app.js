@@ -91,8 +91,8 @@ io.sockets.on('connection', function(socket) {
     	addRoom(roomId, roomObject);
     });
     socket.on('deleteRoomFromDatabase', function(data){
-        roomId = data.roomId;
-        deleteRoom(roomId);
+    	console.log(data);
+        deleteRoom(data);
     });
  
     socket.on('getRoomObjectFromDatabase', function(roomID){
@@ -386,7 +386,7 @@ function startGame(gameID, user, gameConfig, socket){
 	var countDown = false;
 	var roomID = "game-"+gameID;
 	var previousNumOfPlayers;
-	setInterval(function() {
+	var intervalId = setInterval(function() {
 		Room.updateRoom();
 		if(pause == false){
 			var clients = io.sockets.adapter.rooms["game-"+gameID];
@@ -404,6 +404,7 @@ function startGame(gameID, user, gameConfig, socket){
 //						    }, 1000);
 //						}
 //						countDownFunc(5);
+						socket.emit('deleteRoomFromDatabase', gameID);
 						countDown = true;
 					}
 					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
@@ -414,17 +415,28 @@ function startGame(gameID, user, gameConfig, socket){
 						io.to(roomID).emit('waiting', waitingOn);
 					}
 					previousNumOfPlayers = currentNumOfPlayers;
-				}else{
-					var pack = {
-						player: Player.updatePlayer(clients),
-						projectile: Player.update(clients),
-						obstacles: Obstacles.update(),
-					};
-					io.to(roomID).emit('newPositions', pack);
+				} else {
+					//Check if all but one players are dead
+					var numPlayersAlive = room.numOfPlayers;
+					Object.keys(clients.sockets).forEach( function(socketId){
+						if(Player.PLAYER_LIST[socketId].dead)
+							numPlayersAlive--;
+					});
+					if(numPlayersAlive > 1){
+						var pack = {
+							player: Player.updatePlayer(clients),
+							projectile: Player.update(clients),
+							obstacles: Obstacles.update(),
+						};
+						io.to(roomID).emit('newPositions', pack);
+					}
+					else {
+						io.to(roomID).emit('endGame');
+						clearInterval(intervalId);
+					}
 				}
 			}
 		}
-        
 	}, 1000 / 25);
 	
 	socket.on('keyPress', function(data) {
