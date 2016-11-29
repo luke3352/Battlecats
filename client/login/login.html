@@ -88,10 +88,8 @@ $(document).ready(function() {
 		else if (correct === 1){
 			username = data.username; 
 			password = data.password;
-			experience = data.experience;
 			wins = data.wins;
 			socket.emit('createUser', username);
-			sessionStorage.setItem('experience', experience);
 			sessionStorage.setItem('wins', wins);
 			sessionStorage.setItem('username', username);		
 			sessionStorage.setItem('password', password);

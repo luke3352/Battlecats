@@ -146,20 +146,18 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-	     verifypassword(username, password, function(correct, experience, wins){
-	    	 console.log("experience: " + experience);
+	     verifypassword(username, password, function(correct, wins){
 	    	 console.log("wins: " + wins);
-	      	 sendCorrectPassword(username, password, correct, experience, wins);
+	      	 sendCorrectPassword(username, password, correct, wins);
 	    });  
     });	
 	
-	function sendCorrectPassword(username, password, correct, experience, wins) {
+	function sendCorrectPassword(username, password, correct, wins) {
 		console.log(correct);
 		var correct = correct;
 		var password = password;
-		var experience = experience;
 		var wins = wins;
-		var sendpasswordverification = {correct: correct, username: username, password: password, experience: experience, wins: wins};
+		var sendpasswordverification = {correct: correct, username: username, password: password, wins: wins};
 		socket.emit('sendpasswordverification', sendpasswordverification);
 
 	}
@@ -199,7 +197,6 @@ function verifypassword(username, password, callback){
 			var string = JSON.stringify(rows);
 			var json = JSON.parse(string);
 			var correct;
-			var experience; 
 			var wins;
 			if (JSON.stringify(rows) === "[]"){
 				console.log("username was not in database... create new account");
@@ -213,9 +210,7 @@ function verifypassword(username, password, callback){
 					console.log(true);
 					console.log('correct password set');
 					correct = 1; 
-					experience = json[0].experience;
 					wins = json[0].wins;
-					console.log(experience);
 					console.log(wins);
 				}
 				else{
@@ -225,7 +220,7 @@ function verifypassword(username, password, callback){
 				}
 			}
 			console.log('return callback');
-			return callback(correct, experience, wins);
+			return callback(correct, wins);
 		}
 	});
 	console.log('end the connection')
@@ -280,7 +275,7 @@ function add_account(username, password){
 	console.log(username);
 	connection.connect();
 	var userinfo = [username,password, '0', '0']
-	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?", userinfo, function(err, result) {
+	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, wins = ?", userinfo, function(err, result) {
 	});
 	console.log("end connection");
 	connection.end();

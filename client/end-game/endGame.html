@@ -72,18 +72,17 @@ left: 100px;
 	color: blue;
 	font-size: 40px;
 	text-align: center;
-	position:fixed;
-  z-index: 100;  
-  left:32.5%;  
+  	z-index: 100;  
+  	left:32.5%;  
+  	border-width: 30px;
 }
 
 </style>
 </head>
 <body>
-	<div id="endGame" class = "rectangle" align="center"> 
+	<div id="endGame" class = "rectangle" > 
 			<h1 align="center" id = "title">END GAME</h1>
-			<div align = "center" id="blink" class = "winner"></div>
-			<br><br><Br>
+			<div id="blink" class = "winner"></div>
 			<form action="/weaponSelect" method="GET">
 			<br>
 				<input class = "button" type="submit" id="anotherGame" value="Play another Game"/>
