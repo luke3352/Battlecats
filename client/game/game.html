@@ -69,6 +69,10 @@ top: 75px;
 		<img id = "Cat4" src="/client/cats/Cat4.png" width="30" height="30">
 		<img id = "Cat5" src="/client/cats/Cat5.png" width="30" height="30">
 		<img id = "Cat6" src="/client/cats/Cat6.png" width="30" height="30">
+		<img id = "yarn-purple" src="/client/yarn/yarn-purple.png" width="30" height="30">
+		<img id = "yarn-blue" src="/client/yarn/yarn-purple.png" width="30" height="30">
+		<img id = "yarn-pink" src="/client/yarn/yarn-purple.png" width="30" height="30">
+		<img id = "yarn-red" src="/client/yarn/yarn-purple.png" width="30" height="30">
 	</div>
 	<div id = "background" class = "rectangle">
 		<div id="optionsSelectInGame" class = "inforectangle">
@@ -125,8 +129,10 @@ $(document).ready(function() {
 			ctx.fillRect(data.player[i].healthX, data.player[i].healthY, data.player[i].HP*40, 20);		
 			}
 		for(var i = 0 ; i < data.projectile.length; i++)	{
+			var image = document.getElementById("yarn-purple");
 			ctx.fillStyle = data.projectile[i].color;
-			ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
+			ctx.drawImage(image, data.projectile[i].x, data.projectile[i].y, 20,20);
+			//ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
 		//for(var i = 0 ; i < data.obstacle.length; i++)	{
 		//	ctx.fillStyle = "0000FF"
