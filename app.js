@@ -343,6 +343,8 @@ var deleteRoom = function(roomId){
 	connection.connect();
 	var roominfo = [roomId]
 	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
+		console.log("err: ", err);
+		console.log("result: ", result);
 	});
 	connection.end();
 }
@@ -404,7 +406,7 @@ function startGame(gameID, user, gameConfig, socket){
 //						    }, 1000);
 //						}
 //						countDownFunc(5);
-						socket.emit('deleteRoomFromDatabase', gameID);
+						deleteRoom(gameID);
 						countDown = true;
 					}
 					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
