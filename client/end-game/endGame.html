@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<style>
+.button{
+	padding: 10px 17px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 7px;
+  margin:auto;
+  display:block;
+}
+.userInfo{
+	padding: 5px 10px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: black;
+  background-color: white;
+  
+}
+#title{
+	font-size: 30px;
+}
+#picture {
+	position: absolute;
+}
+.display, .rectangle {
+	position: absolute;
+	z-index: 9999;
+	width: 1000px;
+	height: 700px;
+	border-radius: 20px;
+	background-color: #f4d942;
+	border: 2px solid #ccc;
+}
+.display, .inforectangle {
+	position: absolute;
+	z-index: 9998;
+	width: 800px;
+	height: 560px;
+	border-radius: 20px;
+	background-color: #ffff99;
+	border: 2px solid #ccc;
+}	
+.inforectangle{
+top: 12px;
+left: 100px;
+}
+.rectangle {
+	top: 0px;
+	left: 0px;
+}
+.alert {
+    background-color: white;
+    color: black;
+    position: absolute;
+    margin-bottom: 15px;
+    margin-right: 893px;
+}
+.p{
+	font-size: 20px;
+}
+.winner{
+	color: blue;
+	font-size: 40px;
+	text-align: center;
+  	z-index: 100;  
+  	left:32.5%;  
+  	border-width: 30px;
+}
+
+</style>
+</head>
+<body>
+	<div id="endGame" class = "rectangle" > 
+			<h1 align="center" id = "title">END GAME</h1>
+			<div id="blink" class = "winner"></div>
+			<form action="/weaponSelect" method="GET">
+			<br>
+				<input class = "button" type="submit" id="anotherGame" value="Play another Game"/>
+				<br>
+			</form>
+			<form action="/mainMenu" method="GET">			
+				<input class = "button" type="submit" id="returnToMain" value="Return to Main Menu"/>
+				<br>
+			</form>
+			<form action="/startPage" method="GET">			
+				<input class = "button" type="submit" id="logout" value="Logout"/>
+				<br>
+			</form>
+	</div>
+<script>
+$(document).ready(function() {
+	var username = "A player";
+	$("#blink").html(username + " won!");
+	$("#blink").css({"border": "3px dotted red", "outline-color" : "yellow", "outline-style" : "dotted"});
+	$("#blink").css({"align": "center"})
+
+});
+</script>
+</body>
+</html>

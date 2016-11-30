@@ -9,13 +9,14 @@ var HEIGHT = 700;
 var WIDTH = 1000;
 var FIRERATE = 500;
 
-exports.player = function(id,numPlayerInRoom) {
+exports.player = function(id,numPlayerInRoom, user) {
 	var self = Entity.Entity();
 		self.width = 92;
 		self.height = 92;
 		self.weapon = {};
 		self.character = {};
 		self.id = id;
+		self.username = user;
 		self.pressingRight = false;
 		self.pressingLeft = false;
 		self.pressingUp = false;

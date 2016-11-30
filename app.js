@@ -17,6 +17,7 @@ app.get('/characterSelect', function(req, res) { res.sendFile(path.join(__dirnam
 app.get('/weaponSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html')); });
 app.get('/game', function(req, res) { res.sendFile(path.join(__dirname + '/client/game/game.html')); });
 app.get('/startPage', function(req, res) { res.sendFile(path.join(__dirname + '/client/start-page/startPage.html'));});
+app.get('/endGame', function(req, res) { res.sendFile(path.join(__dirname + '/client/end-game/endGame.html'));});
 app.use('/client', express.static(__dirname + '/client'));
 
 var User = 	require("./controllers/user.js");
@@ -343,8 +344,6 @@ var deleteRoom = function(roomId){
 	connection.connect();
 	var roominfo = [roomId]
 	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
-		console.log("err: ", err);
-		console.log("result: ", result);
 	});
 	connection.end();
 }
@@ -372,7 +371,7 @@ function startGame(gameID, user, gameConfig, socket){
 	console.log("gameConfig: ", gameConfig);*/
 	
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer);
+	var player = Player.player(socket.id, numPlayer, user);
 	
 
 	var room = Room.room(gameConfig);
