@@ -134,10 +134,12 @@ $(document).ready(function() {
 			ctx.drawImage(image, data.projectile[i].x, data.projectile[i].y, 20,20);
 			//ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
-		//for(var i = 0 ; i < data.obstacle.length; i++)	{
-		//	ctx.fillStyle = "0000FF"
-		//	ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,20,20);		
-		//}
+		console.log("vgjv"+data.obstacles.length);
+		for(var i = 0 ; i < data.obstacles.length; i++)	{
+			console.log("x"+data.obstacles[i].x);
+			ctx.fillStyle = "0000FF"
+			ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,data.obstacles[i].width,data.obstacles[i].height);		
+		}
 	});
 	socket.on('waiting', function(numWait){
 		console.log("Inside waiting");

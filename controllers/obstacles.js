@@ -14,10 +14,10 @@ exports.obstacles = function(id) {
 }
 
 exports.update = function(){
+	
 	var pack = [];
 	for(var i in exports.OBSTACLES_LIST){
 		var obstacle = exports.OBSTACLES_LIST[i];
-		
 		pack.push({
 			x:obstacle.x,
 			y:obstacle.y,
@@ -25,4 +25,5 @@ exports.update = function(){
 			height:obstacle.height
 		});
 	}
+	return pack;
 }

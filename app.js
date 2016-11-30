@@ -380,8 +380,52 @@ function startGame(gameID, user, gameConfig, socket){
 
 	function createObstacles(){
 		var obstacle = Obstacles.obstacles(0);
-		obstacle.x = 300;
-		obstacle.y = 300;
+		obstacle.x = 200;
+		obstacle.y = 170;
+		obstacle.width = 30;
+		obstacle.height = 100;
+		
+		var obstacle2 = Obstacles.obstacles(1);
+		obstacle2.x = 200;
+		obstacle2.y = 170;
+		obstacle2.width = 100;
+		obstacle2.height = 30;
+		
+		var obstacle3 = Obstacles.obstacles(2);
+		obstacle3.x = 800;
+		obstacle3.y = 170;
+		obstacle3.width = 30;
+		obstacle3.height = 100;
+		
+		var obstacle4 = Obstacles.obstacles(3);
+		obstacle4.x = 730;
+		obstacle4.y = 170;
+		obstacle4.width = 100;
+		obstacle4.height = 30;
+		
+		var obstacle5 = Obstacles.obstacles(4);
+		obstacle5.x = 200;
+		obstacle5.y = 430;
+		obstacle5.width = 30;
+		obstacle5.height = 100;
+		
+		var obstacle6 = Obstacles.obstacles(5);
+		obstacle6.x = 200;
+		obstacle6.y = 500;
+		obstacle6.width = 100;
+		obstacle6.height = 30;
+		
+		var obstacle7 = Obstacles.obstacles(6);
+		obstacle7.x = 800;
+		obstacle7.y = 430;
+		obstacle7.width = 30;
+		obstacle7.height = 100;
+		
+		var obstacle8 = Obstacles.obstacles(7);
+		obstacle8.x = 730;
+		obstacle8.y = 500;
+		obstacle8.width = 100;
+		obstacle8.height = 30;
 	}
 		
 	createObstacles();
@@ -429,7 +473,7 @@ function startGame(gameID, user, gameConfig, socket){
 						var pack = {
 							player: Player.updatePlayer(clients),
 							projectile: Player.update(clients),
-							obstacles: Obstacles.update(),
+							obstacles: Obstacles.update()
 						};
 						io.to(roomID).emit('newPositions', pack);
 					}
