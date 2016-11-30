@@ -17,6 +17,7 @@ app.get('/characterSelect', function(req, res) { res.sendFile(path.join(__dirnam
 app.get('/weaponSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html')); });
 app.get('/game', function(req, res) { res.sendFile(path.join(__dirname + '/client/game/game.html')); });
 app.get('/startPage', function(req, res) { res.sendFile(path.join(__dirname + '/client/start-page/startPage.html'));});
+app.get('/endGame', function(req, res) { res.sendFile(path.join(__dirname + '/client/end-game/endGame.html'));});
 app.use('/client', express.static(__dirname + '/client'));
 
 var User = 	require("./controllers/user.js");
@@ -419,8 +420,9 @@ function startGame(gameID, user, gameConfig, socket){
 					//Check if all but one players are dead
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
-						if(Player.PLAYER_LIST[socketId].dead)
+						if(Player.PLAYER_LIST[socketId].dead){
 							numPlayersAlive--;
+						}
 					});
 					if(numPlayersAlive > 1){
 						var pack = {
