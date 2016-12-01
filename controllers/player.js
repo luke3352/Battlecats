@@ -1,9 +1,11 @@
 var Entity = require("./Entity.js");
 var Projectile = require("./projectile.js");
+var Obstacle = require("./obstacles.js");
 var exports = module.exports = {};
 //List of players
 exports.PLAYER_LIST = {};
 exports.PROJECTILES_LIST = {};
+exports.OBSTACLES_LIST = {};
 //Player constructor
 var HEIGHT = 700;
 var WIDTH = 1000;
@@ -76,57 +78,116 @@ exports.player = function(id,numPlayerInRoom, user) {
 					self.y=-250;
 				}
 			}
-			var moveRight = false;
-			var moveLeft = false;
-			var moveUp = false;
-			var moveDown = false;
-				
-			for ( var i in exports.PLAYER_LIST) {
-				var p = exports.PLAYER_LIST[i];
-				if (self.pressingRight && self.id != p.id){
-					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x)) && !(self.x > WIDTH-92)) {
+			var moveRight = null;
+			var moveLeft = null;
+			var moveUp = null;
+			var moveDown = null;
+			//checks for collisons with obstacles
+			//console.log("x: "+exports.OBSTACLES_LIST[0].x);
+			
+			for ( var i in exports.OBSTACLES_LIST) {console.log("HERE");
+				var p = exports.OBSTACLES_LIST[i];
+				if (self.pressingRight){
+					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x))) {
 						moveRight = true;
-					} else { 
+					} 
+					else { 
 							moveRight =false; 
-							break;
+							break;7
 					}
-				}else if(self.pressingRight && (self.id == p.id)  && !(self.x > WIDTH-92)){moveRight=true;}
+				}
 			}
-		
-			for ( var i in exports.PLAYER_LIST) {
-				var p = exports.PLAYER_LIST[i];
-				if (self.pressingLeft && self.id != p.id){
-					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x)) && !(0 > self.x - 5)) {
+			
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if (self.pressingLeft){
+					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x))) {
 						moveLeft = true;
 					} else {
 							moveLeft = false;
 							break;
 					}
-				}else if(self.pressingLeft && (self.id == p.id) && !(0 > self.x - 5)){moveLeft=true;}
+				}
 			}
-			for ( var i in exports.PLAYER_LIST) {
-				var p = exports.PLAYER_LIST[i];
-				if (self.pressingUp && self.id != p.id){
-					if(!((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(0 > self.y - 5)) {
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if (self.pressingUp){
+					if(!((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width))) {
 						moveUp = true;
 					} else {
 						moveUp= false;
 						break;
 					}
-				}else if(self.pressingUp && (self.id == p.id) && !(0 > self.y - 5)){moveUp=true;}
+				}
 			}
-			for ( var i in exports.PLAYER_LIST) {
-				var p = exports.PLAYER_LIST[i];
-				if (self.pressingDown && self.id != p.id){
-					if(!((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(self.y + 40 > HEIGHT-55)) {
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if (self.pressingDown){
+					if(!((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width))) {
 						moveDown = true;
 					} else {
 						moveDown = false; 
 						break;
 					}
-				}else if(self.pressingDown && (self.id == p.id) && !(self.y + 40 > HEIGHT-55)){moveDown=true;}
+				}
 			}
-		
+			//console.log(moveRight+""+moveLeft+""+moveUp+""+moveDown);
+			//checks for collisons with other players
+			if(moveRight!=false){
+				for ( var i in exports.PLAYER_LIST) {
+					var p = exports.PLAYER_LIST[i];
+					if (self.pressingRight && self.id != p.id){
+						if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x)) 
+							&& !(self.x > WIDTH-92)) {
+							moveRight = true;
+						} 
+						else { 
+								moveRight =false; 
+								break;
+						}
+					}else if(self.pressingRight && (self.id == p.id)  && !(self.x > WIDTH-92)){moveRight=true;}
+				}
+			}
+			if(moveLeft!=false){
+				for ( var i in exports.PLAYER_LIST) {
+					var p = exports.PLAYER_LIST[i];
+					if (self.pressingLeft && self.id != p.id){
+						if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x)) && !(0 > self.x - 5)) {
+							moveLeft = true;
+						} else {
+								moveLeft = false;
+								break;
+						}
+					}else if(self.pressingLeft && (self.id == p.id) && !(0 > self.x - 5)){moveLeft=true;}
+				}
+			}
+			if(moveUp!=false){
+				for ( var i in exports.PLAYER_LIST) {
+					var p = exports.PLAYER_LIST[i];
+					if (self.pressingUp && self.id != p.id){
+						if(!((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(0 > self.y - 5)) {
+							moveUp = true;
+						} else {
+							moveUp= false;
+							break;
+						}
+					}else if(self.pressingUp && (self.id == p.id) && !(0 > self.y - 5)){moveUp=true;}
+				}
+			}
+			if(moveDown!=false){
+				for ( var i in exports.PLAYER_LIST) {
+					
+					var p = exports.PLAYER_LIST[i];
+					if (self.pressingDown && self.id != p.id){
+						if(!((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(self.y + 40 > HEIGHT-55)) {
+							moveDown = true;
+						} else {
+							moveDown = false; 
+							break;
+						}
+					}else if(self.pressingDown && (self.id == p.id) && !(self.y + 40 > HEIGHT-55)){moveDown=true;}
+				}
+			}
 			if(moveRight==true){self.x += self.maxSpd; moveRight=false;}
 			if(moveLeft==true){self.x -= self.maxSpd; moveLeft=false;}
 			if(moveUp==true){self.y -= self.maxSpd; moveUp=false;}
