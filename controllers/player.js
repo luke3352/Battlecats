@@ -82,10 +82,9 @@ exports.player = function(id,numPlayerInRoom, user) {
 			var moveLeft = null;
 			var moveUp = null;
 			var moveDown = null;
-			//checks for collisons with obstacles
-			console.log("x: "+exports.OBSTACLES_LIST[0].x);
 			
-			for ( var i in exports.OBSTACLES_LIST) {console.log("HERE");
+			//checks for collisons with obstacles
+			for ( var i in exports.OBSTACLES_LIST) {
 				var p = exports.OBSTACLES_LIST[i];
 				if (self.pressingRight){
 					if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x))) {
@@ -93,7 +92,7 @@ exports.player = function(id,numPlayerInRoom, user) {
 					} 
 					else { 
 							moveRight =false; 
-							break;7
+							break;
 					}
 				}
 			}
@@ -131,7 +130,6 @@ exports.player = function(id,numPlayerInRoom, user) {
 					}
 				}
 			}
-			//console.log(moveRight+""+moveLeft+""+moveUp+""+moveDown);
 			//checks for collisons with other players
 			if(moveRight!=false){
 				for ( var i in exports.PLAYER_LIST) {
@@ -261,12 +259,43 @@ var HEIGHT = 700;
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
 		//for(var i in exports.PLAYER_LIST){
         Object.keys(clients.sockets).forEach( function(socketId){
-			var player = exports.PLAYER_LIST[socketId];			
+			var player = exports.PLAYER_LIST[socketId];		
+			
 			if((self.x >=player.x-20 && self.x<=player.x+92) && 
 			(self.y >=player.y-20 && self.y<=player.y+92) && (self.firedByID != player.id)){
 				//HIT PLAYER
 				player.hit = true;
 				self.toRemove = true;
+			}
+			
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if(((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x))) {
+						self.toRemove = true;
+						break;
+				} 		
+			}
+			
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if(((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x))) {
+						self.toRemove = true;
+						break;
+				} 
+			}
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if(((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width))) {
+						self.toRemove = true;
+						break;
+				} 
+			}
+			for ( var i in exports.OBSTACLES_LIST) {
+				var p = exports.OBSTACLES_LIST[i];
+				if(((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width))) {
+						self.toRemove = true;
+						break;
+				} 
 			}
 		});
 		//HIT TOP OF SCREEN

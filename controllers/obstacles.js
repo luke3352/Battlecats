@@ -18,7 +18,6 @@ exports.getArray = function(){
 exports.update = function(){
 	
 	var pack = [];
-	//console.log("size: "+exports.OBSTACLES_LIST.length);
 	for(var i in exports.OBSTACLES_LIST){
 		var obstacle = exports.OBSTACLES_LIST[i];
 		pack.push({
