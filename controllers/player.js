@@ -5,7 +5,7 @@ var exports = module.exports = {};
 //List of players
 exports.PLAYER_LIST = {};
 exports.PROJECTILES_LIST = {};
-exports.OBSTACLES_LIST = {};
+exports.OBSTACLES_LIST =Obstacle.getArray();
 //Player constructor
 var HEIGHT = 700;
 var WIDTH = 1000;
@@ -83,7 +83,7 @@ exports.player = function(id,numPlayerInRoom, user) {
 			var moveUp = null;
 			var moveDown = null;
 			//checks for collisons with obstacles
-			//console.log("x: "+exports.OBSTACLES_LIST[0].x);
+			console.log("x: "+exports.OBSTACLES_LIST[0].x);
 			
 			for ( var i in exports.OBSTACLES_LIST) {console.log("HERE");
 				var p = exports.OBSTACLES_LIST[i];

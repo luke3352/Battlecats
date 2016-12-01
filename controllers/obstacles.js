@@ -12,7 +12,9 @@ exports.obstacles = function(id) {
 	exports.OBSTACLES_LIST[id] = self;
 	return self;
 }
-
+exports.getArray = function(){
+	return exports.OBSTACLES_LIST;
+}
 exports.update = function(){
 	
 	var pack = [];
