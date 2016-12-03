@@ -368,7 +368,7 @@ function startGame(gameID, user, gameConfig, socket){
 	console.log("gameConfig: ", gameConfig);*/
 	
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer);
+	var player = Player.player(socket.id, numPlayer, user);
 	
 
 	var room = Room.room(gameConfig);
@@ -426,12 +426,19 @@ function startGame(gameID, user, gameConfig, socket){
 							player: Player.updatePlayer(clients),
 							projectile: Player.update(clients),
 							obstacles: Obstacles.update(),
-						};
+						}
 						io.to(roomID).emit('newPositions', pack);
 					}
 					else {
-						io.to(roomID).emit('endGame');
-						clearInterval(intervalId);
+						Object.keys(clients.sockets).forEach(function(socketId, callback){
+							if (!Player.PLAYER_LIST[socketId].dead){
+								var winner = Player.PLAYER_LIST[socketId].username;
+								var sendWinner = {winner: winner};	
+								io.to(roomID).emit('endGame', sendWinner);
+								clearInterval(intervalId);
+							}
+						});
+
 					}
 				}
 			}
