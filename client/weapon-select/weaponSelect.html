@@ -52,7 +52,7 @@
 			<img id = "weapon1" src="/client/yarn/yarn-blue.png" width="200" height="150" hspace="20">
 			<img id = "weapon2" src="/client/yarn/yarn-pink.png"  width="200" height="150" hspace="20">
 			<img id = "weapon3" src="/client/yarn/yarn-purple.png"  width="200" height="150" hspace="20">
-			<img id = "weapon3" src="/client/yarn/yarn-red.png"  width="200" height="150" hspace="20">
+			<img id = "weapon4" src="/client/yarn/yarn-red.png"  width="200" height="150" hspace="20">
 			<pre>     weapon 1                            weapon 2                             weapon 3                           weapon 4</pre>
 			<br>
 			<p id = "weaponselection" class = "selectcat"> </p>
@@ -66,19 +66,19 @@ $(document).ready(function() {
 	var roomID = sessionStorage.getItem("roomID");
 	$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
 	 document.getElementById('weapon1').addEventListener('click', function (e) {
-	 	//sessionStorage.setItem('image', 'weapon1');
+	 	sessionStorage.setItem('weaponImage', 'yarn-blue');
     	document.getElementById("weaponselection").innerHTML = "Weapon 1 Selected";
   	 });
   	 document.getElementById('weapon2').addEventListener('click', function (e) {
-  	  	//sessionStorage.setItem('image', 'weapon2');
+  	  	sessionStorage.setItem('weaponImage', 'yarn-pink');
     	document.getElementById("weaponselection").innerHTML = "Weapon 2 Selected";
   	 });
   	 document.getElementById('weapon3').addEventListener('click', function (e) {
-  	 	//sessionStorage.setItem('image', 'weapon3');
+  	 	sessionStorage.setItem('weaponImage', 'yarn-purple');
     	document.getElementById("weaponselection").innerHTML = "Weapon 3 Selected";
   	 });
   	 document.getElementById('weapon4').addEventListener('click', function (e) {
-    	//sessionStorage.setItem('image', 'weapon4');
+    	sessionStorage.setItem('weaponImage', 'yarn-red');
     	document.getElementById("weaponselection").innerHTML = "Weapon 4 Selected";
   	 });
 	
