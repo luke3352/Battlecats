@@ -19,19 +19,8 @@ exports.room = function(data) {
 		gameMode: 		data.gameMode, // default game mode is stock
 		gameModeVal: 	data.gameModeVal, // either stock or time
 		items: 			data.items, // items disabled for now
-		numPlayersAlive: 4
 	};
 	
-	self.checkLiving = function(){
-		for(var i in Player.PLAYER_LIST){
-			//console.log("List"+Player.PLAYER_LIST[i].id);
-		}
-	}
 	room = self;
 	return self;
-}
-
-
-exports.updateRoom = function(){
-	room.checkLiving();
 }
