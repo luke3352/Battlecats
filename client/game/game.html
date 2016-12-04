@@ -72,7 +72,7 @@ top: 75px;
 		<img id = "yarn-purple" src="/client/yarn/yarn-purple.png" width="30" height="30">
 		<img id = "yarn-blue" src="/client/yarn/yarn-blue.png" width="30" height="30">
 		<img id = "yarn-pink" src="/client/yarn/yarn-pink.png" width="30" height="30">
-		<img id = "yarn-red" src="/client/yarn/yarn-red" width="30" height="30">
+		<img id = "yarn-red" src="/client/yarn/yarn-red.png" width="30" height="30">
 	</div>
 	<div id = "background" class = "rectangle">
 		<div id="optionsSelectInGame" class = "inforectangle">
@@ -135,7 +135,7 @@ $(document).ready(function() {
 			var weaponimage = data.projectile[i].weaponImage;
 			var image = document.getElementById(weaponimage);
 			ctx.fillStyle = data.projectile[i].color;
-			ctx.drawImage(image, data.projectile[i].x, data.projectile[i].y, 20,20);
+			ctx.drawImage(image, data.projectile[i].x, data.projectile[i].y, data.projectile[i].width,data.projectile[i].height);
 			//ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
 		for(var i = 0; i < data.obstacles.length; i++)	{

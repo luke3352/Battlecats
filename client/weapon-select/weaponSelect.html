@@ -62,19 +62,19 @@ $(document).ready(function() {
 	$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
 	 document.getElementById('weapon1').addEventListener('click', function (e) {
 	 	sessionStorage.setItem('weaponImage', 'yarn-blue');
-    	document.getElementById("weaponselection").innerHTML = "Weapon 1 Selected";
+    	document.getElementById("weaponselection").innerHTML = "Blue Yarn goes through walls.";
   	 });
   	 document.getElementById('weapon2').addEventListener('click', function (e) {
   	  	sessionStorage.setItem('weaponImage', 'yarn-pink');
-    	document.getElementById("weaponselection").innerHTML = "Weapon 2 Selected";
+    	document.getElementById("weaponselection").innerHTML = "Pink yarn comes in pairs of three.";
   	 });
   	 document.getElementById('weapon3').addEventListener('click', function (e) {
   	 	sessionStorage.setItem('weaponImage', 'yarn-purple');
-    	document.getElementById("weaponselection").innerHTML = "Weapon 3 Selected";
+    	document.getElementById("weaponselection").innerHTML = "Purple yarn is large but slow.";
   	 });
   	 document.getElementById('weapon4').addEventListener('click', function (e) {
     	sessionStorage.setItem('weaponImage', 'yarn-red');
-    	document.getElementById("weaponselection").innerHTML = "Weapon 4 Selected";
+    	document.getElementById("weaponselection").innerHTML = "Red yarn is small and fast.";
   	 });
 	
 });

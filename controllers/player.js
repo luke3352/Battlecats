@@ -203,10 +203,43 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 				if(self.fireTime - self.previousFireTime > FIRERATE){
 					self.previousFireTime = self.fireTime;
 					self.fireTime = new Date().getTime();
-					var projectile = exports.Projectile(self.id,self.mouseAngle,self.weaponImage);
-					projectile.x = self.x;
-					projectile.y = self.y;
-					projectile.shoot(self.mouseAngle);
+					var projectile = null;
+					
+					if(self.weaponImage == "yarn-blue"){
+						projectile = exports.Projectile(self.id,self.mouseAngle,20,20,5,1,self.weaponImage);
+						projectile.x = self.x;
+						projectile.y = self.y;
+						projectile.shoot(self.mouseAngle);
+					}
+					else if(self.weaponImage == "yarn-pink"){
+						projectile = exports.Projectile(self.id,self.mouseAngle,20,20,3,2,self.weaponImage);
+						projectile.x = self.x;
+						projectile.y = self.y;
+						projectile.shoot(self.mouseAngle);
+						
+						projectile2 = exports.Projectile(self.id,self.mouseAngle,20,20,3,2,self.weaponImage);
+						projectile2.x = self.x+20;
+						projectile2.y = self.y+20;
+						projectile2.shoot(self.mouseAngle);
+						
+						projectile2 = exports.Projectile(self.id,self.mouseAngle,20,20,3,2,self.weaponImage);
+						projectile2.x = self.x-20;
+						projectile2.y = self.y-20;
+						projectile2.shoot(self.mouseAngle);
+					}
+					else if(self.weaponImage == "yarn-purple"){
+						projectile = exports.Projectile(self.id,self.mouseAngle,40,40,5,3,self.weaponImage);
+						projectile.x = self.x;
+						projectile.y = self.y;
+						projectile.shoot(self.mouseAngle);
+						
+					}
+					else if(self.weaponImage == "yarn-red"){
+						projectile = exports.Projectile(self.id,self.mouseAngle,20,20,10,4,self.weaponImage);
+						projectile.x = self.x;
+						projectile.y = self.y;
+						projectile.shoot(self.mouseAngle);
+					}
 				}
 				else self.fireTime = new Date().getTime();
 				
@@ -241,22 +274,22 @@ exports.updatePlayer = function(clients){
 	return pack;
 }
 
-exports.Projectile = function(id,angle,weaponImage){
+exports.Projectile = function(id,angle,width,height,speed,weaponNum,weaponImage){
 var WIDTH  = 1000;
 var HEIGHT = 700;
 
  var self = Entity.Entity();
 	self.id = Math.random();
-	self.width=10;
-	self.height=10;
-	self.spdX = Math.cos(angle/180*Math.PI) * 10;
-    self.spdY = Math.sin(angle/180*Math.PI) * 10;
+	self.width = width;
+	self.height = height;
+	self.spdX = Math.cos(angle/180*Math.PI) * speed;
+    self.spdY = Math.sin(angle/180*Math.PI) * speed;
 	self.firedByID = id;
 	self.timer = 0;
-	self.toRemove = false;
-	self.speed = 12;
-	self.color = exports.PLAYER_LIST[self.firedByID].color;
+	self.weaponNum = weaponNum
 	self.weaponImage = weaponImage;
+	self.toRemove = false;
+	self.color = exports.PLAYER_LIST[self.firedByID].color;
 	self.vel = {
 		x: 0,
 		y: 0
@@ -264,9 +297,10 @@ var HEIGHT = 700;
  
 	var super_update = self.update;
 	self.update = function(clients){
-		if(self.timer++ > 100) self.toRemove = true;
+		if(self.timer++ > 300) self.toRemove = true;
         super_update();
         
+		var count =0;
 		//LOOKS TO SEE IF PLAYER AND BALL HAVE COLLIDED
 		//for(var i in exports.PLAYER_LIST){
         Object.keys(clients.sockets).forEach( function(socketId){
@@ -278,35 +312,46 @@ var HEIGHT = 700;
 				player.hit = true;
 				self.toRemove = true;
 			}
-			
+			//right
 			for ( var i in exports.OBSTACLES_LIST) {
 				var p = exports.OBSTACLES_LIST[i];
-				if(((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x))) {
-						self.toRemove = true;
-						break;
-				} 		
+				if(weaponNum!=1){
+					if(((self.y+self.height > p.y) && (self.y < p.y + p.height) && (self.x + self.width <p.x + p.width) && (self.x + self.width > p.x))) {
+					self.toRemove = true;
+					break;
+					}
+				} 	
+					
 			}
-			
+			//left
 			for ( var i in exports.OBSTACLES_LIST) {
 				var p = exports.OBSTACLES_LIST[i];
-				if(((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x))) {
+				if(weaponNum!=1){
+					if(((self.y+self.height > p.y) && (self.y < p.y + p.height) && (self.x<p.x + p.width) && (self.x > p.x))) {
 						self.toRemove = true;
 						break;
-				} 
+					} 
+				}
 			}
+			//up
 			for ( var i in exports.OBSTACLES_LIST) {
 				var p = exports.OBSTACLES_LIST[i];
-				if(((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width))) {
+			    if(weaponNum!=1){
+					if(((self.y < p.y+p.height) && (self.y > p.y) && (self.x+self.width>p.x) && (self.x < p.x+p.width))) {
 						self.toRemove = true;
 						break;
-				} 
+					} 
+				}
 			}
+			//down
 			for ( var i in exports.OBSTACLES_LIST) {
 				var p = exports.OBSTACLES_LIST[i];
-				if(((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width))) {
+				if(weaponNum!=1){
+					if(((self.y +self.height > p.y) && (self.y +self.height < p.y + p.height) && (self.x+self.width>p.x) && (self.x < p.x+p.width))) {
 						self.toRemove = true;
 						break;
-				} 
+					} 
+				}
 			}
 		});
 		//HIT TOP OF SCREEN
@@ -314,8 +359,9 @@ var HEIGHT = 700;
 		//OUT ON LEFT
 		if(0 > self.x + 20) self.toRemove = true;
 		//OUT ON RIGHT
-		else if(self.x > WIDTH) self.toRemove = true;
-		
+	    if(self.x > WIDTH) self.toRemove = true;
+		//OUT ON BOTTOM
+		if(self.y > HEIGHT) self.toRemove = true;
 	}
 	
 	//fires the projectile
@@ -344,6 +390,8 @@ exports.update = function(clients){
 				pack.push({ 
 					x:projectile.x, 
 					y:projectile.y,
+					width:projectile.width,
+					height:projectile.height,
 					color:projectile.color,
 					weaponImage:projectile.weaponImage
 				});
