@@ -90,7 +90,7 @@ $(document).ready(function() {
 			password = data.password;
 			wins = data.wins;
 			socket.emit('createUser', username);
-			sessionStorage.setItem('wins', wins);
+			sessionStorage.se tItem('wins', wins);
 			sessionStorage.setItem('username', username);		
 			sessionStorage.setItem('password', password);
 			window.location.href = "/mainMenu";
@@ -100,8 +100,6 @@ $(document).ready(function() {
 			alert("Incorrect Password or Username");
 		}
 	});
-	
-	
 	
 });
 </script>

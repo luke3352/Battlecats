@@ -78,12 +78,14 @@ io.sockets.on('connection', function(socket) {
     	console.log("recieved emit");
     	getRoomsList(function(roomslist){
     		returnRoomsList(roomslist);
-    		//console.log("roomsList in the callback" + roomslist);
     	});
     });
     
     function returnRoomsList(roomslist){
     	socket.emit("updateRoomsList", JSON.parse(roomslist));
+    }
+    function returnRoomsListAll(roomslist){
+    	socket.to('JoinRoom').emit("updateRoomsList", JSON.parse(roomslist));
     }
    
     socket.on('addRoomToDatabase', function(data){
@@ -119,8 +121,10 @@ io.sockets.on('connection', function(socket) {
 	///////////////////////
 	socket.on('sendCreateRoomData',function(data, user){
         var room = Room.room(data);
-        room.roomPlayers.push(user);        
-        io.to('JoinRoom').emit('updateRoomsList', data);
+        room.roomPlayers.push(user);     
+    	getRoomsList(function(roomslist){
+    		returnRoomsListAll(roomslist);
+    	});
     });	
 	socket.on('hostRoomConnection', function(id, user){
 		io.to(id).emit('addToHostRoomChat', user + ': has connected.');
@@ -387,7 +391,6 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 	var roomID = "game-"+gameID;
 	var previousNumOfPlayers;
 	var intervalId = setInterval(function() {
-		Room.updateRoom();
 		if(pause == false){
 			var clients = io.sockets.adapter.rooms["game-"+gameID];
 			if(clients){
