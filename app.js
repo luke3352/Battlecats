@@ -432,17 +432,14 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 						io.to(roomID).emit('newPositions', pack);
 					}
 					else {
-//						Object.keys(clients.sockets).forEach(function(socketId, callback){
-//							if (!Player.PLAYER_LIST[socketId].dead){
-//								var winner = Player.PLAYER_LIST[socketId].username;
-//								var sendWinner = {winner: winner};	
-//								io.to(roomID).emit('endGame', sendWinner);
-//								clearInterval(intervalId);
-//							}
-//						});
-
-						io.to(roomID).emit('endGame');
-						clearInterval(intervalId);
+						Object.keys(clients.sockets).forEach(function(socketId, callback){
+							if (!Player.PLAYER_LIST[socketId].dead){
+								var winner = Player.PLAYER_LIST[socketId].username;
+								var sendWinner = {winner: winner};	
+								io.to(roomID).emit('endGame', sendWinner);
+								clearInterval(intervalId);
+							}
+						});
 					}
 				}
 			}

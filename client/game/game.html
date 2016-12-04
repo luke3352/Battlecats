@@ -154,15 +154,11 @@ $(document).ready(function() {
 //		ctx.font="20px Georgia";
 //		ctx.fillText(count, 10, 50);
 //	});
-	socket.on('endGame', function(){
+	socket.on('endGame', function(data){
+		sessionStorage.setItem('winner', data.winner);
 		console.log("GAME OVER");
 		window.location.href = "/endGame";
 	});
-	//socket.on('endGame', function(data){
-	//	sessionStorage.setItem('winner', data.winner);
-	//	console.log("GAME OVER");
-	//	window.location.href = "/endGame";
-	//});
 	
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
