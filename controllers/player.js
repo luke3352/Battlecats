@@ -11,19 +11,26 @@ var HEIGHT = 700;
 var WIDTH = 1000;
 var FIRERATE = 500;
 
-exports.player = function(id,numPlayerInRoom, user) {
+exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 	var self = Entity.Entity();
+		self.id = id;
+		self.numPlayer = numPlayerInRoom;
+		self.username = user;
+		self.catImage = catImage;
+		self.weaponImage = weaponImage;
+		self.color = "#0000FF";
+		
 		self.width = 92;
 		self.height = 92;
 		self.weapon = {};
 		self.character = {};
-		self.id = id;
-		self.username = user;
+		
 		self.pressingRight = false;
 		self.pressingLeft = false;
 		self.pressingUp = false;
 		self.pressingDown = false;
 		self.mouseAngle = 0;
+		
 		self.maxSpd = 5;
 		self.generateProjectile = false;
 		self.hit = false;
@@ -31,10 +38,11 @@ exports.player = function(id,numPlayerInRoom, user) {
 		self.healthBarX = 200;
 		self.healthBarY = 30;
 		self.dead = false;
+		
 		self.fireTime = new Date().getTime();
 		self.previousFireTime = 0;
-		self.color = "#0000FF";
-		self.numPlayer = numPlayerInRoom;
+		
+		
 		if(numPlayerInRoom == 1){
 			self.x = 100;
 			self.y = 100;
@@ -224,7 +232,9 @@ exports.updatePlayer = function(clients){
 				HP:player.HP,
 				healthX:player.healthBarX,
 				healthY:player.healthBarY,
-				color:player.color
+				color:player.color,
+				catImage:player.catImage,
+				weaponImage:player.weaponImage
 			});	
 		} else console.log("Player at ", socketId, " is undefined");
 	});

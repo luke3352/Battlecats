@@ -109,8 +109,9 @@ io.sockets.on('connection', function(socket) {
     ////////////////
     // START GAME //
     ////////////////
-    socket.on('startGame', function(id, user, gameConfig){
-    	startGame(id, user, gameConfig, socket);
+    socket.on('startGame', function(id, user, gameConfig, catImage){
+    	console.log("startGame catImage: ", catImage);
+    	startGame(id, user, gameConfig, catImage, socket);
     });
 
 	///////////////////////
@@ -363,15 +364,17 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-function startGame(gameID, user, gameConfig, socket){
-	/*console.log("inside startGame.");
-	console.log("gameID: ", gameID); 
-	console.log("user: ",  user); 
-	//console.log("socket: ",  socket); 
-	console.log("gameConfig: ", gameConfig);*/
-	
+function startGame(gameID, user, gameConfig, catImage, socket){
+	/* console.log("inside startGame.");
+	 * console.log("socket: ",  socket); 
+	 * console.log("gameID: ", gameID); 
+	 * console.log("user: ",  user); 
+	 * console.log("gameConfig: ", gameConfig);
+	 */
+	console.log("catImage: ", catImage);
+
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer, user);
+	var player = Player.player(socket.id, numPlayer, user, catImage, null);
 	
 
 	var room = Room.room(gameConfig);
@@ -439,16 +442,16 @@ function startGame(gameID, user, gameConfig, socket){
 				if(!countDown){ //Starts countdown
 					var currentNumOfPlayers = Object.keys(clients.sockets).length;
 					if(currentNumOfPlayers == room.numOfPlayers) {
-//						console.log("Inside Countdown");
-//						function countDownFunc(i, callback) {
-//							console.log("inside countDownFunc");
-//						    callback = callback || function(){};
-//						    var int = setInterval(function() {
-//						        io.to(roomID).emit('countdown', i);
-//						        i-- || (clearInterval(int), callback());
-//						    }, 1000);
-//						}
-//						countDownFunc(5);
+						/* console.log("Inside Countdown"); 
+						 * function countDownFunc(i, callback) {
+						 * callback = callback || function(){};
+						 *  var int = setInterval(function() {
+						 *  io.to(roomID).emit('countdown', i);
+						 *  i-- || (clearInterval(int), callback());
+						 *  }, 1000);
+						 *  }
+						 *  countDownFunc(5);
+						 */
 						deleteRoom(gameID);
 						countDown = true;
 					}
@@ -464,7 +467,7 @@ function startGame(gameID, user, gameConfig, socket){
 					//Check if all but one players are dead
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
-						if(Player.PLAYER_LIST[socketId].dead){
+						if(Player.PLAYER_LIST[socketId] && Player.PLAYER_LIST[socketId].dead){
 							numPlayersAlive--;
 						}
 					});
