@@ -203,7 +203,7 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 				if(self.fireTime - self.previousFireTime > FIRERATE){
 					self.previousFireTime = self.fireTime;
 					self.fireTime = new Date().getTime();
-					var projectile = exports.Projectile(self.id,self.mouseAngle);
+					var projectile = exports.Projectile(self.id,self.mouseAngle,self.weaponImage);
 					projectile.x = self.x;
 					projectile.y = self.y;
 					projectile.shoot(self.mouseAngle);
@@ -241,7 +241,7 @@ exports.updatePlayer = function(clients){
 	return pack;
 }
 
-exports.Projectile = function(id,angle){
+exports.Projectile = function(id,angle,weaponImage){
 var WIDTH  = 1000;
 var HEIGHT = 700;
 
@@ -256,6 +256,7 @@ var HEIGHT = 700;
 	self.toRemove = false;
 	self.speed = 12;
 	self.color = exports.PLAYER_LIST[self.firedByID].color;
+	self.weaponImage = weaponImage;
 	self.vel = {
 		x: 0,
 		y: 0
@@ -343,7 +344,8 @@ exports.update = function(clients){
 				pack.push({ 
 					x:projectile.x, 
 					y:projectile.y,
-					color:projectile.color
+					color:projectile.color,
+					weaponImage:projectile.weaponImage
 				});
 			}
 		});

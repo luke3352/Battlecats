@@ -109,9 +109,9 @@ io.sockets.on('connection', function(socket) {
     ////////////////
     // START GAME //
     ////////////////
-    socket.on('startGame', function(id, user, gameConfig, catImage){
+    socket.on('startGame', function(id, user, gameConfig, catImage, weaponImage){
     	console.log("startGame catImage: ", catImage);
-    	startGame(id, user, gameConfig, catImage, socket);
+    	startGame(id, user, gameConfig, catImage, weaponImage, socket);
     });
 
 	///////////////////////
@@ -364,7 +364,7 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-function startGame(gameID, user, gameConfig, catImage, socket){
+function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 	/* console.log("inside startGame.");
 	 * console.log("socket: ",  socket); 
 	 * console.log("gameID: ", gameID); 
@@ -372,63 +372,15 @@ function startGame(gameID, user, gameConfig, catImage, socket){
 	 * console.log("gameConfig: ", gameConfig);
 	 */
 	console.log("catImage: ", catImage);
-
+	console.log("weaponImage: ", weaponImage);
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer, user, catImage, null);
+	var player = Player.player(socket.id, numPlayer, user, catImage, weaponImage);
 	
 
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
 
-	function createObstacles(){
-		var obstacle = Obstacles.obstacles(0);
-		obstacle.x = 200;
-		obstacle.y = 170;
-		obstacle.width = 30;
-		obstacle.height = 100;
-		
-		var obstacle2 = Obstacles.obstacles(1);
-		obstacle2.x = 200;
-		obstacle2.y = 170;
-		obstacle2.width = 100;
-		obstacle2.height = 30;
-		
-		var obstacle3 = Obstacles.obstacles(2);
-		obstacle3.x = 800;
-		obstacle3.y = 170;
-		obstacle3.width = 30;
-		obstacle3.height = 100;
-		
-		var obstacle4 = Obstacles.obstacles(3);
-		obstacle4.x = 730;
-		obstacle4.y = 170;
-		obstacle4.width = 100;
-		obstacle4.height = 30;
-		
-		var obstacle5 = Obstacles.obstacles(4);
-		obstacle5.x = 200;
-		obstacle5.y = 430;
-		obstacle5.width = 30;
-		obstacle5.height = 100;
-		
-		var obstacle6 = Obstacles.obstacles(5);
-		obstacle6.x = 200;
-		obstacle6.y = 500;
-		obstacle6.width = 100;
-		obstacle6.height = 30;
-		
-		var obstacle7 = Obstacles.obstacles(6);
-		obstacle7.x = 800;
-		obstacle7.y = 430;
-		obstacle7.width = 30;
-		obstacle7.height = 100;
-		
-		var obstacle8 = Obstacles.obstacles(7);
-		obstacle8.x = 730;
-		obstacle8.y = 500;
-		obstacle8.width = 100;
-		obstacle8.height = 30;
-	}
+
 		
 	createObstacles();
 	var countDown = false;
@@ -505,4 +457,54 @@ function startGame(gameID, user, gameConfig, catImage, socket){
 			}
 		}
 	});
+	
+	function createObstacles(){
+		var obstacle = Obstacles.obstacles(0);
+		obstacle.x = 200;
+		obstacle.y = 170;
+		obstacle.width = 30;
+		obstacle.height = 100;
+		
+		var obstacle2 = Obstacles.obstacles(1);
+		obstacle2.x = 200;
+		obstacle2.y = 170;
+		obstacle2.width = 100;
+		obstacle2.height = 30;
+		
+		var obstacle3 = Obstacles.obstacles(2);
+		obstacle3.x = 800;
+		obstacle3.y = 170;
+		obstacle3.width = 30;
+		obstacle3.height = 100;
+		
+		var obstacle4 = Obstacles.obstacles(3);
+		obstacle4.x = 730;
+		obstacle4.y = 170;
+		obstacle4.width = 100;
+		obstacle4.height = 30;
+		
+		var obstacle5 = Obstacles.obstacles(4);
+		obstacle5.x = 200;
+		obstacle5.y = 430;
+		obstacle5.width = 30;
+		obstacle5.height = 100;
+		
+		var obstacle6 = Obstacles.obstacles(5);
+		obstacle6.x = 200;
+		obstacle6.y = 500;
+		obstacle6.width = 100;
+		obstacle6.height = 30;
+		
+		var obstacle7 = Obstacles.obstacles(6);
+		obstacle7.x = 800;
+		obstacle7.y = 430;
+		obstacle7.width = 30;
+		obstacle7.height = 100;
+		
+		var obstacle8 = Obstacles.obstacles(7);
+		obstacle8.x = 730;
+		obstacle8.y = 500;
+		obstacle8.width = 100;
+		obstacle8.height = 30;
+	}
 }
