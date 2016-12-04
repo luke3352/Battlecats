@@ -12,12 +12,14 @@ exports.obstacles = function(id) {
 	exports.OBSTACLES_LIST[id] = self;
 	return self;
 }
-
+exports.getArray = function(){
+	return exports.OBSTACLES_LIST;
+}
 exports.update = function(){
+	
 	var pack = [];
 	for(var i in exports.OBSTACLES_LIST){
 		var obstacle = exports.OBSTACLES_LIST[i];
-		
 		pack.push({
 			x:obstacle.x,
 			y:obstacle.y,
@@ -25,4 +27,5 @@ exports.update = function(){
 			height:obstacle.height
 		});
 	}
+	return pack;
 }

@@ -109,8 +109,9 @@ io.sockets.on('connection', function(socket) {
     ////////////////
     // START GAME //
     ////////////////
-    socket.on('startGame', function(id, user, gameConfig){
-    	startGame(id, user, gameConfig, socket);
+    socket.on('startGame', function(id, user, gameConfig, catImage, weaponImage){
+    	console.log("startGame catImage: ", catImage);
+    	startGame(id, user, gameConfig, catImage, weaponImage, socket);
     });
 
 	///////////////////////
@@ -146,18 +147,20 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendLoginData',function(data){
 		 var username = data.username;
 	     var password = data.password;
-	     verifypassword(username, password, function(correct, wins){
+	     verifypassword(username, password, function(correct, experience, wins){
+	    	 console.log("experience: " + experience);
 	    	 console.log("wins: " + wins);
-	      	 sendCorrectPassword(username, password, correct, wins);
+	      	 sendCorrectPassword(username, password, correct, experience, wins);
 	    });  
     });	
 	
-	function sendCorrectPassword(username, password, correct, wins) {
+	function sendCorrectPassword(username, password, correct, experience, wins) {
 		console.log(correct);
 		var correct = correct;
 		var password = password;
+		var experience = experience;
 		var wins = wins;
-		var sendpasswordverification = {correct: correct, username: username, password: password, wins: wins};
+		var sendpasswordverification = {correct: correct, username: username, password: password, experience: experience, wins: wins};
 		socket.emit('sendpasswordverification', sendpasswordverification);
 
 	}
@@ -197,6 +200,7 @@ function verifypassword(username, password, callback){
 			var string = JSON.stringify(rows);
 			var json = JSON.parse(string);
 			var correct;
+			var experience; 
 			var wins;
 			if (JSON.stringify(rows) === "[]"){
 				console.log("username was not in database... create new account");
@@ -210,7 +214,9 @@ function verifypassword(username, password, callback){
 					console.log(true);
 					console.log('correct password set');
 					correct = 1; 
+					experience = json[0].experience;
 					wins = json[0].wins;
+					console.log(experience);
 					console.log(wins);
 				}
 				else{
@@ -220,7 +226,7 @@ function verifypassword(username, password, callback){
 				}
 			}
 			console.log('return callback');
-			return callback(correct, wins);
+			return callback(correct, experience, wins);
 		}
 	});
 	console.log('end the connection')
@@ -275,7 +281,7 @@ function add_account(username, password){
 	console.log(username);
 	connection.connect();
 	var userinfo = [username,password, '0', '0']
-	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, wins = ?", userinfo, function(err, result) {
+	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?", userinfo, function(err, result) {
 	});
 	console.log("end connection");
 	connection.end();
@@ -339,8 +345,6 @@ var deleteRoom = function(roomId){
 	connection.connect();
 	var roominfo = [roomId]
 	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
-		console.log("err: ", err);
-		console.log("result: ", result);
 	});
 	connection.end();
 }
@@ -360,25 +364,23 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-function startGame(gameID, user, gameConfig, socket){
-	/*console.log("inside startGame.");
-	console.log("gameID: ", gameID); 
-	console.log("user: ",  user); 
-	//console.log("socket: ",  socket); 
-	console.log("gameConfig: ", gameConfig);*/
-	
+function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
+	/* console.log("inside startGame.");
+	 * console.log("socket: ",  socket); 
+	 * console.log("gameID: ", gameID); 
+	 * console.log("user: ",  user); 
+	 * console.log("gameConfig: ", gameConfig);
+	 */
+	console.log("catImage: ", catImage);
+	console.log("weaponImage: ", weaponImage);
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer, user);
+	var player = Player.player(socket.id, numPlayer, user, catImage, weaponImage);
 	
 
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
 
-	function createObstacles(){
-		var obstacle = Obstacles.obstacles(0);
-		obstacle.x = 300;
-		obstacle.y = 300;
-	}
+
 		
 	createObstacles();
 	var countDown = false;
@@ -392,16 +394,16 @@ function startGame(gameID, user, gameConfig, socket){
 				if(!countDown){ //Starts countdown
 					var currentNumOfPlayers = Object.keys(clients.sockets).length;
 					if(currentNumOfPlayers == room.numOfPlayers) {
-//						console.log("Inside Countdown");
-//						function countDownFunc(i, callback) {
-//							console.log("inside countDownFunc");
-//						    callback = callback || function(){};
-//						    var int = setInterval(function() {
-//						        io.to(roomID).emit('countdown', i);
-//						        i-- || (clearInterval(int), callback());
-//						    }, 1000);
-//						}
-//						countDownFunc(5);
+						/* console.log("Inside Countdown"); 
+						 * function countDownFunc(i, callback) {
+						 * callback = callback || function(){};
+						 *  var int = setInterval(function() {
+						 *  io.to(roomID).emit('countdown', i);
+						 *  i-- || (clearInterval(int), callback());
+						 *  }, 1000);
+						 *  }
+						 *  countDownFunc(5);
+						 */
 						deleteRoom(gameID);
 						countDown = true;
 					}
@@ -417,7 +419,7 @@ function startGame(gameID, user, gameConfig, socket){
 					//Check if all but one players are dead
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
-						if(Player.PLAYER_LIST[socketId].dead){
+						if(Player.PLAYER_LIST[socketId] && Player.PLAYER_LIST[socketId].dead){
 							numPlayersAlive--;
 						}
 					});
@@ -425,20 +427,22 @@ function startGame(gameID, user, gameConfig, socket){
 						var pack = {
 							player: Player.updatePlayer(clients),
 							projectile: Player.update(clients),
-							obstacles: Obstacles.update(),
-						}
+							obstacles: Obstacles.update()
+						};
 						io.to(roomID).emit('newPositions', pack);
 					}
 					else {
-						Object.keys(clients.sockets).forEach(function(socketId, callback){
-							if (!Player.PLAYER_LIST[socketId].dead){
-								var winner = Player.PLAYER_LIST[socketId].username;
-								var sendWinner = {winner: winner};	
-								io.to(roomID).emit('endGame', sendWinner);
-								clearInterval(intervalId);
-							}
-						});
+//						Object.keys(clients.sockets).forEach(function(socketId, callback){
+//							if (!Player.PLAYER_LIST[socketId].dead){
+//								var winner = Player.PLAYER_LIST[socketId].username;
+//								var sendWinner = {winner: winner};	
+//								io.to(roomID).emit('endGame', sendWinner);
+//								clearInterval(intervalId);
+//							}
+//						});
 
+						io.to(roomID).emit('endGame');
+						clearInterval(intervalId);
 					}
 				}
 			}
@@ -462,4 +466,54 @@ function startGame(gameID, user, gameConfig, socket){
 			}
 		}
 	});
+	
+	function createObstacles(){
+		var obstacle = Obstacles.obstacles(0);
+		obstacle.x = 200;
+		obstacle.y = 170;
+		obstacle.width = 30;
+		obstacle.height = 100;
+		
+		var obstacle2 = Obstacles.obstacles(1);
+		obstacle2.x = 200;
+		obstacle2.y = 170;
+		obstacle2.width = 100;
+		obstacle2.height = 30;
+		
+		var obstacle3 = Obstacles.obstacles(2);
+		obstacle3.x = 800;
+		obstacle3.y = 170;
+		obstacle3.width = 30;
+		obstacle3.height = 100;
+		
+		var obstacle4 = Obstacles.obstacles(3);
+		obstacle4.x = 730;
+		obstacle4.y = 170;
+		obstacle4.width = 100;
+		obstacle4.height = 30;
+		
+		var obstacle5 = Obstacles.obstacles(4);
+		obstacle5.x = 200;
+		obstacle5.y = 430;
+		obstacle5.width = 30;
+		obstacle5.height = 100;
+		
+		var obstacle6 = Obstacles.obstacles(5);
+		obstacle6.x = 200;
+		obstacle6.y = 500;
+		obstacle6.width = 100;
+		obstacle6.height = 30;
+		
+		var obstacle7 = Obstacles.obstacles(6);
+		obstacle7.x = 800;
+		obstacle7.y = 430;
+		obstacle7.width = 30;
+		obstacle7.height = 100;
+		
+		var obstacle8 = Obstacles.obstacles(7);
+		obstacle8.x = 730;
+		obstacle8.y = 500;
+		obstacle8.width = 100;
+		obstacle8.height = 30;
+	}
 }

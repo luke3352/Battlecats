@@ -106,6 +106,7 @@ $(document).ready(function() {
 	socket.on('connect', function(){
 		var user = sessionStorage.getItem("username");
 		var gameID = sessionStorage.getItem("roomID");
+		var catImage =  sessionStorage.getItem("catImage");
 		var gameConfig = JSON.parse(sessionStorage.getItem("roomConfig"));
 		console.log(gameConfig);
 		//$('form').append("<input type='hidden' name='id' value='"+ gameID +"'>");
@@ -113,7 +114,8 @@ $(document).ready(function() {
 		console.log("Inside Game: ");
 		console.log("user: ", user, " gameID: ", gameID, " gameConfig: ", gameConfig);
 		socket.emit('joinRoom', ("game-"+gameID));
-		socket.emit('startGame', gameID, user, gameConfig);
+		console.log("CAT IMAGE: ", catImage);
+		socket.emit('startGame', gameID, user, gameConfig, catImage);
 	});
 	
 	// Updates Player In-Game Position
@@ -121,23 +123,23 @@ $(document).ready(function() {
 		ctx.clearRect(0, 0, 1000, 700);
 		for(var i = 0; i < data.player.length; i++){
 			//ctx.fillStyle = data.player[i].color;	
-			var catimage = sessionStorage.getItem("image");
+			var catimage = data.player[i].catImage;
 			var image = document.getElementById(catimage);
 			ctx.fillStyle = data.player[i].color;
 			ctx.drawImage(image, data.player[i].x, data.player[i].y, 90,90);
 			ctx.drawImage(image, data.player[i].healthX - 40, data.player[i].healthY - 10, 50,50);
 			ctx.fillRect(data.player[i].healthX, data.player[i].healthY, data.player[i].HP*40, 20);		
 			}
-		for(var i = 0 ; i < data.projectile.length; i++)	{
+		for(var i = 0; i < data.projectile.length; i++)	{
 			var image = document.getElementById("yarn-purple");
 			ctx.fillStyle = data.projectile[i].color;
 			ctx.drawImage(image, data.projectile[i].x, data.projectile[i].y, 20,20);
 			//ctx.fillRect(data.projectile[i].x,data.projectile[i].y,20,20);		
 		}
-		//for(var i = 0 ; i < data.obstacle.length; i++)	{
-		//	ctx.fillStyle = "0000FF"
-		//	ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,20,20);		
-		//}
+		for(var i = 0; i < data.obstacles.length; i++)	{
+			ctx.fillStyle = "0000FF";
+			ctx.fillRect(data.obstacles[i].x,data.obstacles[i].y,data.obstacles[i].width,data.obstacles[i].height);		
+		}
 	});
 	socket.on('waiting', function(numWait){
 		console.log("Inside waiting");
@@ -150,11 +152,16 @@ $(document).ready(function() {
 //		ctx.font="20px Georgia";
 //		ctx.fillText(count, 10, 50);
 //	});
-	socket.on('endGame', function(data){
-		sessionStorage.setItem('winner', data.winner);
+	socket.on('endGame', function(){
 		console.log("GAME OVER");
 		window.location.href = "/endGame";
 	});
+	//socket.on('endGame', function(data){
+	//	sessionStorage.setItem('winner', data.winner);
+	//	console.log("GAME OVER");
+	//	window.location.href = "/endGame";
+	//});
+	
 	document.onkeydown = function(event) {
 		if (event.keyCode === 68) { //d
 			socket.emit('keyPress', {
