@@ -401,9 +401,7 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 						countDown = true;
 					}
 					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
-						//console.log("Inside Waiting on");
-						//console.log("curr ", currentNumOfPlayers);
-						//console.log("gameConfig ", room.numOfPlayers);
+						console.log("Inside Waiting on");
 						var waitingOn = room.numOfPlayers - currentNumOfPlayers;
 						io.to(roomID).emit('waiting', waitingOn);
 					}
