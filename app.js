@@ -439,8 +439,14 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 					io.to(roomID).emit('newPositions', pack);
 				}
 					else {
-						io.to(roomID).emit('endGame');
-						clearInterval(intervalId);
+						Object.keys(clients.sockets).forEach(function(socketId, callback){
+							if (!Player.PLAYER_LIST[socketId].dead){
+								var winner = Player.PLAYER_LIST[socketId].username;
+								var sendWinner = {winner: winner};	
+								io.to(roomID).emit('endGame', sendWinner);
+								clearInterval(intervalId);
+							}
+						});
 					}
 					
 				}

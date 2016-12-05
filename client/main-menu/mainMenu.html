@@ -74,6 +74,7 @@ left: 100px;
 	<div id="SelectRoom"> 
 		<div class="rectangle">
 			<button class = "userInfo" id = "infoButton">Account Info</button>
+			<button class = "userInfo" id = "logout" onclick = "window.location.href = '/startpage'">Log Out</button>
 			<div class="alert" id = "userInfo">
 			</div>
 			<h1 align="Center" id = "title">BATTLE CATS</h1>
@@ -119,8 +120,7 @@ $(document).ready(function() {
 	});
 	var user = sessionStorage.getItem("username");
 	var wins = sessionStorage.getItem("wins");
-	var button = '<button id = "logout" onclick = "logout()">Log Out</button>'
-	$("#userInfo").html("username: " + user + "\ncummulative wins: " + wins + "\n" + button);
+	$("#userInfo").html("username: " + user + "\ total#ofwins: " + wins + "\n");
 	$(howToPlayPage).hide();
 	$("#howToPlay").click(function() {
 		$(SelectRoom).hide();
@@ -134,6 +134,7 @@ $(document).ready(function() {
 	});
 	function logout(){
 		alert("abc");
+		console.log("this");
 	}
 	
 });

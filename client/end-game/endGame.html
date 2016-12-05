@@ -99,7 +99,7 @@ left: 100px;
 	</div>
 <script>
 $(document).ready(function() {
-	var username = "A player";
+	var username = sessionStorage.getItem("winner");
 	$("#blink").html(username + " won!");
 	$("#blink").css({"border": "3px dotted red", "outline-color" : "yellow", "outline-style" : "dotted"});
 	$("#blink").css({"align": "center"})

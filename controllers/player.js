@@ -26,7 +26,8 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 		self.height = 92;
 		self.weapon = {};
 		self.character = {};
-		
+		self.id = id;
+		self.username = user;
 		self.pressingRight = false;
 		self.pressingLeft = false;
 		self.pressingUp = false;
@@ -303,6 +304,7 @@ var HEIGHT = 700;
 	self.weaponImage = weaponImage;
 	self.toRemove = false;
 	self.color = exports.PLAYER_LIST[self.firedByID].color;
+	self.weaponImage = weaponImage;
 	self.vel = {
 		x: 0,
 		y: 0
