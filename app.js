@@ -27,6 +27,7 @@ var Entity = require("./controllers/entity.js");
 var Weapon = require("./controllers/weapon.js");
 var Projectile = require("./controllers/projectile.js");
 var Obstacles = require("./controllers/obstacles.js");
+var Items = require("./controllers/items.js");
 
 var pause = false;
 var numPlayer = 0;
@@ -111,9 +112,9 @@ io.sockets.on('connection', function(socket) {
     ////////////////
     // START GAME //
     ////////////////
-    socket.on('startGame', function(id, user, gameConfig, catImage, weaponImage){
+    socket.on('startGame', function(id, user, gameConfig, catImage, weaponImage,itemImage){
     	console.log("startGame catImage: ", catImage);
-    	startGame(id, user, gameConfig, catImage, weaponImage, socket);
+    	startGame(id, user, gameConfig, catImage, weaponImage, itemImage, socket);
     });
 
 	///////////////////////
@@ -368,7 +369,7 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
+function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, socket){
 	/* console.log("inside startGame.");
 	 * console.log("socket: ",  socket); 
 	 * console.log("gameID: ", gameID); 
@@ -385,7 +386,7 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
     room.roomPlayers.push(player);
 
 
-		
+	createItem();
 	createObstacles();
 	var countDown = false;
 	var roomID = "game-"+gameID;
@@ -430,7 +431,8 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 					var pack = {
 						player: Player.updatePlayer(clients),
 						projectile: Player.update(clients),
-						obstacles: Obstacles.update()
+						obstacles: Obstacles.update(),
+						items: Items.update()
 					};
 					io.to(roomID).emit('newPositions', pack);
 				}
@@ -467,6 +469,10 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 			}
 		}
 	});
+	
+	function createItem(){
+		var item = Items.items(1,itemImage,500,350);
+	}
 	
 	function createObstacles(){
 		var obstacle = Obstacles.obstacles(0);
