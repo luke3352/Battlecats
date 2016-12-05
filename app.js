@@ -78,12 +78,14 @@ io.sockets.on('connection', function(socket) {
     	console.log("recieved emit");
     	getRoomsList(function(roomslist){
     		returnRoomsList(roomslist);
-    		//console.log("roomsList in the callback" + roomslist);
     	});
     });
     
     function returnRoomsList(roomslist){
     	socket.emit("updateRoomsList", JSON.parse(roomslist));
+    }
+    function returnRoomsListAll(roomslist){
+    	socket.to('JoinRoom').emit("updateRoomsList", JSON.parse(roomslist));
     }
    
     socket.on('addRoomToDatabase', function(data){
@@ -119,8 +121,10 @@ io.sockets.on('connection', function(socket) {
 	///////////////////////
 	socket.on('sendCreateRoomData',function(data, user){
         var room = Room.room(data);
-        room.roomPlayers.push(user);        
-        io.to('JoinRoom').emit('updateRoomsList', data);
+        room.roomPlayers.push(user);     
+    	getRoomsList(function(roomslist){
+    		returnRoomsListAll(roomslist);
+    	});
     });	
 	socket.on('hostRoomConnection', function(id, user){
 		io.to(id).emit('addToHostRoomChat', user + ': has connected.');
@@ -387,35 +391,24 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 	var roomID = "game-"+gameID;
 	var previousNumOfPlayers;
 	var intervalId = setInterval(function() {
-		Room.updateRoom();
 		if(pause == false){
 			var clients = io.sockets.adapter.rooms["game-"+gameID];
 			if(clients){
 				if(!countDown){ //Starts countdown
 					var currentNumOfPlayers = Object.keys(clients.sockets).length;
 					if(currentNumOfPlayers == room.numOfPlayers) {
-						/* console.log("Inside Countdown"); 
-						 * function countDownFunc(i, callback) {
-						 * callback = callback || function(){};
-						 *  var int = setInterval(function() {
-						 *  io.to(roomID).emit('countdown', i);
-						 *  i-- || (clearInterval(int), callback());
-						 *  }, 1000);
-						 *  }
-						 *  countDownFunc(5);
-						 */
 						deleteRoom(gameID);
 						countDown = true;
 					}
 					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
-						console.log("Inside Waiting on");
-						console.log("curr ", currentNumOfPlayers);
-						console.log("gameConfig ", room.numOfPlayers);
+						//console.log("Inside Waiting on");
+						//console.log("curr ", currentNumOfPlayers);
+						//console.log("gameConfig ", room.numOfPlayers);
 						var waitingOn = room.numOfPlayers - currentNumOfPlayers;
 						io.to(roomID).emit('waiting', waitingOn);
 					}
 					previousNumOfPlayers = currentNumOfPlayers;
-				} else {
+				} else { // GAME IS STARTED
 					//Check if all but one players are dead
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
@@ -423,14 +416,26 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 							numPlayersAlive--;
 						}
 					});
-					if(numPlayersAlive > 1){
-						var pack = {
-							player: Player.updatePlayer(clients),
-							projectile: Player.update(clients),
-							obstacles: Obstacles.update()
-						};
-						io.to(roomID).emit('newPositions', pack);
-					}
+					
+//					if(room.gameMode === 1 && numPlayersAlive > 1){
+//						var pack = {
+//							player: Player.updatePlayer(clients),
+//							projectile: Player.update(clients),
+//							obstacles: Obstacles.update()
+//						};
+//						io.to(roomID).emit('newPositions', pack);
+//					}
+//					else if(room.gameMode === 2){
+//						
+//					}
+				if(numPlayersAlive > 1){
+					var pack = {
+						player: Player.updatePlayer(clients),
+						projectile: Player.update(clients),
+						obstacles: Obstacles.update()
+					};
+					io.to(roomID).emit('newPositions', pack);
+				}
 					else {
 						Object.keys(clients.sockets).forEach(function(socketId, callback){
 							if (!Player.PLAYER_LIST[socketId].dead){
@@ -441,6 +446,7 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 							}
 						});
 					}
+					
 				}
 			}
 		}
