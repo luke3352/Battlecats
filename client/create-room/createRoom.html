@@ -91,7 +91,7 @@ $(document).ready(function() {
 		}
 	});
 	var socket = io();
-	#"	$("#buttonCreateGame").click(function() {
+	$("#buttonCreateGame").click(function() {
 		console.log("inside #buttonCreateGame");
 		$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
 		sessionStorage.setItem("roomID", roomID);

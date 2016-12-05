@@ -1,11 +1,13 @@
 var Entity = require("./Entity.js");
 var Projectile = require("./projectile.js");
 var Obstacle = require("./obstacles.js");
+var Item = require("./items.js");
 var exports = module.exports = {};
 //List of players
 exports.PLAYER_LIST = {};
 exports.PROJECTILES_LIST = {};
 exports.OBSTACLES_LIST =Obstacle.getArray();
+exports.ITEMS_LIST =Item.getArray();
 //Player constructor
 var HEIGHT = 700;
 var WIDTH = 1000;
@@ -90,6 +92,17 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 			var moveLeft = null;
 			var moveUp = null;
 			var moveDown = null;
+			
+			//check if player has contacted object
+			for ( var i in exports.ITEMS_LIST) { 
+				var p = exports.ITEMS_LIST[i];
+				if((self.x >= p.x - 92) && (self.y >= p.y - 92) && (self.x <= p.x) && (self.y <= p.y)) {
+					self.HP+=3;
+					console.log("hp "+self.HP);
+					exports.ITEMS_LIST[i].x = -100;
+					exports.ITEMS_LIST[i].y= -100;
+				} 
+			}
 			
 			//checks for collisons with obstacles
 			for ( var i in exports.OBSTACLES_LIST) {
