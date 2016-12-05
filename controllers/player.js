@@ -77,7 +77,7 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 	
 		
 	// Check if players share the same position
-	self.updatePosition = function() {
+	self.updatePosition = function(clients) {
 		if(self.dead == false){
 			if(self.hit == true) {
 				self.HP--;
@@ -154,59 +154,75 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 			}
 			//checks for collisons with other players
 			if(moveRight!=false){
-				for ( var i in exports.PLAYER_LIST) {
-					var p = exports.PLAYER_LIST[i];
-					if (self.pressingRight && self.id != p.id){
-						if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x)) 
-							&& !(self.x > WIDTH-92)) {
-							moveRight = true;
-						} 
-						else { 
-								moveRight =false; 
-								break;
+				var go = true;
+				Object.keys(clients.sockets).forEach( function(socketId){
+					if(go == true){
+						var p = exports.PLAYER_LIST[socketId];
+						if(p){
+							if (self.pressingRight && self.id != p.id){
+								if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x + self.width <=p.x + p.width) && (self.x + self.width >= p.x)) 
+									&& !(self.x > WIDTH-92)) {
+									moveRight = true;
+								} 
+								else { 
+										moveRight =false; 
+										go = false;	
+								}
+							}else if(self.pressingRight && (self.id == p.id)  && !(self.x > WIDTH-92)){moveRight=true;}
 						}
-					}else if(self.pressingRight && (self.id == p.id)  && !(self.x > WIDTH-92)){moveRight=true;}
-				}
+					}
+				});
 			}
 			if(moveLeft!=false){
-				for ( var i in exports.PLAYER_LIST) {
-					var p = exports.PLAYER_LIST[i];
-					if (self.pressingLeft && self.id != p.id){
-						if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x)) && !(0 > self.x - 5)) {
-							moveLeft = true;
-						} else {
-								moveLeft = false;
-								break;
+				Object.keys(clients.sockets).forEach( function(socketId){
+					if(go == true){
+						var p = exports.PLAYER_LIST[socketId];
+						if(p){
+							if (self.pressingLeft && self.id != p.id){
+								if(!((self.y+self.height >= p.y) && (self.y <= p.y + p.height) && (self.x<=p.x + p.width) && (self.x >= p.x)) && !(0 > self.x - 5)) {
+									moveLeft = true;
+								} else {
+										moveLeft = false;
+										go = false;
+								}
+							}else if(self.pressingLeft && (self.id == p.id) && !(0 > self.x - 5)){moveLeft=true;}
 						}
-					}else if(self.pressingLeft && (self.id == p.id) && !(0 > self.x - 5)){moveLeft=true;}
-				}
+					}
+				});
 			}
 			if(moveUp!=false){
-				for ( var i in exports.PLAYER_LIST) {
-					var p = exports.PLAYER_LIST[i];
-					if (self.pressingUp && self.id != p.id){
-						if(!((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(0 > self.y - 5)) {
-							moveUp = true;
-						} else {
-							moveUp= false;
-							break;
+				Object.keys(clients.sockets).forEach( function(socketId){
+					if(go == true){
+						var p = exports.PLAYER_LIST[socketId];
+						if(p){
+							if (self.pressingUp && self.id != p.id){
+								if(!((self.y <= p.y+p.height) && (self.y >= p.y) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(0 > self.y - 5)) {
+									moveUp = true;
+								} else {
+									moveUp= false;
+									go = false;
+								}
+							}else if(self.pressingUp && (self.id == p.id) && !(0 > self.y - 5)){moveUp=true;}
 						}
-					}else if(self.pressingUp && (self.id == p.id) && !(0 > self.y - 5)){moveUp=true;}
-				}
+					}
+				});
 			}
 			if(moveDown!=false){
-				for ( var i in exports.PLAYER_LIST) {
-					
-					var p = exports.PLAYER_LIST[i];
-					if (self.pressingDown && self.id != p.id){
-						if(!((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(self.y + 40 > HEIGHT-55)) {
-							moveDown = true;
-						} else {
-							moveDown = false; 
-							break;
+				Object.keys(clients.sockets).forEach( function(socketId){
+					if(go==true){
+						var p = exports.PLAYER_LIST[socketId];
+						if(p){
+							if (self.pressingDown && self.id != p.id){
+								if(!((self.y +self.height >= p.y) && (self.y +self.height <= p.y + p.height) && (self.x+self.width>=p.x) && (self.x <= p.x+p.width)) && !(self.y + 40 > HEIGHT-55)) {
+									moveDown = true;
+								} else {
+									moveDown = false; 
+									go = false;
+								}
+							}else if(self.pressingDown && (self.id == p.id) && !(self.y + 40 > HEIGHT-55)){moveDown=true;}
 						}
-					}else if(self.pressingDown && (self.id == p.id) && !(self.y + 40 > HEIGHT-55)){moveDown=true;}
-				}
+					}
+				});
 			}
 			if(moveRight==true){self.x += self.maxSpd; moveRight=false;}
 			if(moveLeft==true){self.x -= self.maxSpd; moveLeft=false;}
@@ -270,7 +286,7 @@ exports.updatePlayer = function(clients){
 	Object.keys(clients.sockets).forEach( function(socketId){
 		var player = exports.PLAYER_LIST[socketId];
 		if(player){
-			player.updatePosition();
+			player.updatePosition(clients);
 			pack.push({
 				x:player.x,
 				y:player.y,
