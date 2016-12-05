@@ -417,17 +417,25 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 						}
 					});
 					
-					if(room.gameMode === 1 && numPlayersAlive > 1){
-						var pack = {
-							player: Player.updatePlayer(clients),
-							projectile: Player.update(clients),
-							obstacles: Obstacles.update()
-						};
-						io.to(roomID).emit('newPositions', pack);
-					}
-					else if(room.gameMode === 2){
-						
-					}
+//					if(room.gameMode === 1 && numPlayersAlive > 1){
+//						var pack = {
+//							player: Player.updatePlayer(clients),
+//							projectile: Player.update(clients),
+//							obstacles: Obstacles.update()
+//						};
+//						io.to(roomID).emit('newPositions', pack);
+//					}
+//					else if(room.gameMode === 2){
+//						
+//					}
+				if(numPlayersAlive > 1){
+					var pack = {
+						player: Player.updatePlayer(clients),
+						projectile: Player.update(clients),
+						obstacles: Obstacles.update()
+					};
+					io.to(roomID).emit('newPositions', pack);
+				}
 					else {
 						io.to(roomID).emit('endGame');
 						clearInterval(intervalId);
