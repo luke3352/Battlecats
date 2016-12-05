@@ -397,28 +397,18 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 				if(!countDown){ //Starts countdown
 					var currentNumOfPlayers = Object.keys(clients.sockets).length;
 					if(currentNumOfPlayers == room.numOfPlayers) {
-						/* console.log("Inside Countdown"); 
-						 * function countDownFunc(i, callback) {
-						 * callback = callback || function(){};
-						 *  var int = setInterval(function() {
-						 *  io.to(roomID).emit('countdown', i);
-						 *  i-- || (clearInterval(int), callback());
-						 *  }, 1000);
-						 *  }
-						 *  countDownFunc(5);
-						 */
 						deleteRoom(gameID);
 						countDown = true;
 					}
 					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
-						console.log("Inside Waiting on");
-						console.log("curr ", currentNumOfPlayers);
-						console.log("gameConfig ", room.numOfPlayers);
+						//console.log("Inside Waiting on");
+						//console.log("curr ", currentNumOfPlayers);
+						//console.log("gameConfig ", room.numOfPlayers);
 						var waitingOn = room.numOfPlayers - currentNumOfPlayers;
 						io.to(roomID).emit('waiting', waitingOn);
 					}
 					previousNumOfPlayers = currentNumOfPlayers;
-				} else {
+				} else { // GAME IS STARTED
 					//Check if all but one players are dead
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
@@ -426,7 +416,8 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 							numPlayersAlive--;
 						}
 					});
-					if(numPlayersAlive > 1){
+					
+					if(room.gameMode === 1 && numPlayersAlive > 1){
 						var pack = {
 							player: Player.updatePlayer(clients),
 							projectile: Player.update(clients),
@@ -434,10 +425,14 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
 						};
 						io.to(roomID).emit('newPositions', pack);
 					}
+					else if(room.gameMode === 2){
+						
+					}
 					else {
 						io.to(roomID).emit('endGame');
 						clearInterval(intervalId);
 					}
+					
 				}
 			}
 		}

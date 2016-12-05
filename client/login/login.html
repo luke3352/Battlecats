@@ -58,12 +58,12 @@ $(document).ready(function() {
 	var socket = io();
 	
 	//For testing purposes
-	///*
+	/*
 	var autoUsername = sessionStorage.getItem("username");
 	var autoPassword = sessionStorage.getItem("password");
 	$("#username").val(autoUsername);
 	$("#password").val(autoPassword);
-	// */
+	*/
 	sessionStorage.clear();
 
 	$("#buttonContinue").click(function() {
@@ -90,7 +90,7 @@ $(document).ready(function() {
 			password = data.password;
 			wins = data.wins;
 			socket.emit('createUser', username);
-			sessionStorage.se tItem('wins', wins);
+			sessionStorage.setItem('wins', wins);
 			sessionStorage.setItem('username', username);		
 			sessionStorage.setItem('password', password);
 			window.location.href = "/mainMenu";
