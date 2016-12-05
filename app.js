@@ -6,21 +6,48 @@ var serv = require('http').Server(app);
 var mysql = require("mysql");
 
 // All HTML files
-app.get('/', function(req, res) { res.sendFile(path.join(__dirname + '/client/index.html')); });
-app.get('/login', function(req, res) { res.sendFile(path.join(__dirname + '/client/login/login.html')); });
-app.get('/createAccount', function(req, res){ res.sendFile(path.join(__dirname + '/client/create-account/createAccount.html')); });
-app.get('/mainMenu', function(req, res) { res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html')); });
-app.get('/createRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html')); });
-app.get('/joinRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html')); });
-app.get('/hostRoom', function(req, res) { res.sendFile(path.join(__dirname + '/client/host-room/hostRoom.html')); });
-app.get('/characterSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/character-select/characterSelect.html')); });
-app.get('/weaponSelect', function(req, res) { res.sendFile(path.join(__dirname + '/client/weapon-select/weaponSelect.html')); });
-app.get('/game', function(req, res) { res.sendFile(path.join(__dirname + '/client/game/game.html')); });
-app.get('/startPage', function(req, res) { res.sendFile(path.join(__dirname + '/client/start-page/startPage.html'));});
-app.get('/endGame', function(req, res) { res.sendFile(path.join(__dirname + '/client/end-game/endGame.html'));});
+app.get('/', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/index.html'));
+});
+app.get('/login', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/login/login.html'));
+});
+app.get('/createAccount', function(req, res) {
+	res.sendFile(path.join(__dirname
+			+ '/client/create-account/createAccount.html'));
+});
+app.get('/mainMenu', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/main-menu/mainMenu.html'));
+});
+app.get('/createRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/create-room/createRoom.html'));
+});
+app.get('/joinRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/join-room/joinRoom.html'));
+});
+app.get('/hostRoom', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/host-room/hostRoom.html'));
+});
+app.get('/characterSelect', function(req, res) {
+	res.sendFile(path.join(__dirname
+			+ '/client/character-select/characterSelect.html'));
+});
+app.get('/weaponSelect', function(req, res) {
+	res.sendFile(path.join(__dirname
+			+ '/client/weapon-select/weaponSelect.html'));
+});
+app.get('/game', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/game/game.html'));
+});
+app.get('/startPage', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/start-page/startPage.html'));
+});
+app.get('/endGame', function(req, res) {
+	res.sendFile(path.join(__dirname + '/client/end-game/endGame.html'));
+});
 app.use('/client', express.static(__dirname + '/client'));
 
-var User = 	require("./controllers/user.js");
+var User = require("./controllers/user.js");
 var Room = require("./controllers/room.js");
 var Player = require("./controllers/player.js");
 var Entity = require("./controllers/entity.js");
@@ -34,233 +61,265 @@ var numPlayer = 0;
 serv.listen(2000);
 console.log("Server started.");
 
-//DATABASE FUNCTIONS FOR LOGIN
+// DATABASE FUNCTIONS FOR LOGIN
 var verifypassword = verifypassword;
 var check_account = check_account;
-var add_account = add_account; 
+var add_account = add_account;
 var getRoomsList = getRoomsList;
 var getRoomObject = getRoomObject;
 var deleteRoom = deleteRoom;
 var addRoom = addRoom;
 var startGame = startGame;
-
+var updateWins = updateWins;
 
 var io = require('socket.io')(serv, {});
-io.sockets.on('connection', function(socket) {
-	var id = socket.id;
-	var currentRoom;
-	socket.on('disconnect', function() {
-		console.log("DISCONNECT");
-		if(currentRoom){
-			console.log(socket.id," is disconnecting from ", currentRoom);
-			socket.leave(currentRoom);
-		}
-		if(Player.PLAYER_LIST[id]) delete Player.PLAYER_LIST[id];
-	});
-    
-	///////////////////////////
-	// GENERIC JOINING ROOMS //
-	///////////////////////////
-	socket.on('joinRoom', function(data){
-		console.log("joining room: ", data);
-		socket.join(data);
-		currentRoom = data;
-	});
-	socket.on('leaveRoom', function(data){
-		console.log("leaving room: ", data);
-		socket.leave(data);
-	});
-	
-	////////////////////////////
-	// DATABASE AND ROOMSLIST //
-	////////////////////////////
-    socket.on('getRoomsListFromDatabase', function(){
-    	console.log("recieved emit");
-    	getRoomsList(function(roomslist){
-    		returnRoomsList(roomslist);
-    		//console.log("roomsList in the callback" + roomslist);
-    	});
-    });
-    
-    function returnRoomsList(roomslist){
-    	socket.emit("updateRoomsList", JSON.parse(roomslist));
-    }
-   
-    socket.on('addRoomToDatabase', function(data){
-    	roomId = data.id + "";
-    	roomObject = JSON.stringify(data);
-    	addRoom(roomId, roomObject);
-    });
-    socket.on('deleteRoomFromDatabase', function(data){
-    	console.log(data);
-        deleteRoom(data);
-    });
- 
-    socket.on('getRoomObjectFromDatabase', function(roomID){
-    	//console.log(roomID);
-    	getRoomObject((roomID + ""), function(roomobject){
-    		returnRoomObject(roomobject);
-    	});
-    });
-    function returnRoomObject(roomobject){
-    	socket.emit("retrieveRoomConfig", JSON.parse(JSON.parse(roomobject)[0].Room_Object));
-    } 	
-    
-    ////////////////
-    // START GAME //
-    ////////////////
-    socket.on('startGame', function(id, user, gameConfig, catImage, weaponImage){
-    	console.log("startGame catImage: ", catImage);
-    	startGame(id, user, gameConfig, catImage, weaponImage, socket);
-    });
+io.sockets.on('connection',
+		function(socket) {
+			var id = socket.id;
+			var currentRoom;
+			socket.on('disconnect', function() {
+				console.log("DISCONNECT");
+				if (currentRoom) {
+					console.log(socket.id, " is disconnecting from ",
+							currentRoom);
+					socket.leave(currentRoom);
+				}
+				if (Player.PLAYER_LIST[id])
+					delete Player.PLAYER_LIST[id];
+			});
 
-	///////////////////////
-	// HOST ROOM SOCKETS //
-	///////////////////////
-	socket.on('sendCreateRoomData',function(data, user){
-        var room = Room.room(data);
-        room.roomPlayers.push(user);        
-        io.to('JoinRoom').emit('updateRoomsList', data);
-    });	
-	socket.on('hostRoomConnection', function(id, user){
-		io.to(id).emit('addToHostRoomChat', user + ': has connected.');
-	});
-    socket.on('sendHostRoomMsgToServer',function(user, msg, id){
-        io.to(id).emit('addToHostRoomChat', user + ': ' + msg);
-    });	 
+			// /////////////////////////
+			// GENERIC JOINING ROOMS //
+			// /////////////////////////
+			socket.on('joinRoom', function(data) {
+				console.log("joining room: ", data);
+				socket.join(data);
+				currentRoom = data;
+			});
+			socket.on('leaveRoom', function(data) {
+				console.log("leaving room: ", data);
+				socket.leave(data);
+			});
 
-    
-    ///////////////////////
-	// JOIN ROOM SOCKETS //
-    ///////////////////////
-	socket.on('joinRoomConnection', function(user){
-		io.to('JoinRoom').emit('addToJoinRoomChat', user + ': has connected.');
-	});
-	// HANDLES JOINROOM MESSAGES
-    socket.on('sendJoinRoomMsgToServer',function(user, msg){
-        io.to('JoinRoom').emit('addToJoinRoomChat', user + ': ' + msg);
-    });	 
+			// //////////////////////////
+			// DATABASE AND ROOMSLIST //
+			// //////////////////////////
+			socket.on('getRoomsListFromDatabase', function() {
+				console.log("recieved emit");
+				getRoomsList(function(roomslist) {
+					returnRoomsList(roomslist);
+					// console.log("roomsList in the callback" + roomslist);
+				});
+			});
 
-	///////////////////
-	// LOGIN SOCKETS //
-    ///////////////////
-	socket.on('sendLoginData',function(data){
-		 var username = data.username;
-	     var password = data.password;
-	     verifypassword(username, password, function(correct, experience, wins){
-	    	 console.log("experience: " + experience);
-	    	 console.log("wins: " + wins);
-	      	 sendCorrectPassword(username, password, correct, experience, wins);
-	    });  
-    });	
-	
-	function sendCorrectPassword(username, password, correct, experience, wins) {
-		console.log(correct);
-		var correct = correct;
-		var password = password;
-		var experience = experience;
-		var wins = wins;
-		var sendpasswordverification = {correct: correct, username: username, password: password, experience: experience, wins: wins};
-		socket.emit('sendpasswordverification', sendpasswordverification);
+			function returnRoomsList(roomslist) {
+				socket.emit("updateRoomsList", JSON.parse(roomslist));
+			}
 
-	}
-	
-	//CREATE ACCOUNT
-	socket.on('sendNewAccountData', function(data){
-		var username = data.newusername;
-		var password = data.newpassword;
-		check_account(username, password, function(value){
-			verifycreateAccount(value, username, password);
+			socket.on('addRoomToDatabase', function(data) {
+				roomId = data.id + "";
+				roomObject = JSON.stringify(data);
+				addRoom(roomId, roomObject);
+			});
+			socket.on('deleteRoomFromDatabase', function(data) {
+				console.log(data);
+				deleteRoom(data);
+			});
+
+			socket.on('getRoomObjectFromDatabase', function(roomID) {
+				// console.log(roomID);
+				getRoomObject((roomID + ""), function(roomobject) {
+					returnRoomObject(roomobject);
+				});
+			});
+			function returnRoomObject(roomobject) {
+				socket.emit("retrieveRoomConfig", JSON.parse(JSON
+						.parse(roomobject)[0].Room_Object));
+			}
+
+			// //////////////
+			// START GAME //
+			// //////////////
+			socket.on('startGame', function(id, user, gameConfig, catImage,
+					weaponImage) {
+				console.log("startGame catImage: ", catImage);
+				startGame(id, user, gameConfig, catImage, weaponImage, socket);
+			});
+
+			// /////////////////////
+			// HOST ROOM SOCKETS //
+			// /////////////////////
+			socket.on('sendCreateRoomData', function(data, user) {
+				var room = Room.room(data);
+				room.roomPlayers.push(user);
+				io.to('JoinRoom').emit('updateRoomsList', data);
+			});
+			socket.on('hostRoomConnection', function(id, user) {
+				io.to(id).emit('addToHostRoomChat', user + ': has connected.');
+			});
+			socket.on('sendHostRoomMsgToServer', function(user, msg, id) {
+				io.to(id).emit('addToHostRoomChat', user + ': ' + msg);
+			});
+
+			// /////////////////////
+			// JOIN ROOM SOCKETS //
+			// /////////////////////
+			socket.on('joinRoomConnection', function(user) {
+				io.to('JoinRoom').emit('addToJoinRoomChat',
+						user + ': has connected.');
+			});
+			// HANDLES JOINROOM MESSAGES
+			socket.on('sendJoinRoomMsgToServer', function(user, msg) {
+				io.to('JoinRoom').emit('addToJoinRoomChat', user + ': ' + msg);
+			});
+
+			// /////////////////
+			// LOGIN SOCKETS //
+			// /////////////////
+			socket.on('sendLoginData', function(data) {
+				var username = data.username;
+				var password = data.password;
+				verifypassword(username, password, function(correct,
+						experience, wins) {
+					console.log("experience: " + experience);
+					console.log("wins: " + wins);
+					sendCorrectPassword(username, password, correct,
+							experience, wins);
+				});
+			});
+
+			function sendCorrectPassword(username, password, correct,
+					experience, wins) {
+				console.log(correct);
+				var correct = correct;
+				var password = password;
+				var experience = experience;
+				var wins = wins;
+				var sendpasswordverification = {
+					correct : correct,
+					username : username,
+					password : password,
+					experience : experience,
+					wins : wins
+				};
+				socket.emit('sendpasswordverification',
+						sendpasswordverification);
+
+			}
+
+			// CREATE ACCOUNT
+			socket.on('sendNewAccountData', function(data) {
+				var username = data.newusername;
+				var password = data.newpassword;
+				check_account(username, password, function(value) {
+					verifycreateAccount(value, username, password);
+				});
+			});
+
+			function verifycreateAccount(value, username, password) {
+				var value = value;
+				console.log(value);
+				if (value === 1) {
+					add_account(username, password);
+				}
+				var verifiednewaccount = {
+					value : value
+				};
+				socket.emit('verifiednewaccount', verifiednewaccount);
+			};
+			socket.on('updateWinner', function(data) {
+				var username = data.username;
+				getWins(username, function(numberOfWins) {
+					numOfWins(username, numberOfWins);
+				});
+			});
+
+			function numOfWins(username, numberOfWins) {
+				var username = username;
+				var numberOfWins = numberOfWins;
+				updateWins(username, numberOfWins);
+			};
+
 		});
-	})
-	
-	function verifycreateAccount(value, username, password){
-		var value = value; 
-		console.log(value);
-		if (value === 1){
-			add_account(username, password);
-		}
-		var verifiednewaccount = {value: value};
-		socket.emit('verifiednewaccount', verifiednewaccount);
-	}
 
-});
-
-function verifypassword(username, password, callback){
+function verifypassword(username, password, callback) {
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
 
 	connection.connect();
-	connection.query("SELECT * from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-		if (!err){
-			var string = JSON.stringify(rows);
-			var json = JSON.parse(string);
-			var correct;
-			var experience; 
-			var wins;
-			if (JSON.stringify(rows) === "[]"){
-				console.log("username was not in database... create new account");
-				correct = 0;
-			}
-			else{
-				var correctpassword = json[0]._password;
-				console.log("entered password: " + password);
-				console.log("correct password: " + correctpassword)
-				if (password === correctpassword){
-					console.log(true);
-					console.log('correct password set');
-					correct = 1; 
-					experience = json[0].experience;
-					wins = json[0].wins;
-					console.log(experience);
-					console.log(wins);
-				}
-				else{
-					console.log(false);
-					console.log('incorrect password set');
-					correct = 2;
-				}
-			}
-			console.log('return callback');
-			return callback(correct, experience, wins);
-		}
-	});
+	connection
+			.query(
+					"SELECT * from User_Info WHERE username =" + "'" + username
+							+ "'" + ";",
+					function(err, rows, fields) {
+						if (!err) {
+							var string = JSON.stringify(rows);
+							var json = JSON.parse(string);
+							var correct;
+							var experience;
+							var wins;
+							if (JSON.stringify(rows) === "[]") {
+								console
+										.log("username was not in database... create new account");
+								correct = 0;
+							} else {
+								var correctpassword = json[0]._password;
+								console.log("entered password: " + password);
+								console.log("correct password: "
+										+ correctpassword)
+								if (password === correctpassword) {
+									console.log(true);
+									console.log('correct password set');
+									correct = 1;
+									experience = json[0].experience;
+									wins = json[0].wins;
+									console.log(experience);
+									console.log(wins);
+								} else {
+									console.log(false);
+									console.log('incorrect password set');
+									correct = 2;
+								}
+							}
+							console.log('return callback');
+							return callback(correct, experience, wins);
+						}
+					});
 	console.log('end the connection')
 	connection.end();
 }
-//VERIFIES NEW ACCOUNT DOESN'T PREVIOUS EXIST AND
-//PASSWORD FITS ALL THREE REQUIREMENTS
-function check_account(username, password, callback){
+// VERIFIES NEW ACCOUNT DOESN'T PREVIOUS EXIST AND
+// PASSWORD FITS ALL THREE REQUIREMENTS
+function check_account(username, password, callback) {
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
 	console.log(username);
 	connection.connect();
-	connection.query("SELECT * from User_Info WHERE username ="+ "'" + username+ "'" +";", function(err, rows, fields) {
-		if (!err){
+	connection.query("SELECT * from User_Info WHERE username =" + "'"
+			+ username + "'" + ";", function(err, rows, fields) {
+		if (!err) {
 			console.log(JSON.stringify(rows));
-			if (JSON.stringify(rows) === "[]"){
+			if (JSON.stringify(rows) === "[]") {
 				console.log("putting into query");
-				if (username === ""){
+				if (username === "") {
 					value = 3;
-				}
-				//password verification, regexp wrong
-				else if (!(password.match(RegExp(/^.{6,}$/)) && (password.match(RegExp(/[0-9]/))) &&  (password.match(RegExp(/[A-Z]/))))){
+				} else if (!(password.match(RegExp(/^.{6,}$/))
+						&& (password.match(RegExp(/[0-9]/))) && (password
+						.match(RegExp(/[A-Z]/))))) {
 					value = 2;
-				}
-				else{
+				} else {
 					value = 1;
 				}
 				console.log(value);
-			}
-			else{
+			} else {
 				console.log("username is already in database");
 				value = 0;
 			}
@@ -270,243 +329,311 @@ function check_account(username, password, callback){
 	console.log("end connection");
 	connection.end();
 }
-//ADD NEW ACCOUNT TO DATABASE
-function add_account(username, password){
+// ADD NEW ACCOUNT TO DATABASE
+function add_account(username, password) {
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
 	console.log(username);
 	connection.connect();
-	var userinfo = [username,password, '0', '0']
-	connection.query("INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?", userinfo, function(err, result) {
-	});
+	var userinfo = [ username, password, '0', '0' ]
+	connection
+			.query(
+					"INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?",
+					userinfo, function(err, result) {
+					});
 	console.log("end connection");
 	connection.end();
 }
-//GETS ROOMS LIST FROM DATABASE
-var getRoomsList = function(callback){
-	
+
+//UPDATE NUMBER OF WINS FOR A PLAYER
+function getWins(winner, callback) {
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
-	
+	connection.connect();
+	console.log("username: " + winner);
+	connection.query("SELECT * FROM User_Info WHERE username = ?", winner,
+			function(err, result) {
+				var string = JSON.stringify(result);
+				var json = JSON.parse(string);
+				console.log(json);
+				var numberOfWins = json[0].wins;
+				console.log("numberOfWins :" + numberOfWins);
+				return callback(numberOfWins);
+			});
+	connection.end();
+	console.log('closes connection');
+}
+
+function updateWins(winner, numberOfWins) {
+	var connection = mysql.createConnection({
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
+	});
+	connection.connect();
+	console.log("makes it here");
+	var query = connection
+			.query(
+					"UPDATE User_Info SET SET WINS = ? WHERE username = ?",
+					numberOfWins, winner, function(err, result) {
+						"added result";
+					});
+	console.log("end connection");
+	connection.end();
+}
+
+
+
+
+// GETS ROOMS LIST FROM DATABASE
+var getRoomsList = function(callback) {
+
+	var connection = mysql.createConnection({
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
+	});
+
 	connection.connect();
 	connection.query("SELECT * from Rooms", function(err, rows, fields) {
-		if (!err){
+		if (!err) {
 			var roomslist = JSON.stringify(rows);
-//			if (JSON.stringify(rows) === "[]"){
-//				//this means that there is nothing in the room tables
-//			}
-			//console.log(roomslist);
+			// if (JSON.stringify(rows) === "[]"){
+			// //this means that there is nothing in the room tables
+			// }
+			// console.log(roomslist);
 			return callback(roomslist);
 		}
 	});
 	console.log('end the connection');
 	connection.end();
 };
-//GETS SPECIFIC ROOM OBJECT FROM DATABASE GIVEN THE ID
-var getRoomObject = function(RoomId, callback){
-	
+// GETS SPECIFIC ROOM OBJECT FROM DATABASE GIVEN THE ID
+var getRoomObject = function(RoomId, callback) {
+
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
-	
+
 	connection.connect();
-	connection.query("SELECT Room_Object from Rooms WHERE Room_Id ="+ "'" + RoomId + "'" +";", function(err, rows, fields) {
-		if (!err){
+	connection.query("SELECT Room_Object from Rooms WHERE Room_Id =" + "'"
+			+ RoomId + "'" + ";", function(err, rows, fields) {
+		if (!err) {
 			var roomobject = JSON.stringify(rows);
-//			if (JSON.stringify(rows) === "[]"){
-//				//this means that there isn't a room with that ID
-//			}
-			//console.log(roomobject);
+			// if (JSON.stringify(rows) === "[]"){
+			// //this means that there isn't a room with that ID
+			// }
+			// console.log(roomobject);
 			return callback(roomobject);
 		}
 	});
 	console.log('end the connection');
 	connection.end();
 };
-//DELETE ROOM FROM DATABASE
-var deleteRoom = function(roomId){
+// DELETE ROOM FROM DATABASE
+var deleteRoom = function(roomId) {
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
 	connection.connect();
-	var roominfo = [roomId]
-	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo, function(err, result) {
-	});
+	var roominfo = [ roomId ]
+	connection.query(" DELETE FROM Rooms WHERE Room_Id = ?", roominfo,
+			function(err, result) {
+			});
 	connection.end();
 }
-//ADD ROOM TO DATABASE
-var addRoom = function(roomId, roomObject){
+// ADD ROOM TO DATABASE
+var addRoom = function(roomId, roomObject) {
 	var connection = mysql.createConnection({
-		  host     : 'mysql.cs.iastate.edu',
-		  user     : 'dbu309la07',
-		  password : '5rqZthHkdvd',
-		  database : 'db309la07'
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
 	});
 	connection.connect();
-	var roominfo = [roomId,roomObject];
-	
-	connection.query("INSERT INTO Rooms SET Room_Id = ?, Room_Object = ?", roominfo, function(err, result) {
-	});
+	var roominfo = [ roomId, roomObject ];
+
+	connection.query("INSERT INTO Rooms SET Room_Id = ?, Room_Object = ?",
+			roominfo, function(err, result) {
+			});
 	connection.end();
 }
 
-function startGame(gameID, user, gameConfig, catImage, weaponImage, socket){
-	/* console.log("inside startGame.");
-	 * console.log("socket: ",  socket); 
-	 * console.log("gameID: ", gameID); 
-	 * console.log("user: ",  user); 
+function startGame(gameID, user, gameConfig, catImage, weaponImage, socket) {
+	/*
+	 * console.log("inside startGame."); console.log("socket: ", socket);
+	 * console.log("gameID: ", gameID); console.log("user: ", user);
 	 * console.log("gameConfig: ", gameConfig);
 	 */
 	console.log("catImage: ", catImage);
 	console.log("weaponImage: ", weaponImage);
 	numPlayer++;
-	var player = Player.player(socket.id, numPlayer, user, catImage, weaponImage);
-	
+	var player = Player.player(socket.id, numPlayer, user, catImage,
+			weaponImage);
 
 	var room = Room.room(gameConfig);
-    room.roomPlayers.push(player);
+	room.roomPlayers.push(player);
 
-
-		
 	createObstacles();
 	var countDown = false;
-	var roomID = "game-"+gameID;
+	var roomID = "game-" + gameID;
 	var previousNumOfPlayers;
-	var intervalId = setInterval(function() {
-		Room.updateRoom();
-		if(pause == false){
-			var clients = io.sockets.adapter.rooms["game-"+gameID];
-			if(clients){
-				if(!countDown){ //Starts countdown
-					var currentNumOfPlayers = Object.keys(clients.sockets).length;
-					if(currentNumOfPlayers == room.numOfPlayers) {
-						/* console.log("Inside Countdown"); 
-						 * function countDownFunc(i, callback) {
-						 * callback = callback || function(){};
-						 *  var int = setInterval(function() {
-						 *  io.to(roomID).emit('countdown', i);
-						 *  i-- || (clearInterval(int), callback());
-						 *  }, 1000);
-						 *  }
-						 *  countDownFunc(5);
-						 */
-						deleteRoom(gameID);
-						countDown = true;
-					}
-					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
-						console.log("Inside Waiting on");
-						console.log("curr ", currentNumOfPlayers);
-						console.log("gameConfig ", room.numOfPlayers);
-						var waitingOn = room.numOfPlayers - currentNumOfPlayers;
-						io.to(roomID).emit('waiting', waitingOn);
-					}
-					previousNumOfPlayers = currentNumOfPlayers;
-				} else {
-					//Check if all but one players are dead
-					var numPlayersAlive = room.numOfPlayers;
-					Object.keys(clients.sockets).forEach( function(socketId){
-						if(Player.PLAYER_LIST[socketId] && Player.PLAYER_LIST[socketId].dead){
-							numPlayersAlive--;
-						}
-					});
-					if(numPlayersAlive > 1){
-						var pack = {
-							player: Player.updatePlayer(clients),
-							projectile: Player.update(clients),
-							obstacles: Obstacles.update()
-						};
-						io.to(roomID).emit('newPositions', pack);
-					}
-					else {
-						Object.keys(clients.sockets).forEach(function(socketId, callback){
-							if (!Player.PLAYER_LIST[socketId].dead){
-								var winner = Player.PLAYER_LIST[socketId].username;
-								var sendWinner = {winner: winner};	
-								io.to(roomID).emit('endGame', sendWinner);
-								clearInterval(intervalId);
+	var intervalId = setInterval(
+			function() {
+				Room.updateRoom();
+				if (pause == false) {
+					var clients = io.sockets.adapter.rooms["game-" + gameID];
+					if (clients) {
+						if (!countDown) { // Starts countdown
+							var currentNumOfPlayers = Object
+									.keys(clients.sockets).length;
+							if (currentNumOfPlayers == room.numOfPlayers) {
+								/*
+								 * console.log("Inside Countdown"); function
+								 * countDownFunc(i, callback) { callback =
+								 * callback || function(){}; var int =
+								 * setInterval(function() {
+								 * io.to(roomID).emit('countdown', i); i-- ||
+								 * (clearInterval(int), callback()); }, 1000); }
+								 * countDownFunc(5);
+								 */
+								deleteRoom(gameID);
+								countDown = true;
+							} else if (currentNumOfPlayers != previousNumOfPlayers) { // Diplays
+																						// waiting
+																						// screen
+								console.log("Inside Waiting on");
+								console.log("curr ", currentNumOfPlayers);
+								console.log("gameConfig ", room.numOfPlayers);
+								var waitingOn = room.numOfPlayers
+										- currentNumOfPlayers;
+								io.to(roomID).emit('waiting', waitingOn);
 							}
-						});
+							previousNumOfPlayers = currentNumOfPlayers;
+						} else {
+							// Check if all but one players are dead
+							var numPlayersAlive = room.numOfPlayers;
+							Object
+									.keys(clients.sockets)
+									.forEach(
+											function(socketId) {
+												if (Player.PLAYER_LIST[socketId]
+														&& Player.PLAYER_LIST[socketId].dead) {
+													numPlayersAlive--;
+												}
+											});
+							if (numPlayersAlive > 1) {
+								var pack = {
+									player : Player.updatePlayer(clients),
+									projectile : Player.update(clients),
+									obstacles : Obstacles.update()
+								};
+								io.to(roomID).emit('newPositions', pack);
+							} else {
+								Object
+										.keys(clients.sockets)
+										.forEach(
+												function(socketId) {
+													if (!Player.PLAYER_LIST[socketId].dead) {
+														var winner = Player.PLAYER_LIST[socketId].username;
+
+														var sendWinner = {
+															winner : winner
+														};
+														io.to(roomID).emit(
+																'endGame',
+																sendWinner);
+														clearInterval(intervalId);
+													}
+												});
+							}
+						}
 					}
 				}
-			}
-		}
-	}, 1000 / 25);
-	
+			}, 1000 / 25);
+
 	socket.on('keyPress', function(data) {
-		if (data.inputId === 'left') player.pressingLeft = data.state;
-		else if (data.inputId === 'right') player.pressingRight = data.state;
-		else if (data.inputId === 'up') player.pressingUp = data.state;
-		else if (data.inputId === 'down') player.pressingDown = data.state;
-		else if (data.inputId === 'attack') player.generateProjectile = data.state;
-		else if (data.inputId === 'mouseAngle') player.mouseAngle = data.state;
-		else if (data.inputId === 'pause'){
-			//button toggle
-			if((pause == true) &&(data.state == true)){
+		if (data.inputId === 'left')
+			player.pressingLeft = data.state;
+		else if (data.inputId === 'right')
+			player.pressingRight = data.state;
+		else if (data.inputId === 'up')
+			player.pressingUp = data.state;
+		else if (data.inputId === 'down')
+			player.pressingDown = data.state;
+		else if (data.inputId === 'attack')
+			player.generateProjectile = data.state;
+		else if (data.inputId === 'mouseAngle')
+			player.mouseAngle = data.state;
+		else if (data.inputId === 'pause') {
+			// button toggle
+			if ((pause == true) && (data.state == true)) {
 				pause = false;
-			}
-			else if((pause == false) && (data.state == true)){
+			} else if ((pause == false) && (data.state == true)) {
 				pause = true;
 			}
 		}
 	});
-	
-	function createObstacles(){
+
+	function createObstacles() {
 		var obstacle = Obstacles.obstacles(0);
 		obstacle.x = 200;
 		obstacle.y = 170;
 		obstacle.width = 30;
 		obstacle.height = 100;
-		
+
 		var obstacle2 = Obstacles.obstacles(1);
 		obstacle2.x = 200;
 		obstacle2.y = 170;
 		obstacle2.width = 100;
 		obstacle2.height = 30;
-		
+
 		var obstacle3 = Obstacles.obstacles(2);
 		obstacle3.x = 800;
 		obstacle3.y = 170;
 		obstacle3.width = 30;
 		obstacle3.height = 100;
-		
+
 		var obstacle4 = Obstacles.obstacles(3);
 		obstacle4.x = 730;
 		obstacle4.y = 170;
 		obstacle4.width = 100;
 		obstacle4.height = 30;
-		
+
 		var obstacle5 = Obstacles.obstacles(4);
 		obstacle5.x = 200;
 		obstacle5.y = 430;
 		obstacle5.width = 30;
 		obstacle5.height = 100;
-		
+
 		var obstacle6 = Obstacles.obstacles(5);
 		obstacle6.x = 200;
 		obstacle6.y = 500;
 		obstacle6.width = 100;
 		obstacle6.height = 30;
-		
+
 		var obstacle7 = Obstacles.obstacles(6);
 		obstacle7.x = 800;
 		obstacle7.y = 430;
 		obstacle7.width = 30;
 		obstacle7.height = 100;
-		
+
 		var obstacle8 = Obstacles.obstacles(7);
 		obstacle8.x = 730;
 		obstacle8.y = 500;
