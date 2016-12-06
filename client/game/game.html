@@ -102,6 +102,7 @@ $(document).ready(function() {
 	var ctx = document.getElementById("ctx").getContext("2d");
 	//ctx.font = '30px Arial';
 
+	var gameTime = null;
 	
 	socket.on('connect', function(){
 		var user = sessionStorage.getItem("username");
@@ -149,18 +150,24 @@ $(document).ready(function() {
 			var image = document.getElementById("heart");
 			ctx.drawImage(image, data.items[i].x, data.items[i].y, data.items[i].width,data.items[i].height);
 		}
+		if(gameTime) {
+			ctx.font="40px Georgia";
+			ctx.fillText(gameTime, 490, 50);
+		}
+	});
+	socket.on('updateGameTime', function(time){
+		if(gameTime != time) gameTime = time;
 	});
 	socket.on('waiting', function(numWait){
 		console.log("Inside waiting");
 		ctx.clearRect(0, 0, 1000, 700);
 		ctx.fillStyle = "#00CC00";
-		ctx.font="20px Georgia";
+		ctx.font="50px Georgia";
 		ctx.fillText("Waiting for " + numWait + " more players.",10, 50);
 	});
 
 	socket.on('endGame', function(data){
 		sessionStorage.setItem('winner', data.winner);
-		console.log("GAME OVER");
 		window.location.href = "/endGame";
 	});
 	
