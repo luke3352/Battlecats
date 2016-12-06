@@ -522,6 +522,13 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 					});
 					
 					//If more than 1 player is alive then continue emitting data to game.html
+					var numPlayersAlive = room.numOfPlayers;
+					Object.keys(clients.sockets).forEach( function(socketId){
+						if(Player.PLAYER_LIST[socketId] && Player.PLAYER_LIST[socketId].dead){
+							numPlayersAlive--;
+						}
+					});
+					
 					if(numPlayersAlive <= 1 || gameTime > time){
 						var winner;
 						Object.keys(clients.sockets).forEach(function(socketId, callback){
