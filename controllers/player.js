@@ -46,28 +46,28 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 		self.previousFireTime = 0;
 		
 		
-		if(numPlayerInRoom == 1){
+		if(numPlayerInRoom%4 == 1){
 			self.x = 100;
 			self.y = 100;
 			self.healthBarX = 50;
 			self.healthBarY = 10;
 			self.color = "#CC0000";
 		}
-		else if(numPlayerInRoom == 2){
+		else if(numPlayerInRoom%4 == 2){
 			self.x = 900;
 			self.y = 100;
 			self.healthBarX = 875;
 			self.healthBarY = 10;
 			self.color = "#00CC00";
 		}
-		else if(numPlayerInRoom == 3){
+		else if(numPlayerInRoom%4 == 3){
 			self.x = 100;
 			self.y = 600;
-			self.healthBarX = 50;
+			self.healthBarX = 50
 			self.healthBarY = 670;
 			self.color = "#0000FF";
 		}
-		else if(numPlayerInRoom == 4){
+		else if(numPlayerInRoom%4 == 0){
 			self.x = 900;
 			self.y = 600;
 			self.healthBarX = 875;
