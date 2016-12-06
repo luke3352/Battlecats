@@ -2,7 +2,6 @@
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <style>
 .button{
@@ -100,13 +99,11 @@ left: 100px;
 	</div>
 <script>
 $(document).ready(function() {
-	var socket = io.connect();
 	var username = sessionStorage.getItem("winner");
-	console.log(username);
 	$("#blink").html(username + " won!");
 	$("#blink").css({"border": "3px dotted red", "outline-color" : "yellow", "outline-style" : "dotted"});
-	$("#blink").css({"align": "center"});
-	
+	$("#blink").css({"align": "center"})
+
 });
 </script>
 </body>
