@@ -116,23 +116,24 @@ $(document).ready(function() {
 			var id = rooms[i].Room_Id;
 			var room = JSON.parse(rooms[i].Room_Object);
 			var roomName = room.roomName;
-			
-			if(room.isPublic) {
-				publicRooms[id] = room;
-				document.getElementById('public-rooms').innerHTML += 
-				'<form id="form'+id+'" action="/hostRoom" method="GET">'
-				+ roomName + '<input class="joinRoomBtn" type="submit" id="'+id+
-				'" value="Join Room"><input type="hidden" name="id" value="'
-				+id+'"></form><br>';
-			}
-			else {
-				privateRooms[id] = room;
-				console.log("PRIVATE ROOMS: ",privateRooms);
-				document.getElementById('private-rooms').innerHTML += 
-				'<form id="'+id+'" action="/hostRoom" method="GET">'
-				+ roomName + '<input class="joinRoomBtn" type="submit" id="btn'+id+
-				'" value="Join Room"><input type="hidden" name="id" value="'
-				+id+'"></form><br>';
+			if(!room.isActive){
+				if(room.isPublic) {
+					publicRooms[id] = room;
+					document.getElementById('public-rooms').innerHTML += 
+					'<form id="form'+id+'" action="/hostRoom" method="GET">'
+					+ roomName + '<input class="joinRoomBtn" type="submit" id="'+id+
+					'" value="Join Room"><input type="hidden" name="id" value="'
+					+id+'"></form><br>';
+				}
+				else {
+					privateRooms[id] = room;
+					console.log("PRIVATE ROOMS: ",privateRooms);
+					document.getElementById('private-rooms').innerHTML += 
+					'<form id="'+id+'" action="/hostRoom" method="GET">'
+					+ roomName + '<input class="joinRoomBtn" type="submit" id="btn'+id+
+					'" value="Join Room"><input type="hidden" name="id" value="'
+					+id+'"></form><br>';
+				}
 			}
 		}
 		
@@ -154,7 +155,9 @@ $(document).ready(function() {
 		}
 		
 	});
-	
+	socket.on("roomDeletedFromDatabase", function(){
+		socket.emit('getRoomsListFromDatabase');
+	});
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');

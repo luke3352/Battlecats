@@ -19,6 +19,7 @@ exports.room = function(data) {
 		gameMode: 		data.gameMode, // default game mode is stock
 		gameModeVal: 	data.gameModeVal, // either stock or time
 		items: 			data.items, // items disabled for now
+		isActive: 		false
 	};
 	
 	room = self;

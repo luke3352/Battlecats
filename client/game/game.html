@@ -156,6 +156,7 @@ $(document).ready(function() {
 		}
 	});
 	socket.on('updateGameTime', function(time){
+		console.log("Time: ", time);
 		if(gameTime != time) gameTime = time;
 	});
 	socket.on('waiting', function(numWait){
@@ -167,6 +168,7 @@ $(document).ready(function() {
 	});
 
 	socket.on('endGame', function(data){
+		sessionStorage.setItem('gameID', data.gameID);
 		sessionStorage.setItem('winner', data.winner);
 		window.location.href = "/endGame";
 	});

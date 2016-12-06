@@ -441,7 +441,7 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 	var gameMode = room.gameMode;
 	var gameModeVal = room.gameModeVal;
 	
-	var time = gameModeVal * 30000;
+	var time = gameModeVal * 60000;
 	var startTime = new Date().getTime();
 	var previousTime = startTime;
 	
@@ -452,8 +452,14 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 			if(!countDown){ //Starts countdown
 				var currentNumOfPlayers = Object.keys(clients.sockets).length;
 				if(currentNumOfPlayers == room.numOfPlayers) {
-					deleteRoom(gameID);
 					countDown = true;
+					deleteRoom(gameID);
+					room.isActive = true;
+			    	var roomId = gameID;
+			    	var roomObject = JSON.stringify(room);
+			    	console.log("roomObject", roomObject);
+			    	addRoom(roomId, roomObject);
+			    	io.to("joinRoom").emit("roomDeletedFromDatabase");
 					startTime = new Date().getTime();
 					previousTime = startTime;
 				}
@@ -493,7 +499,7 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 							if (!Player.PLAYER_LIST[socketId].dead){
 								winner = Player.PLAYER_LIST[socketId].username;
 								var sendWinner = {winner: winner};	
-								io.to(roomID).emit('endGame', sendWinner);
+								io.to(roomID).emit('endGame', sendWinner, gameID);
 								clearInterval(intervalId);
 							}	
 						});
@@ -516,14 +522,15 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 					});
 					
 					//If more than 1 player is alive then continue emitting data to game.html
-					if(numPlayersAlive > 1 || gameTime > time){
+					if(numPlayersAlive <= 1 || gameTime > time){
 						var winner;
 						Object.keys(clients.sockets).forEach(function(socketId, callback){
 							if (!Player.PLAYER_LIST[socketId].dead)
 								winner = Player.PLAYER_LIST[socketId].username;
 						});
 						var sendWinner = {winner: winner};	
-						io.to(roomID).emit('endGame', sendWinner);
+						if(numPlayersAlive > 1)
+						io.to(roomID).emit('endGame', sendWinner, gameID);
 						clearInterval(intervalId);
 					}
 					if(currentTime - previousTime > 1000) {
