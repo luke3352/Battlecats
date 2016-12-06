@@ -63,7 +63,7 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 		else if(numPlayerInRoom%4 == 3){
 			self.x = 100;
 			self.y = 600;
-			self.healthBarX = 50
+			self.healthBarX = 50;
 			self.healthBarY = 670;
 			self.color = "#0000FF";
 		}
@@ -78,6 +78,7 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 		
 	// Check if players share the same position
 	self.updatePosition = function(clients) {
+		console.log("Player num "+ self.numPlayer);
 		if(self.dead == false){
 			if(self.hit == true) {
 				self.HP--;
