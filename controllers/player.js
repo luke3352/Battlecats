@@ -1,4 +1,4 @@
-var Entity = require("./Entity.js");
+var Entity = require("./entity.js");
 var Projectile = require("./projectile.js");
 var Obstacle = require("./obstacles.js");
 var Item = require("./items.js");
@@ -431,4 +431,5 @@ exports.update = function(clients){
 		});
 	}	
 	return pack;
+
 }
