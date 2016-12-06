@@ -19,15 +19,15 @@
 }
 .button{
 	padding: 10px 17px;
-  font-size: 15px;
-  text-align: center;
-  cursor: pointer;
-  outline: none;
-  color: black;
-  background-color: white;
-  border-radius: 7px;
-  margin:auto;
-  display:block;
+	font-size: 15px;
+	text-align: center;
+	cursor: pointer;
+	outline: none;
+	color: black;
+	background-color: white;
+	border-radius: 7px;
+	margin:auto;
+	display:block;
 }
 .rectangle {
 	top: 0px;
@@ -158,10 +158,7 @@ $(document).ready(function() {
 		ctx.font="20px Georgia";
 		ctx.fillText("Waiting for " + numWait + " more players.",10, 50);
 	});
-//	socket.on('countdown', function(count){
-//		ctx.font="20px Georgia";
-//		ctx.fillText(count, 10, 50);
-//	});
+
 	socket.on('endGame', function(data){
 		sessionStorage.setItem('winner', data.winner);
 		console.log("GAME OVER");
