@@ -103,11 +103,10 @@ $(document).ready(function() {
 	var socket = io.connect();
 	var username = sessionStorage.getItem("winner");
 	console.log(username);
-	var winner = {username: username};
 	$("#blink").html(username + " won!");
 	$("#blink").css({"border": "3px dotted red", "outline-color" : "yellow", "outline-style" : "dotted"});
 	$("#blink").css({"align": "center"});
-	socket.emit("updateWinner", winner);
+	
 });
 </script>
 </body>

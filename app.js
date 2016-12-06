@@ -180,26 +180,22 @@ io.sockets.on('connection',
 				var username = data.username;
 				var password = data.password;
 				verifypassword(username, password, function(correct,
-						experience, wins) {
-					console.log("experience: " + experience);
+			 wins) {
 					console.log("wins: " + wins);
-					sendCorrectPassword(username, password, correct,
-							experience, wins);
+					sendCorrectPassword(username, password, correct, wins);
 				});
 			});
 
 			function sendCorrectPassword(username, password, correct,
-					experience, wins) {
+					 wins) {
 				console.log(correct);
 				var correct = correct;
 				var password = password;
-				var experience = experience;
 				var wins = wins;
 				var sendpasswordverification = {
 					correct : correct,
 					username : username,
 					password : password,
-					experience : experience,
 					wins : wins
 				};
 				socket.emit('sendpasswordverification',
@@ -227,12 +223,6 @@ io.sockets.on('connection',
 				};
 				socket.emit('verifiednewaccount', verifiednewaccount);
 			};
-			socket.on('updateWinner', function(data) {
-				var username = data.username;
-				getWins(username, function(numberOfWins) {
-					numOfWins(username, numberOfWins);
-				});
-			});
 
 			function numOfWins(username, numberOfWins) {
 				var username = username;
@@ -260,7 +250,6 @@ function verifypassword(username, password, callback) {
 							var string = JSON.stringify(rows);
 							var json = JSON.parse(string);
 							var correct;
-							var experience;
 							var wins;
 							if (JSON.stringify(rows) === "[]") {
 								console
@@ -275,9 +264,7 @@ function verifypassword(username, password, callback) {
 									console.log(true);
 									console.log('correct password set');
 									correct = 1;
-									experience = json[0].experience;
 									wins = json[0].wins;
-									console.log(experience);
 									console.log(wins);
 								} else {
 									console.log(false);
@@ -286,7 +273,7 @@ function verifypassword(username, password, callback) {
 								}
 							}
 							console.log('return callback');
-							return callback(correct, experience, wins);
+							return callback(correct, wins);
 						}
 					});
 	console.log('end the connection')
@@ -339,13 +326,13 @@ function add_account(username, password) {
 	});
 	console.log(username);
 	connection.connect();
-	var userinfo = [ username, password, '0', '0' ]
+	var userinfo = [ username, password, '0' ]
 	connection
 			.query(
-					"INSERT INTO User_Info SET username = ?, _password = ?, experience = ?, wins = ?",
+					"INSERT INTO User_Info SET username = ?, _password = ?, wins = ?",
 					userinfo, function(err, result) {
 					});
-	console.log("end connection");
+	console.log("close connection");
 	connection.end();
 }
 
@@ -362,17 +349,17 @@ function getWins(winner, callback) {
 	connection.query("SELECT * FROM User_Info WHERE username = ?", winner,
 			function(err, result) {
 				var string = JSON.stringify(result);
-				var json = JSON.parse(string);
-				console.log(json);
-				var numberOfWins = json[0].wins;
+				var jsonobj = JSON.parse(string);
+				console.log(jsonobj);
+				var numberOfWins = jsonobj[0].wins;
 				console.log("numberOfWins :" + numberOfWins);
 				return callback(numberOfWins);
 			});
-	connection.end();
 	console.log('closes connection');
+	connection.end();
 }
 
-function updateWins(winner, numberOfWins) {
+function updateWins(numberOfWins, winner) {
 	var connection = mysql.createConnection({
 		host : 'mysql.cs.iastate.edu',
 		user : 'dbu309la07',
@@ -381,11 +368,13 @@ function updateWins(winner, numberOfWins) {
 	});
 	connection.connect();
 	console.log("makes it here");
-	var query = connection
+	console.log("numberOfWins being entered: " + numberOfWins);
+	console.log("winner being entered: "+ winner);
+	var wininfo = [numberOfWins, winner]
+	connection
 			.query(
-					"UPDATE User_Info SET SET WINS = ? WHERE username = ?",
-					numberOfWins, winner, function(err, result) {
-						"added result";
+					"UPDATE User_Info SET WINS = ? WHERE username = ?", wininfo, function(err, result) {
+						console.log("added result");
 					});
 	console.log("end connection");
 	connection.end();
@@ -546,22 +535,22 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, socket) {
 								};
 								io.to(roomID).emit('newPositions', pack);
 							} else {
+								var winner;
 								Object
 										.keys(clients.sockets)
 										.forEach(
 												function(socketId) {
 													if (!Player.PLAYER_LIST[socketId].dead) {
-														var winner = Player.PLAYER_LIST[socketId].username;
-
-														var sendWinner = {
-															winner : winner
-														};
-														io.to(roomID).emit(
-																'endGame',
-																sendWinner);
-														clearInterval(intervalId);
+														winner = Player.PLAYER_LIST[socketId].username;
 													}
 												});
+								getWins(winner, function(numberOfWins){
+									var numberOfWins = numberOfWins + 1;
+									updateWins(numberOfWins, winner);
+								});
+								var sendWinner = {winner: winner};	
+								io.to(roomID).emit('endGame', sendWinner);
+								clearInterval(intervalId);
 							}
 						}
 					}
