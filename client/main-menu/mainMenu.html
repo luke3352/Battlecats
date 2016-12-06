@@ -2,6 +2,7 @@
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <style>
 .button{
@@ -93,18 +94,18 @@ left: 100px;
 	<div id = "background" class = "rectangle">
 		<div id="howToPlayPage" class = "inforectangle">
 			<h1 align="Center" id = "title">How to Play</h1>
-			<p align="center">W = move player upwards</p>
-			<p align="center">S = move player downwards</p>
-			<p align="center">A = move player left</p>
-			<p align="center">D = move player right</p>
-			<p align="center">It takes 4 hits to defeat another player</p>
-			<p align="center">Goal is to defeat every other cat until you are the last one standing</p>
-			<p align="center">FAQ: //TODO</p>
+			<img id = "wasd" src="/client/menu-page-images/wasd.png" style = "width: 150px; display: block; margin: 0 auto"  hspace="20">
+			<p align="center">Use WASD keys to navigate</p>
+			<p align="center">The goal of the game is to defeat every other cat until you are the last one standing</p>
+			<p align="center">You can select one of four weapons - each with different skills</p>
+			<p align="center">Games can be private with friends or public to anyone</p>
+			<p align="center">Games have the option to include a healing heart item to gain back health points</p>
 			<button style="align: 'left'" class = "button" id="return_to_main">Back</button>
 		</div>
 	</div>
 <script>
 $(document).ready(function() {
+	var socket = io();
 	$(userInfo).hide();
 	$(background).hide();
 	var userInfoOn = false;

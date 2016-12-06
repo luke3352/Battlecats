@@ -108,6 +108,7 @@ io.sockets.on('connection', function(socket) {
     function returnRoomObject(roomobject){
     	socket.emit("retrieveRoomConfig", JSON.parse(JSON.parse(roomobject)[0].Room_Object));
     } 	
+
     
     ////////////////
     // START GAME //
@@ -369,6 +370,52 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
+//GET NUMBER OF WINS FOR A PLAYER
+function getWins(winner, callback) {
+	var connection = mysql.createConnection({
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
+	});
+	connection.connect();
+	console.log("username: " + winner);
+	connection.query("SELECT * FROM User_Info WHERE username = ?", winner,
+			function(err, result) {
+				var string = JSON.stringify(result);
+				var json = JSON.parse(string);
+				console.log(json);
+				var numberOfWins = json[0].wins;
+				console.log("numberOfWins :" + numberOfWins);
+				return callback(numberOfWins);
+			});
+	console.log('closes connection');
+	connection.end();
+}
+
+//UPDATE NUMBER OF WINS FOR A RECENT WINNER IN DATABASE
+function updateWins(numberOfWins, winner) {
+	var connection = mysql.createConnection({
+		host : 'mysql.cs.iastate.edu',
+		user : 'dbu309la07',
+		password : '5rqZthHkdvd',
+		database : 'db309la07'
+	});
+	connection.connect();
+	console.log("makes it here");
+	console.log("numberOfWins being entered: " + numberOfWins);
+	console.log("winner being entered: "+ winner);
+	var wininfo = [numberOfWins, winner]
+	connection
+			.query(
+					"UPDATE User_Info SET WINS = ? WHERE username = ?", wininfo, function(err, result) {
+						console.log("added result");
+					});
+	console.log("end connection");
+	connection.end();
+}
+
+
 function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, socket){
 	/* console.log("inside startGame.");
 	 * console.log("socket: ",  socket); 
@@ -439,13 +486,18 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 					io.to(roomID).emit('newPositions', pack);
 				}
 					else {
-						Object.keys(clients.sockets).forEach(function(socketId, callback){
+						var winner;
+						Object.keys(clients.sockets).forEach(function(socketId){
 							if (!Player.PLAYER_LIST[socketId].dead){
-								var winner = Player.PLAYER_LIST[socketId].username;
+								winner = Player.PLAYER_LIST[socketId].username;
 								var sendWinner = {winner: winner};	
 								io.to(roomID).emit('endGame', sendWinner);
 								clearInterval(intervalId);
-							}
+							}	
+						});
+						getWins(winner, function(numberOfWins){
+							var numberOfWins = numberOfWins + 1;
+							updateWins(numberOfWins, winner);
 						});
 					}
 					
