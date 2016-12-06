@@ -76,6 +76,11 @@ left: 100px;
   	left:32.5%;  
   	border-width: 30px;
 }
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    visibility:hidden;
+}
 
 </style>
 </head>
@@ -99,10 +104,11 @@ left: 100px;
 	</div>
 <script>
 $(document).ready(function() {
-	var username = sessionStorage.getItem("winner");
-	$("#blink").html(username + " won!");
+	var winner = sessionStorage.getItem("winner");
+	var username = sessionStorage.getItem("username");
+	$("#blink").html(winner + " won!");
 	$("#blink").css({"border": "3px dotted red", "outline-color" : "yellow", "outline-style" : "dotted"});
-	$("#blink").css({"align": "center"})
+	$("#blink").css({"align": "center"});
 
 });
 </script>

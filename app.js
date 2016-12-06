@@ -108,6 +108,7 @@ io.sockets.on('connection', function(socket) {
     function returnRoomObject(roomobject){
     	socket.emit("retrieveRoomConfig", JSON.parse(JSON.parse(roomobject)[0].Room_Object));
     } 	
+
     
     ////////////////
     // START GAME //
@@ -369,7 +370,7 @@ var addRoom = function(roomId, roomObject){
 	connection.end();
 }
 
-//UPDATE NUMBER OF WINS FOR A PLAYER
+//GET NUMBER OF WINS FOR A PLAYER
 function getWins(winner, callback) {
 	var connection = mysql.createConnection({
 		host : 'mysql.cs.iastate.edu',
@@ -392,6 +393,7 @@ function getWins(winner, callback) {
 	connection.end();
 }
 
+//UPDATE NUMBER OF WINS FOR A RECENT WINNER IN DATABASE
 function updateWins(numberOfWins, winner) {
 	var connection = mysql.createConnection({
 		host : 'mysql.cs.iastate.edu',
@@ -412,7 +414,6 @@ function updateWins(numberOfWins, winner) {
 	console.log("end connection");
 	connection.end();
 }
-
 
 
 function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, socket){
@@ -494,8 +495,6 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 								clearInterval(intervalId);
 							}	
 						});
-						var winner2 = winner;
-						console.log("the winner outside of the for each: " + winner2);
 						getWins(winner, function(numberOfWins){
 							var numberOfWins = numberOfWins + 1;
 							updateWins(numberOfWins, winner);

@@ -36,10 +36,11 @@
 	#title{
 	font-size: 30px;
 }
-.weaponselection {
+.selectweapon {
     font-size: 30px;
     text-align: center;
-   
+    
+}
 </style>
 </head>
 <body>
@@ -55,7 +56,7 @@
 			<img id = "weapon4" src="/client/yarn/yarn-red.png"  width="200" height="150" hspace="20">
 			<pre>     weapon 1                            weapon 2                             weapon 3                           weapon 4</pre>
 			<br>
-			<p id = "weaponselection" class = "selectcat"> </p>
+			<p id = "weaponselection" class = "selectweapon"> </p>
 			<form action="/game" method="GET">
 				<input type="submit" style="align: 'left'" class = "button" id="buttonReady" value="Ready"/>
 			</form>
@@ -67,19 +68,19 @@ $(document).ready(function() {
 	$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
 	 document.getElementById('weapon1').addEventListener('click', function (e) {
 	 	sessionStorage.setItem('weaponImage', 'yarn-blue');
-    	document.getElementById("weaponselection").innerHTML = "Blue Yarn goes through walls.";
+    	document.getElementById("weaponselection").innerHTML = "Blue Yarn is selected - goes through walls.";
   	 });
   	 document.getElementById('weapon2').addEventListener('click', function (e) {
   	  	sessionStorage.setItem('weaponImage', 'yarn-pink');
-    	document.getElementById("weaponselection").innerHTML = "Pink yarn comes in pairs of three.";
+    	document.getElementById("weaponselection").innerHTML = "Pink yarn is selected - comes in pairs of three.";
   	 });
   	 document.getElementById('weapon3').addEventListener('click', function (e) {
   	 	sessionStorage.setItem('weaponImage', 'yarn-purple');
-    	document.getElementById("weaponselection").innerHTML = "Purple yarn is large but slow.";
+    	document.getElementById("weaponselection").innerHTML = "Purple yarn is selected -  large but slow.";
   	 });
   	 document.getElementById('weapon4').addEventListener('click', function (e) {
     	sessionStorage.setItem('weaponImage', 'yarn-red');
-    	document.getElementById("weaponselection").innerHTML = "Red yarn is small and fast.";
+    	document.getElementById("weaponselection").innerHTML = "Red yarn is selecteed - small and fast.";
   	 });
 	
 });
