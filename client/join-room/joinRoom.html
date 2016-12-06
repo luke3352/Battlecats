@@ -7,13 +7,13 @@
 <style>
 .button{
 	padding: 10px 17px;
-  font-size: 15px;
-  text-align: center;
-  cursor: pointer;
-  outline: none;
-  color: black;
-  background-color: white;
-  border-radius: 7px;
+	font-size: 15px;
+	text-align: center;
+	cursor: pointer;
+	outline: none;
+	color: black;
+	background-color: white;
+	border-radius: 7px;
 }
 #picture {
 	position: absolute;
@@ -25,7 +25,8 @@
 	height: 700px;
 	border-radius: 20px;
 	background-color: #f4d942;
-	border: 2px solid #ccc; 
+	border: 2px solid #ccc;
+	padding: 20px; 
 }
 .rectangle {
 	top: 0px;
@@ -33,28 +34,63 @@
 }	
 #title{
 	font-size: 30px;
-}	
+}
+.room-list {
+	width: 960px; 
+	height: 350px;
+	border-radius: 20px;
+	background-color: #f4f443;
+	border:5px solid #f4c843;
+	padding: 10px;
+}
+.rooms {
+	width: 400px;
+	height: 300px;
+	border-radius: 20px;
+	border:3px solid #f4c843;
+	padding: 10px;
+	overflow-y: auto;
+	
+}
+.chat {
+	width: 960px; height: 200px; 
+	border-radius: 20px;
+	background-color: #f4f443;
+	border:5px solid #f4c843;
+	padding: 10px;
+}
+.message {
+	
+}
+.joinRoomBtn {
+	float: right;
+}
+
 </style>
 </head>
 <body>
 	<div id="joinRoom">
 		<div class="rectangle">
 			<h1 align="Center" id = "title">JOIN ROOM</h1>
-			<div id="room-list" >
-				<form action="/hostRoom" method="GET">
-				
+			<div class="room-list">
+				<div class="rooms" style="float:left;">
+					<h1>Public Rooms</h1>
+					<div id="public-rooms"></div>
+				</div>
+				<div class="rooms" style="float:right;">
+					<h1>Private Rooms</h1>
+					<p>Enter Room Password: <input type="text" id="room-password" value="" style="float:right;"></p>
+					<div id="private-rooms"></div>
+				</div>
+			</div><br>
+			<div class="chat">
+				<div id="chat-text" style="width: 960px; height: 180px; overflow-y: auto">
+					<div class="message">Enter a message!</div>
+				</div>
+				<form id="chat-form">
+					<input id="chat-input" type="text" style="width: 955px"></input>
 				</form>
 			</div>
-			<div id="chat-text" style="width: 500px; height: 200px; overflow-y: scroll">
-				<div>Enter a message!</div>
-			</div>
-			<form id="chat-form">
-				<input id="chat-input" type="text" style="width: 500px"></input>
-
-			</form><br>
-			<form action="/characterSelect" method="GET">
-				<input type="submit" style="align: 'left'" class ="button"id="buttonCharacterSelect" value="Character Select"/>
-			</form>
 		</div>
 	</div>
 
@@ -62,6 +98,9 @@
 $(document).ready(function() {
 	var socket = io.connect();
 	var user = sessionStorage.getItem("username");
+	var privateRooms = {};
+	var publicRooms = {};
+	
 	socket.on('connect', function(){
 		socket.emit('joinRoom', 'JoinRoom');
 		socket.emit('joinRoomConnection', user);
@@ -70,24 +109,63 @@ $(document).ready(function() {
 	
 	socket.on('updateRoomsList',function(rooms){
 		console.log('UPDATE ROOM LIST', rooms);
-		document.getElementById('room-list').innerHTML = "";
+		document.getElementById('public-rooms').innerHTML = "";
+		document.getElementById('private-rooms').innerHTML = "";
+		
 		for(var i = 0; i < rooms.length; i++){
 			var id = rooms[i].Room_Id;
-			var roomName = JSON.parse(rooms[i].Room_Object).roomName;
-			document.getElementById('room-list').innerHTML += 
+			var room = JSON.parse(rooms[i].Room_Object);
+			var roomName = room.roomName;
+			
+			if(room.isPublic) {
+				publicRooms[id] = room;
+				document.getElementById('public-rooms').innerHTML += 
 				'<form id="form'+id+'" action="/hostRoom" method="GET">'
-				+roomName + ':<input type="submit" id="'+id+
-				'" value="Join Room"><input type="hidden" name="id" value="'+id+'"></form>';
+				+ roomName + '<input class="joinRoomBtn" type="submit" id="'+id+
+				'" value="Join Room"><input type="hidden" name="id" value="'
+				+id+'"></form><br>';
+			}
+			else {
+				privateRooms[id] = room;
+				console.log("PRIVATE ROOMS: ",privateRooms);
+				document.getElementById('private-rooms').innerHTML += 
+				'<form id="'+id+'" action="/hostRoom" method="GET">'
+				+ roomName + '<input class="joinRoomBtn" type="submit" id="btn'+id+
+				'" value="Join Room"><input type="hidden" name="id" value="'
+				+id+'"></form><br>';
+			}
 		}
+		
+		for(room in privateRooms){
+			console.log("ROOM: ", room);
+			console.log("#"+room);
+			$("#"+room).submit({'room':room}, function(e){
+				console.log("room: ", room);
+				console.log("INSIDE SUBMIT STATEMENT");
+				console.log("if("+privateRooms[e.data.room].password+" === "+ $("#room-password").val()+")");
+				console.log(privateRooms[e.data.room]);
+				if(privateRooms[e.data.room].password === $("#room-password").val()){
+					console.log("returning true");
+					return true;
+				}
+				alert("incorrect password.");
+				return false;
+			});
+		}
+		
 	});
 	
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');
 	
+	function validation() {
+		var pass = $("#room-password").val();
+	}
+	
 	// Updates the chat	
 	socket.on('addToJoinRoomChat', function(data){
-		chatText.innerHTML += '<div>' + data + '</div>';
+		chatText.innerHTML += '<div class="message">' + data + '</div>';
 	});
 
 	chatForm.onsubmit = function(e){

@@ -19,6 +19,7 @@
 	border: 2px solid #ccc;
 }
 .rectangle {
+	padding: 10px;
 	top: 0px;
 	left: 0px;
 }		
@@ -27,15 +28,15 @@
 }
 .button{
 	padding: 10px 17px;
-  font-size: 15px;
-  text-align: center;
-  cursor: pointer;
-  outline: none;
-  color: black;
-  background-color: white;
-  border-radius: 7px;
-  margin:auto;
-  display:block;
+	font-size: 15px;
+	text-align: center;
+	cursor: pointer;
+	outline: none;
+	color: black;
+	background-color: white;
+	border-radius: 7px;
+	margin:auto;
+	display:block;
 }
 </style>
 </head>
@@ -43,43 +44,42 @@
 	<div align="left" id="CreateRoom"> 
 		<div class="rectangle"> 
 			<p align="Center">CREATE ROOM</p>
-			<form action="/hostRoom" method="GET"> 
-				Game Name:<br> 
-				<input type="text" id="gamename" required><br><br> 
-				Public: 
-				<input type="checkbox" id="public"><br><br> 
-				<p id="passwordText">Password:</p>
-				<input type="text" id="password"><br><br>
-				Players: 
+			<form action="/hostRoom" method="GET" style="width:1000px;height:700px;"> 
+				<p>Game Name: 
+				<input type="text" id="gamename" required></p>
+				<p>Public: 
+				<input type="checkbox" id="public" style="align:left;" checked>
+				<div id="passwordText">Password: <input type="text" id="password"></div>
+				</p>
+				<p>Players: 
 				<select id="numPlayers">
 					<option value="2">2</option>
 					<option value="3">3</option>
 					<option value="4">4</option>
-				</select><br><br> 
-				Game Mode: 
+				</select></p>
+				<p>Game Mode: 
 				<select id="gameMode">
 					<option value="1">Stock</option>
 					<option value="2">Time</option>
-				</select> 
-				<select id="gameModeValue" class="1-100"></select><br><br>
-				Items: <input type="checkbox" id="items"><br><br><br>
-				<input id="buttonCreateGame" type="submit" style="align: 'left'" class= "button" value="Create Game"/>
+				</select>
+				<select id="gameModeValue" class="1-100"></select></p>
+				<p>Items: <input type="checkbox" id="items" checked></p>
+				<input id="buttonCreateGame" type="submit" style="vertical-align: bottom; align: 'left'" class= "button" value="Create Game"/>
 			</form>
 		</div>
 	</div>
 
 <script>
 $(document).ready(function() {
-	var publicCheckBox = false;
+	var publicCheckBox = true;
 	var roomID = Math.floor(Math.random() * 999999999);	
+	$("#passwordText").hide();
 	$("#public").click(function() {
 		if (publicCheckBox == false) {
-			$(password).hide();
 			$("#passwordText").hide();
 			publicCheckBox = true;
 		} else {
-			$(password).show();
-			$("p").show();
+			$("#passwordText").show();
 			publicCheckBox = false;
 		}
 	});
@@ -91,7 +91,6 @@ $(document).ready(function() {
 		}
 	});
 	var socket = io();
-	
 	$("#buttonCreateGame").click(function() {
 		console.log("inside #buttonCreateGame");
 		$('form').append("<input type='hidden' name='id' value='"+ roomID +"'>");
@@ -104,15 +103,15 @@ $(document).ready(function() {
 		//gathers data from the create room form
 		var room = {
 			id:				id,
-			//host: 			sessionStorage.getItem("username"),
-			roomName : 		document.getElementById("gamename").value,
-			isPublic : 		document.getElementById("public").value,
-			password : 		document.getElementById("password").value,
-			numOfPlayers : 	document.getElementById("numPlayers").value,
-			gameMode : 		document.getElementById("gameMode").value,
-			gameModeVal : 	document.getElementById("gameModeValue").value,
-			items : 		document.getElementById("items").value
+			roomName : 		$("#gamename").val(),
+			isPublic : 		$("#public").prop("checked") ? true : false,
+			password : 		$("#password").val(),
+			numOfPlayers : 	$("#numPlayers").val(),
+			gameMode : 		$("#gameMode").val(),
+			gameModeVal : 	$("#gameModeValue").val(),
+			items : 		$("#items").prop("checked") ? true : false
 		};
+		console.log(room);
 		//sessionStorage.setItem("roomConfig", JSON.stringify(room));
 		console.log("emitting data: ", room);
 		socket.emit('addRoomToDatabase', room);
