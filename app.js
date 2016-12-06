@@ -375,40 +375,53 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 	 * console.log("gameID: ", gameID); 
 	 * console.log("user: ",  user); 
 	 * console.log("gameConfig: ", gameConfig);
+	 * console.log("catImage: ", catImage);
+	 * console.log("weaponImage: ", weaponImage);
 	 */
-	console.log("catImage: ", catImage);
-	console.log("weaponImage: ", weaponImage);
 	numPlayer++;
 	var player = Player.player(socket.id, numPlayer, user, catImage, weaponImage);
 	
-
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
 
-
 	createItem();
 	createObstacles();
+	
 	var countDown = false;
 	var roomID = "game-"+gameID;
 	var previousNumOfPlayers;
+	
+	var gameMode = room.gameMode;
+	var gameModeVal = room.gameModeVal;
+	
+	var time = gameModeVal * 30000;
+	var startTime = new Date().getTime();
+	var previousTime = startTime;
+	
 	var intervalId = setInterval(function() {
-		if(pause == false){
-			var clients = io.sockets.adapter.rooms["game-"+gameID];
-			if(clients){
-				if(!countDown){ //Starts countdown
-					var currentNumOfPlayers = Object.keys(clients.sockets).length;
-					if(currentNumOfPlayers == room.numOfPlayers) {
-						deleteRoom(gameID);
-						countDown = true;
-					}
-					else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
-						console.log("Inside Waiting on");
-						var waitingOn = room.numOfPlayers - currentNumOfPlayers;
-						io.to(roomID).emit('waiting', waitingOn);
-					}
-					previousNumOfPlayers = currentNumOfPlayers;
-				} else { // GAME IS STARTED
-					//Check if all but one players are dead
+		var clients = io.sockets.adapter.rooms["game-"+gameID];
+		if(pause == false && clients){
+			//WAITS FOR ALL PLAYERS TO CONNECT
+			if(!countDown){ //Starts countdown
+				var currentNumOfPlayers = Object.keys(clients.sockets).length;
+				if(currentNumOfPlayers == room.numOfPlayers) {
+					deleteRoom(gameID);
+					countDown = true;
+					startTime = new Date().getTime();
+					previousTime = startTime;
+				}
+				else if(currentNumOfPlayers != previousNumOfPlayers) { //Diplays waiting screen
+					console.log("Inside Waiting on");
+					var waitingOn = room.numOfPlayers - currentNumOfPlayers;
+					io.to(roomID).emit('waiting', waitingOn);
+				}
+				previousNumOfPlayers = currentNumOfPlayers;
+			} 
+			//STARTS GAME
+			else {
+				//GAMEMODE 1: Stock
+				if(gameMode == 1) {
+					//Checks how many players are alive
 					var numPlayersAlive = room.numOfPlayers;
 					Object.keys(clients.sockets).forEach( function(socketId){
 						if(Player.PLAYER_LIST[socketId] && Player.PLAYER_LIST[socketId].dead){
@@ -416,26 +429,17 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 						}
 					});
 					
-//					if(room.gameMode === 1 && numPlayersAlive > 1){
-//						var pack = {
-//							player: Player.updatePlayer(clients),
-//							projectile: Player.update(clients),
-//							obstacles: Obstacles.update()
-//						};
-//						io.to(roomID).emit('newPositions', pack);
-//					}
-//					else if(room.gameMode === 2){
-//						
-//					}
-				if(numPlayersAlive > 1){
-					var pack = {
-						player: Player.updatePlayer(clients),
-						projectile: Player.update(clients),
-						obstacles: Obstacles.update(),
-						items: Items.update()
-					};
-					io.to(roomID).emit('newPositions', pack);
-				}
+					//If more than 1 player is alive then continue emitting data to game.html
+					if(numPlayersAlive > 1){
+						var pack = {
+							player: Player.updatePlayer(clients),
+							projectile: Player.update(clients),
+							obstacles: Obstacles.update(),
+							items: Items.update()
+						};
+						io.to(roomID).emit('newPositions', pack);
+					}
+					//Else check for the winner and clear the interval
 					else {
 						Object.keys(clients.sockets).forEach(function(socketId, callback){
 							if (!Player.PLAYER_LIST[socketId].dead){
@@ -446,10 +450,45 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 							}
 						});
 					}
+				}
+				//GAMEMODE 2: Time
+				else if(gameMode == 2) {
+					var currentTime = new Date().getTime();
+					var	gameTime = currentTime - startTime;
+					//Checks how many players are alive
+					var numPlayersAlive = room.numOfPlayers;
+					Object.keys(clients.sockets).forEach( function(socketId){
+						if(Player.PLAYER_LIST[socketId] && Player.PLAYER_LIST[socketId].dead){
+							numPlayersAlive--;
+						}
+					});
 					
+					//If more than 1 player is alive then continue emitting data to game.html
+					if(numPlayersAlive > 1 || gameTime > time){
+						var winner;
+						Object.keys(clients.sockets).forEach(function(socketId, callback){
+							if (!Player.PLAYER_LIST[socketId].dead)
+								winner = Player.PLAYER_LIST[socketId].username;
+						});
+						var sendWinner = {winner: winner};	
+						io.to(roomID).emit('endGame', sendWinner);
+						clearInterval(intervalId);
+					}
+					if(currentTime - previousTime > 1000) {
+						previousTime = currentTime;
+						socket.emit('updateGameTime', Math.floor(gameTime/1000));
+					}
+					var pack = {
+						player: Player.updatePlayer(clients),
+						projectile: Player.update(clients),
+						obstacles: Obstacles.update(),
+						items: Items.update(),
+					};
+					io.to(roomID).emit('newPositions', pack);
 				}
 			}
 		}
+		
 	}, 1000 / 25);
 	
 	socket.on('keyPress', function(data) {
