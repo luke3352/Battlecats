@@ -3,7 +3,7 @@ var exports = module.exports = {};
 //List of obstacles
 exports.ITEMS_LIST = {};
 //Player constructor
-var Entity = require("./Entity.js");
+var Entity = require("./entity.js");
 
 exports.items = function(id, itemImage, x, y) {
 	var self = Entity.Entity();

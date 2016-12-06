@@ -1,4 +1,4 @@
-var Entity = require("./Entity.js");
+var Entity = require("./entity.js");
 var Projectile = require("./projectile.js");
 var Obstacle = require("./obstacles.js");
 var Item = require("./items.js");
@@ -78,7 +78,7 @@ exports.player = function(id, numPlayerInRoom, user, catImage, weaponImage) {
 		
 	// Check if players share the same position
 	self.updatePosition = function(clients) {
-		console.log("Player num "+ self.numPlayer);
+		//console.log("Player num "+ self.numPlayer);
 		if(self.dead == false){
 			if(self.hit == true) {
 				self.HP--;

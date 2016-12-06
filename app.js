@@ -385,8 +385,11 @@ function startGame(gameID, user, gameConfig, catImage, weaponImage, itemImage, s
 	var room = Room.room(gameConfig);
     room.roomPlayers.push(player);
 
+	if(room.items == true)
+	{
+		createItem();
+	}
 
-	createItem();
 	createObstacles();
 	var countDown = false;
 	var roomID = "game-"+gameID;
